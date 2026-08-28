@@ -1,0 +1,33 @@
+{
+  "name": "agentic-qa-kit",
+  "version": "0.1.0",
+  "description": "Evidence-centered QA workflows for autonomous Codex agents",
+  "author": {
+    "name": "Aegolius Labs",
+    "url": "https://github.com/aegolius-labs"
+  },
+  "homepage": "https://github.com/aegolius-labs/agentic-qa-kit",
+  "repository": "https://github.com/aegolius-labs/agentic-qa-kit",
+  "keywords": [
+    "quality-assurance",
+    "quality-engineering",
+    "software-testing",
+    "evidence",
+    "reproduction"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Agentic QA Kit",
+    "shortDescription": "Autonomous, evidence-centered QA workflows",
+    "longDescription": "Discover a codebase, plan and run bounded QA sessions, reproduce findings, preserve evidence, and hand confirmed defects to a backlog system.",
+    "developerName": "Aegolius Labs",
+    "category": "Developer Tools",
+    "capabilities": ["Read", "Write"],
+    "websiteURL": "https://github.com/aegolius-labs/agentic-qa-kit",
+    "defaultPrompt": [
+      "Run a risk-based QA workflow on this repository.",
+      "Reproduce this suspected defect and preserve evidence.",
+      "Turn confirmed QA findings into backlog handoffs."
+    ]
+  }
+}

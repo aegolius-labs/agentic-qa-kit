@@ -1,0 +1,12 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+.validator-deps/
+build/
+dist/
+*.egg-info/
+
+# Local plugin evaluation and generated QA evidence.
+.agentic-qa/
+.eval-workspaces/

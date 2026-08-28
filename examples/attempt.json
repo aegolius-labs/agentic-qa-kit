@@ -1,0 +1,16 @@
+{
+  "id": "attempt-boundary",
+  "charter_id": "charter-calculation",
+  "action": "python -m unittest tests.test_calculator",
+  "environment": {"python": "3.11", "locale": "C.UTF-8"},
+  "outcome": "fail",
+  "exit_code": 1,
+  "observation": "Total rounded down at the half-cent boundary",
+  "oracle": "Expected half-up result from an independent Decimal calculation",
+  "evidence": [
+    {
+      "kind": "test-output",
+      "location": ".agentic-qa/sessions/SESSION_ID/evidence/test-output.txt"
+    }
+  ]
+}

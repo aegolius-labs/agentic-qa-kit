@@ -1,0 +1,4 @@
+interface:
+  display_name: "QA Discovery"
+  short_description: "Map a codebase into risks and QA charters"
+  default_prompt: "Use $qa-discover to map this repository and propose risk-based QA charters."

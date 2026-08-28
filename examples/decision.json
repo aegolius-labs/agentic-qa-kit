@@ -1,0 +1,7 @@
+{
+  "disposition": "hold",
+  "summary": "The tested calculation boundary violates the declared rule.",
+  "limitations": ["Only Python 3.11 was exercised"],
+  "residual_risks": ["Other rounding boundaries may be affected"],
+  "next_actions": ["Hand the confirmed defect to the backlog"]
+}

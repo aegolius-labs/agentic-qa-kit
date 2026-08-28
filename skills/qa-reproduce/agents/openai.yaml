@@ -1,0 +1,4 @@
+interface:
+  display_name: "QA Reproduction"
+  short_description: "Confirm and minimize suspected software defects"
+  default_prompt: "Use $qa-reproduce to reproduce this anomaly without losing the first failure."

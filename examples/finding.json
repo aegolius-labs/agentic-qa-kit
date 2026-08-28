@@ -1,0 +1,30 @@
+{
+  "id": "finding-rounding",
+  "title": "Half-cent totals round down instead of half up",
+  "quality_attribute": "functional-suitability",
+  "severity": "high",
+  "confidence": "high",
+  "status": "confirmed",
+  "summary": "A customer-visible total differs from the declared rounding rule.",
+  "expected": "10.005 rounds to 10.01 using the declared half-up rule.",
+  "actual": "10.005 rounds to 10.00.",
+  "oracle": "Independent Decimal quantization using ROUND_HALF_UP.",
+  "reproduction": {
+    "preconditions": ["Default currency configuration"],
+    "steps": ["Calculate a total of 10.005", "Observe the persisted total"],
+    "reproducibility": "once",
+    "attempts": 1
+  },
+  "attempt_ids": ["attempt-boundary"],
+  "evidence": [
+    {
+      "kind": "test-output",
+      "location": ".agentic-qa/sessions/qa-example/evidence/test-output.txt"
+    }
+  ],
+  "limitations": ["Only one runtime was exercised"],
+  "acceptance_criteria": [
+    "10.005 produces 10.01 under the declared currency rounding rule"
+  ],
+  "suspected_root_cause": "unknown"
+}

@@ -1,0 +1,4 @@
+interface:
+  display_name: "QA Report"
+  short_description: "Turn QA records into an auditable report"
+  default_prompt: "Use $qa-report to review this session and produce an evidence-backed closeout."

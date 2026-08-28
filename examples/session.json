@@ -1,0 +1,36 @@
+{
+  "id": "qa-example",
+  "objective": "Evaluate the critical calculation path",
+  "mode": "functional",
+  "target": {
+    "root": ".",
+    "revision": "abc123",
+    "dirty": false,
+    "runtime": ["Python 3.11"]
+  },
+  "scope": {
+    "include": ["src/calculator.py"],
+    "exclude": ["production"]
+  },
+  "context": {
+    "intended_use": "Calculate customer-visible totals",
+    "risk_tier": "high",
+    "quality_attributes": ["functional-suitability"],
+    "constraints": ["Use generated fixtures only"],
+    "authorization_notes": ["Existing local tests are authorized"]
+  },
+  "charters": [
+    {
+      "id": "charter-calculation",
+      "title": "Calculation boundaries",
+      "objective": "Check total calculation around rounding boundaries",
+      "risks": ["Incorrect customer-visible total"],
+      "quality_attributes": ["functional-suitability"],
+      "methods": ["boundary analysis", "focused unit execution"],
+      "oracle": "An independently calculated decimal result",
+      "budget": {"minutes": 15, "attempts": 4},
+      "stop_conditions": ["Budget exhausted", "Target revision changes"],
+      "status": "planned"
+    }
+  ]
+}

@@ -1,0 +1,165 @@
+{
+  "subject_id": "SL-01",
+  "subject_title": "Static Program Analysis and Formal Verification",
+  "theoretical_foundations": "Static verification reasons from program text or a derived representation without running the target program. The first obligation is a semantics boundary: define the source language, libraries, compiler/IR, memory model, concurrency model, and environment assumptions, then preserve source locations and identities through parsing and lowering. A lexer/parser turns concrete syntax into an AST; name resolution, type checking, and effect checking establish judgments such as Γ ⊢ e : τ ! ε, where ε records capabilities or effects such as mutation, exceptions, I/O, blocking, or unsafe operations. Type soundness is normally proved through progress and preservation: a well-typed term is either a value or can take a step, and stepping preserves its type. Effect systems refine this discipline by rejecting forbidden effects or requiring explicit handling; they provide strong local guarantees but do not prove arbitrary functional properties. Control-flow analysis builds a CFG with basic blocks, branch edges, loop back edges, and exceptional edges. Data-flow analysis propagates facts over that graph using monotone transfer functions and a worklist; SSA form makes def-use relationships explicit, while alias/points-to analysis approximates memory identities. Interprocedural analyses add call-graph edges, summaries, and context sensitivity. IFDS/IDE-style analyses obtain polynomial algorithms for finite, distributive fact domains, whereas richer relational, heap, concurrency, or nonlinear domains require more approximation or cost. Taint analysis is a data-flow instance: sources introduce labels, transfers propagate them through assignments/calls/fields/objects, sanitizers discharge labels under a specified policy, and sinks require a proof that no forbidden label reaches them. Precision depends on flow, context, field, object, path, lifecycle, and library-model sensitivity; soundness is conditional on complete modeling of reflection, generated code, native calls, callbacks, and framework behavior. Abstract interpretation gives the unifying semantics: a concrete collecting semantics is mapped to an abstract domain, usually by abstraction/concretization relations or a Galois connection. Abstract transfer functions compute a fixpoint over a lattice (or complete semilattice); widening forces termination on infinite-height domains and narrowing can recover precision. A sound over-approximation contains every concrete behavior, so proving an invariant on the abstract state establishes that invariant for the modeled concrete program; failure to prove it is not a counterexample and usually manifests as a false positive or unknown. An unsound under-approximation can find real witnesses but cannot establish absence. Hoare logic represents partial correctness as {P} C {Q}; weakest preconditions calculate the least state predicate that guarantees Q after C, and loop invariants summarize unbounded iteration. A verification-condition generator converts assignments, conditionals, calls, heap ownership, and invariants into logical obligations. Separation logic adds ownership and separating conjunction to make aliasing and frame reasoning modular; concurrent variants add interference protocols, permissions, or rely/guarantee conditions. Model checking represents a finite or abstracted transition system as a Kripke structure and checks temporal properties (for example LTL or CTL) by reachability/fixpoint algorithms, BDDs, SAT-based bounded model checking, or SMT-based transition reasoning. State explosion is addressed with partial-order, symmetry, slicing, predicate, and data abstraction. CEGAR starts coarse, checks an abstract counterexample, concretely validates it, and refines predicates or state distinctions when the trace is spurious. Symbolic execution maintains symbolic state σ and path condition PC, forks on branches, and asks a SAT/SMT solver whether PC is satisfiable; a model gives a concrete witness for that path, while unsatisfiability rules out the path only under the encoded semantics. Path explosion, nonlinear arithmetic, aliasing, external effects, and memory modeling are central limits. Concolic execution mixes a concrete run with symbolic constraints and therefore belongs in a boundary layer: it generates witnesses and coverage, but execution of selected paths means it is not a static proof and incomplete path exploration cannot support absence claims. SAT decides Boolean formulas; SMT combines a Boolean engine with theory solvers for arithmetic, bit-vectors, arrays, uninterpreted functions, strings, or datatypes. DPLL(T) supplies Boolean search, theory propagation, conflict analysis, and clause learning. A sat result is a candidate model/witness, unsat may have a proof or unsat core, and unknown/timeout is inconclusive; solver correctness and trusted proof checking matter when results gate assurance. Proof assistants encode syntax, semantics, specifications, and proofs in a small kernel (often dependent type theory). Tactics and SMT can automate proof search, but the final theorem is accepted only after kernel checking; the trusted computing base still includes the kernel, axioms, formal semantics, extraction/runtime, compiler, and any unverified boundary. CompCert illustrates semantic-preservation proofs across intermediate languages: source-level proofs only transfer to executables when compilation and target semantics preserve the relevant behavior. Soundness therefore means sound relative to a stated language, model, specification, abstraction, and checker—not universal correctness. Precision, recall, runtime, memory, annotation burden, and interpretability trade against soundness and scale. A useful assurance ordering is: a type/effect error is definite under its type rules; a sound abstract invariant is a proof of the modeled property; a model-checking counterexample is definitive only after feasibility validation; a satisfiable solver model is a witness; unsat/proof certificates support absence only for the exact formula; a heuristic warning or benchmark metric is evidence for triage, not a theorem. These distinctions are theoretical foundations and are also the basis for evidence semantics in an enterprise workflow.",
+  "practical_architecture_and_implementation": "Use a layered analyzer with explicit contracts between representations. Ingest exact source revisions, compiler flags, target triples, dependency versions, generated-source manifests, and configuration. Parse into a lossless AST with source spans and diagnostics; perform name resolution, type/effect checking, macro expansion policy, and desugaring. Lower to a versioned IR, preferably SSA plus explicit memory and exceptional control-flow operations, while retaining source maps and a stable symbol identity. Build CFGs, def-use chains, call graphs, class hierarchies, points-to/alias summaries, thread/task relations, and framework entry-point models. Treat reflection, dynamic loading, FFI/native code, code generation, unsafe blocks, and unknown library calls as explicit modeled boundaries rather than silently assuming behavior. Run cheap intraprocedural checks first, then incremental interprocedural analyses. A worklist computes CFG facts; summaries cache procedure effects and invalidate by dependency; IFDS/IDE handles distributive finite taint or typestate facts; richer abstract interpreters use interval, congruence, symbolic, relational, shape, ownership, or numeric domains with documented widening/narrowing. Taint configuration must version source, sink, sanitizer, propagation, lifecycle, and trust-boundary models and must distinguish a missing model from a clean result. For deductive verification, translate annotations/specifications into weakest-precondition or separation-logic verification conditions, normalize arithmetic and heap predicates, and emit SMT-LIB with source/VC labels. Solvers should run with explicit logic selection, resource limits, deterministic seeds where supported, incremental push/pop contexts, model generation, unsat cores, and proof logging when available. Cache by formula and model hash, but replay high-assurance obligations with an independent checker or solver. For model checking, construct a finite abstraction, check safety/liveness properties, preserve an abstract-to-concrete mapping, and implement a CEGAR loop: classify each trace as feasible, infeasible, or unresolved; refine only from validated spurious traces. For symbolic execution, maintain σ, PC, heap/object model, path provenance, and fork budget; merge states where sound, slice irrelevant constraints, use incremental solving, and report the explored-path boundary. If concolic execution is added, label all generated artifacts as executable witnesses and record the concrete run separately from static facts. Proof-assistant workflows should keep specifications, definitions, proof scripts, compiled proof objects, kernel/version, axioms, extraction/compiler, and target assumptions in an immutable artifact bundle. Finding records need stable IDs, code/IR spans, rule and model versions, severity rationale, evidence class, assumptions, solver outcome, trace or proof object, first-seen/last-seen revisions, and remediation status. Triage should deduplicate by semantic location, cluster correlated paths, distinguish definite type/proof failures from possible abstract warnings, validate model-checking traces and solver models, and preserve unknown/timeouts as unresolved rather than passing. Use independent review or checker replay for high-impact findings, and treat suppressions as scoped, expiring claims with justification and tests. Integration in a 2026 enterprise SDLC should be staged: editor/pre-commit type/effect and syntax checks; pull-request incremental AST/IR/data-flow and targeted taint/model checks; scheduled whole-program analyses and proof obligations; high-risk components receive explicit contracts, ownership/loop invariants, bounded model checks, or machine-checked proofs. Gate only on evidence classes and risk thresholds that the organization has documented, with a fail-closed policy for violated high-assurance proofs and a clearly visible inconclusive lane for unsupported features or solver limits. Store versioned analyzer configurations, IR/model snapshots, SMT-LIB inputs, solver logs, proof/certificate objects, replay results, and source maps so a finding can be reproduced after tool upgrades. Evaluate adoption by property criticality, language/framework model coverage, expected false-positive load, solver/analysis budget, change rate, annotation skill, and whether the organization can maintain the specifications and trusted base; no tool or standard should be treated as universally sufficient. The architecture must explicitly separate evidence from interpretation: sat/model/feasible trace is a witness, validated unsat/proof is a negative result for the encoded obligation, sound abstract success is an invariant under assumptions, a heuristic warning is a lead, and a timeout/unknown/model gap is unresolved.",
+  "primary_evidence": [
+    {
+      "source_title": "An axiomatic basis for computer programming",
+      "authors_or_institution": "C. A. R. Hoare; Queen's University of Belfast",
+      "year": 1969,
+      "source_type": "ACM",
+      "doi_or_url": "https://doi.org/10.1145/363235.363259",
+      "verbatim_excerpt": "axioms and rules of inference which can be used in proofs of the properties of computer programs",
+      "analytical_interpretation": "This foundational ACM paper establishes the proof-rule view behind Hoare triples, loop invariants, and weakest-precondition reasoning. In a 2026 SDLC, a proof obligation is evidence only relative to the selected language semantics, arithmetic/memory axioms, and implementation conformance; the paper itself emphasizes that those assumptions matter."
+    },
+    {
+      "source_title": "Abstract interpretation: a unified lattice model for static analysis of programs by construction or approximation of fixpoints",
+      "authors_or_institution": "Patrick Cousot and Radhia Cousot",
+      "year": 1977,
+      "source_type": "ACM",
+      "doi_or_url": "https://doi.org/10.1145/512950.512973",
+      "verbatim_excerpt": "Abstract interpretation of programs consists in using that denotation to describe computations in another universe of abstract objects",
+      "analytical_interpretation": "The POPL paper supplies the lattice/fixpoint foundation for sound static analyses. Enterprise analyzers should state their abstract domain, transfer soundness, widening policy, and modeled boundary; a proof of an abstract invariant is conditional on those definitions, while loss of precision appears as warnings or inability to prove."
+    },
+    {
+      "source_title": "Precise interprocedural dataflow analysis via graph reachability",
+      "authors_or_institution": "Thomas Reps, Susan Horwitz, and Mooly Sagiv; University of Wisconsin",
+      "year": 1995,
+      "source_type": "ACM",
+      "doi_or_url": "https://doi.org/10.1145/199448.199462",
+      "verbatim_excerpt": "The paper shows how a large class of interprocedural dataflow-analysis problems can be solved precisely in polynomial time",
+      "analytical_interpretation": "The POPL result motivates IFDS-style implementations for finite distributive facts such as reaching definitions, uninitialized variables, typestate, or taint. Its restrictions are adoption criteria: precision and polynomial scaling do not automatically extend to arbitrary heap, nonlinear, concurrency, or non-distributive analyses."
+    },
+    {
+      "source_title": "Counterexample-guided abstraction refinement for symbolic model checking",
+      "authors_or_institution": "Edmund M. Clarke, Orna Grumberg, Somesh Jha, Yuan Lu, and Helmut Veith; Carnegie Mellon University, Technion, University of Wisconsin, Broadcom, Vienna University of Technology",
+      "year": 2003,
+      "source_type": "ACM",
+      "doi_or_url": "https://doi.org/10.1145/876638.876643",
+      "verbatim_excerpt": "Abstract models may admit erroneous (or \"spurious\") counterexamples.",
+      "analytical_interpretation": "The JACM paper makes counterexample status a first-class semantic issue. A 2026 model-checking pipeline should validate traces against the concrete model and refine abstractions on spurious traces; an unvalidated trace is a lead, not proof of a defect. CEGAR addresses state explosion but can still time out or cycle."
+    },
+    {
+      "source_title": "Bugs as deviant behavior: a general approach to inferring errors in systems code",
+      "authors_or_institution": "Dawson Engler, David Yu Chen, Seth Hallem, Andy Chou, and Benjamin Chelf; Stanford University",
+      "year": 2001,
+      "source_type": "ACM",
+      "doi_or_url": "https://doi.org/10.1145/502034.502041",
+      "verbatim_excerpt": "A major obstacle to finding program errors in a real system is knowing what correctness rules the system must obey.",
+      "analytical_interpretation": "The SOSP paper demonstrates inferred programmer beliefs and contradiction checking, including MUST versus MAY rules. This supports project-specific rule mining and ranked triage, but statistical ranking of deviations is not a sound proof; organizations must label inferred findings as probabilistic and validate the underlying convention."
+    },
+    {
+      "source_title": "DART: directed automated random testing",
+      "authors_or_institution": "Patrice Godefroid, Nils Klarlund, and Koushik Sen; Bell Laboratories and University of Illinois at Urbana-Champaign",
+      "year": 2005,
+      "source_type": "ACM",
+      "doi_or_url": "https://doi.org/10.1145/1065010.1065036",
+      "verbatim_excerpt": "automated extraction of the interface of a program with its external environment using static source-code parsing",
+      "analytical_interpretation": "DART is a precise boundary case: static parsing supplies the interface, but dynamic analysis and generated concrete inputs drive path exploration. In an enterprise evidence ledger, DART-like artifacts should be tagged concolic/executable witnesses and never presented as exhaustive static verification."
+    },
+    {
+      "source_title": "Symbolic execution for software testing: three decades later",
+      "authors_or_institution": "Cristian Cadar and Koushik Sen; Imperial College London and University of California, Berkeley",
+      "year": 2013,
+      "source_type": "ACM",
+      "doi_or_url": "https://doi.org/10.1145/2408776.2408795",
+      "verbatim_excerpt": "Symbolic execution works by exploring as many program paths as possible in a given time budget",
+      "analytical_interpretation": "The CACM survey describes symbolic state/path-condition encoding, constraint solving, memory modeling, and path explosion. It supports solver-backed witness generation and per-path reasoning, while its explicit time-budget framing is a reminder that unexamined paths and unsupported operations are assurance gaps."
+    },
+    {
+      "source_title": "FlowDroid: precise context, flow, field, object-sensitive and lifecycle-aware taint analysis for Android apps",
+      "authors_or_institution": "Steven Arzt, Siegfried Rasthofer, Christian Fritz, Eric Bodden, Alexandre Bartel, Jacques Klein, Yves Le Traon, Damien Octeau, and Patrick McDaniel; Technische Universität Darmstadt, University of Luxembourg, Pennsylvania State University",
+      "year": 2014,
+      "source_type": "ACM",
+      "doi_or_url": "https://doi.org/10.1145/2666356.2594299",
+      "verbatim_excerpt": "context, flow, field and object-sensitivity allows the analysis to reduce the number of false alarms",
+      "analytical_interpretation": "The PLDI study ties taint precision to sensitivity and Android lifecycle modeling and reports benchmark-specific recall/precision results. It is evidence for engineering choices, not a universal performance claim: framework callbacks, reflection, inter-component communication, native code, and benchmark construction can change recall and false-alarm rates."
+    },
+    {
+      "source_title": "Solving SAT and SAT Modulo Theories: From an abstract Davis–Putnam–Logemann–Loveland procedure to DPLL(T)",
+      "authors_or_institution": "Robert Nieuwenhuis, Albert Oliveras, and Cesare Tinelli; Universitat Politècnica de Catalunya and University of Iowa",
+      "year": 2006,
+      "source_type": "ACM",
+      "doi_or_url": "https://doi.org/10.1145/1217856.1217859",
+      "verbatim_excerpt": "Its properties, such as soundness, completeness or termination, immediately carry over to the modern DPLL implementations",
+      "analytical_interpretation": "The JACM paper formalizes the DPLL(T) architecture and theory-solver cooperation, including propagation and learning. Production VC pipelines should record the selected logic, solver version, resource outcome, model/unsat core/proof artifacts, and treat unknown or timeout as inconclusive rather than as a pass."
+    },
+    {
+      "source_title": "Formal verification of a realistic compiler",
+      "authors_or_institution": "Xavier Leroy; INRIA Paris-Rocquencourt",
+      "year": 2009,
+      "source_type": "ACM",
+      "doi_or_url": "https://doi.org/10.1145/1538788.1538814",
+      "verbatim_excerpt": "each of the source, intermediate and target languages has formally-defined semantics",
+      "analytical_interpretation": "The CompCert report supplies an end-to-end integration principle: semantic preservation must be stated and proved across every IR and transformation pass. It also exposes assurance gaps at parsers, printers, assemblers, linkers, undefined behavior, and target environments; source proofs do not transfer automatically across those boundaries."
+    },
+    {
+      "source_title": "Secure Software Development Framework (SSDF) Version 1.1: Recommendations for Mitigating the Risk of Software Vulnerabilities",
+      "authors_or_institution": "Murugiah Souppaya, Karen Scarfone, and Donna Dodson; National Institute of Standards and Technology",
+      "year": 2022,
+      "source_type": "Formal_Standard",
+      "doi_or_url": "https://doi.org/10.6028/NIST.SP.800-218",
+      "verbatim_excerpt": "Use a static analysis tool to automatically check code for vulnerabilities and compliance with the organization’s secure coding standards",
+      "analytical_interpretation": "NIST PW.7 gives normative-style guidance to integrate code analysis with human review and issue triage, while the document explicitly says it does not prescribe tools and recommends risk-based tailoring. In 2026 implementation, record rule/model versions, review outcomes, remediations, and unresolved limitations rather than equating tool execution with security proof."
+    },
+    {
+      "source_title": "ISO/IEC 5055:2021 Information technology — Software measurement — Software quality measurement — Automated source code quality measures",
+      "authors_or_institution": "ISO/IEC JTC 1",
+      "year": 2021,
+      "source_type": "Formal_Standard",
+      "doi_or_url": "https://www.iso.org/standard/80623.html",
+      "verbatim_excerpt": "The measures in this standard were calculated from detecting and counting violations of good architectural and coding practices",
+      "analytical_interpretation": "ISO/IEC 5055 defines standardized structural source-code measures across quality weaknesses; it is useful for a common vocabulary and thresholds, but counts are not formal proofs of absence and do not replace language-semantics, data-flow, model-checking, or proof-assistant evidence."
+    },
+    {
+      "source_title": "The SMT-LIB Standard: Version 2.6 (release 2024-09-20)",
+      "authors_or_institution": "Clark Barrett, Pascal Fontaine, and Cesare Tinelli; SMT-LIB Initiative",
+      "year": 2024,
+      "source_type": "Formal_Standard",
+      "doi_or_url": "https://smt-lib.org/papers/smt-lib-reference-v2.6-r2024-09-20.pdf",
+      "verbatim_excerpt": "Only the concrete syntax is part of the official SMT-LIB standard.",
+      "analytical_interpretation": "The standard makes solver interchange reproducible while intentionally leaving internal AST choices open. Enterprise solver evidence should therefore archive the exact SMT-LIB script, logic, declarations, options, release date, source/VC mapping, and result artifacts rather than relying on an opaque internal representation."
+    },
+    {
+      "source_title": "Programming Language Foundations (Software Foundations, Volume 2, Version 6.5)",
+      "authors_or_institution": "Benjamin C. Pierce, Arthur Azevedo de Amorim, Chris Casinghino, Marco Gaboardi, Michael Greenberg, Cătălin Hrițcu, Vilhelm Sjöberg, Andrew Tolmach, and Brent Yorgey; University of Pennsylvania and Princeton University courseware",
+      "year": 2024,
+      "source_type": "University_Courseware",
+      "doi_or_url": "https://www.cs.princeton.edu/courses/archive/spring24/cos510/sf/plf/Preface.html",
+      "verbatim_excerpt": "Our main tools for these tasks are abstract syntax and operational semantics",
+      "analytical_interpretation": "This machine-checked university courseware makes the representation boundary explicit: formal reasoning needs abstract syntax and an operational semantics before properties can be proved. It also connects Hoare logic, static type systems, and Coq proofs, making it a practical blueprint for teaching and small verified components."
+    },
+    {
+      "source_title": "Foundations of Separation Logic for Sequential Programs, Software Foundations Volume 6, WPsem chapter",
+      "authors_or_institution": "Arthur Charguéraud; University of Strasbourg/Inria, Software Foundations courseware",
+      "year": 2023,
+      "source_type": "University_Courseware",
+      "doi_or_url": "https://softwarefoundations.cis.upenn.edu/current/current/slf-current/WPsem.html",
+      "verbatim_excerpt": "wp and triples are equivalent presentations of the same thing.",
+      "analytical_interpretation": "The courseware gives a mechanized account of weakest preconditions and their equivalence to separation-logic triples, including frame/consequence rules and characteristic-formula generation. This supports VC generation for heap-manipulating code, but the resulting assurance remains conditional on the heap semantics, specifications, permissions, and proof kernel."
+    }
+  ],
+  "failure_modes_and_antipatterns": [
+    "Treating parser success, syntax highlighting, or AST pattern matching as semantic verification; without name resolution, types, effects, CFGs, and memory models, the result misses aliasing, dispatch, exceptions, and data-flow behavior.",
+    "Claiming soundness while silently dropping unsupported language constructs, compiler flags, undefined behavior, reflection, dynamic loading, generated code, native/FFI calls, callbacks, or library versions; unsupported regions must be explicit assumptions or unknown results.",
+    "Using an under-approximating or heuristic analyzer as if it proved absence. A useful witness finder can be incomplete; it cannot justify a clean release unless an independent sound argument covers all modeled behaviors.",
+    "Allowing over-approximation to produce an untriaged warning flood. Excessive context-insensitivity, path merging, imprecise points-to sets, or missing sanitizers raises false positives until developers suppress or ignore real findings.",
+    "Treating every abstract warning or inferred convention violation as a confirmed defect. Evidence must distinguish definite type/proof failures, feasible model-checking traces, solver witnesses, spurious traces, probabilistic rankings, and unresolved approximations.",
+    "Treating model-checking counterexamples as concrete bugs without replay against the concrete semantics. Abstraction can introduce spurious traces; failure to implement CEGAR or trace validation converts modeling artifacts into false incidents.",
+    "Treating solver timeout, unknown, unsupported theory, incomplete quantifier reasoning, or a missing proof certificate as unsat/verified. Resource exhaustion and solver incompleteness are inconclusive states and should remain visible.",
+    "Ignoring path/state explosion and memory-model cost. Unbounded loops, recursion, concurrency, nonlinear arithmetic, heap aliasing, and environment interaction require abstraction, cutoffs, summaries, merging, or staged budgets; none preserves all properties automatically.",
+    "Publishing benchmark precision/recall or a single tool comparison as a universal claim. Results depend on labels, framework versions, corpus composition, source/sink models, and operating assumptions; external validity needs independent corpora and mutation/adversarial checks.",
+    "Using stale or coarse framework summaries. Lifecycle-driven systems, event callbacks, reflection, dependency injection, inter-component communication, and generated entry points can make a precise local analysis globally wrong or incomplete.",
+    "Proving a specification that is vacuous, too weak, inconsistent, or disconnected from the deployed artifact. Proof assistants and SMT solvers check encoded propositions; they do not validate that requirements capture intent or that the code/IR/compiler target matches the proof.",
+    "Assuming source-level proofs survive compilation and linking without semantic-preservation evidence. Parser, elaborator, optimizer, code generator, assembler, linker, target ABI, undefined behavior, and runtime libraries are separate trust boundaries.",
+    "Using concolic execution, generated tests, or runtime replay as static proof. Concrete paths are valuable witnesses and can guide exploration, but selected execution paths do not establish absence over unexecuted paths.",
+    "Making permanent blanket suppressions or baselining all legacy findings. Suppressions should be scoped to a rule/model/location, justified, reviewed, and expiry-tracked; otherwise regressions and model drift disappear from evidence.",
+    "Scaling by distributing opaque runs while losing configuration, IR/model snapshots, solver scripts, logs, source maps, and checker versions. Without replayable artifacts, a finding cannot be independently audited after tool or dependency changes."
+  ],
+  "maturity_matrix": {
+    "foundational": "Make the representation and evidence boundary reliable. Parse supported languages into ASTs with source spans; run compiler-backed type and basic effect checks; build CFGs and simple intraprocedural data-flow/lint rules; maintain a versioned baseline and triage records; fail only on deterministic, high-confidence type or rule violations. Document unsupported constructs, dependency/library models, compiler flags, and the difference between warning, witness, and proof. Use fast editor/pre-commit and pull-request feedback, but do not claim whole-program soundness or absence of defects.",
+    "advanced": "Introduce a canonical SSA/IR with source maps, call-graph and points-to summaries, incremental invalidation, IFDS/IDE taint/typestate, and abstract interpretation with a documented domain and soundness envelope. Add targeted CEGAR/model checking and weakest-precondition/SMT obligations for high-risk modules; archive SMT-LIB, solver outcomes, models/cores/proofs, traces, and assumptions. Validate counterexamples, preserve unknown/timeouts, measure precision on independent corpora, and use staged gates based on evidence class rather than raw warning counts.",
+    "expert_2026": "Operate semantics-first, proof-aware verification as a portfolio. Version language/framework/environment models and specifications; combine sound abstract invariants, context-sensitive taint, CEGAR/model checking, symbolic/concolic witness generation, SMT with replayable proof artifacts, and proof-assistant/kernel-checked obligations. Use independent checkers or solver proof replay for release-critical claims, verified validators or translation validation across compiler/IR boundaries, and CompCert-like semantic-preservation reasoning where justified. Maintain an explicit trusted-computing-base register, coverage/unknown ledger, specification-vacuity checks, artifact hashes, reproducible replays, expiry-governed suppressions, and human review for model gaps. This is an assurance progression, not a universal prescription: choose depth by property criticality, model coverage, scalability, and the organization’s ability to maintain specifications and proofs."
+  }
+}

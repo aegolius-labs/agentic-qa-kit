@@ -1,0 +1,4 @@
+interface:
+  display_name: "QA Workflow"
+  short_description: "Run or resume an evidence-centered QA lifecycle"
+  default_prompt: "Use $qa-workflow to run a bounded QA workflow on this repository."

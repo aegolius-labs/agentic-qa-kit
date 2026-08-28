@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "project": {
+    "name": "example-project",
+    "repository_root": "."
+  },
+  "defaults": {
+    "risk_tier": "medium",
+    "evidence_root": ".agentic-qa/sessions",
+    "max_session_minutes": 60,
+    "max_reproduction_attempts": 3
+  },
+  "quality_profile": [],
+  "authorization": {
+    "allowed": [
+      "read_repository",
+      "run_existing_local_checks",
+      "write_qa_evidence"
+    ],
+    "requires_approval": [
+      "install_dependencies",
+      "change_source_or_tests",
+      "use_external_service",
+      "access_sensitive_data",
+      "run_load_or_fault_injection",
+      "touch_production"
+    ],
+    "forbidden": [
+      "expose_secrets",
+      "use_unapproved_production_data",
+      "alter_oracles_to_force_pass"
+    ]
+  },
+  "backlog": {
+    "plugin": "agentic-backlog-kit",
+    "mode": "handoff-only"
+  }
+}

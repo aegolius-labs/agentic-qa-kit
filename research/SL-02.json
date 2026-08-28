@@ -1,0 +1,183 @@
+{
+  "subject_id": "SL-02",
+  "subject_title": "Executable Specifications, Contract Testing, Property-Based Testing, and Developer Feedback",
+  "theoretical_foundations": "An executable specification is a machine-checkable description whose predicates can be run against an implementation. It can combine structural constraints (types, required fields, ranges, encodings, protocol states), examples, and behavioral relations (invariants, preconditions, postconditions, algebraic laws, temporal/state-machine rules). This makes a specification an executable test oracle, but not necessarily a complete oracle: a schema can establish that a message has an allowed shape while leaving business meaning, authorization policy, timing, ordering, idempotency, side effects, and error-recovery behavior unspecified. OpenAPI 3.1 aligns its Schema Object with JSON Schema 2020-12; AsyncAPI describes message-driven operations and payload validity. These are consensus interface languages, not guarantees that every producer, consumer, parser, or tool interprets every edge case identically. The OpenAPI project itself warns that schemas can miss specification violations, so validation should be paired with semantic linting and executable interaction tests.
+
+Contract semantics have at least three useful layers. A provider contract states what an API offers; a consumer-driven contract (CDC) records the subset of interactions a particular consumer actually depends on; and a behavioral contract adds postconditions, invariants, or protocol sequencing that a shape schema alone cannot express. In a CDC workflow, the consumer test exercises a mock or stub and publishes an interaction contract; provider verification replays those interactions against the provider implementation. Because the phases are isolated, teams receive compatibility feedback without a shared, fully deployed environment. This is an interoperability check, not a replacement for consumer functional tests, provider domain tests, end-to-end workflows, resilience tests, or tests of uncontrolled external systems. Provider- or specification-driven contracts remain useful where consumers are numerous, anonymous, or not available to publish expectations; CDC is most informative where consumers are known and their needs should constrain provider evolution.
+
+Compatibility is multidimensional. Syntactic compatibility covers parseability, operation names, parameter locations, media types, status codes, requiredness, enum/range constraints, and message shape. Behavioral compatibility covers accepted input sets, response meaning, side effects, ordering, retry/idempotency semantics, latency assumptions, and failure behavior. A change may be structurally additive yet behaviorally breaking: tightening a range, changing an error from retryable to terminal, reordering events, or making a formerly optional field semantically mandatory can break a consumer. Conversely, a deliberately tolerant consumer may accept a provider change that a strict schema diff marks as incompatible. SemVer communicates an author's compatibility intent (major for incompatible API changes, minor for backward-compatible additions, patch for compatible fixes) but cannot infer domain semantics or prove that the implementation follows its version claim. A robust evolution policy therefore combines versioned artifacts, schema and contract diffs, consumer/provider verification, deprecation windows, and representative behavioral properties. OpenAPI and AsyncAPI similarly define patch/minor tooling expectations, but those version rules concern specification/tool compatibility rather than all application behavior.
+
+Property-based testing (PBT) treats a property as an executable predicate over an explicitly chosen input domain and runs it against many generated cases. Common properties include invariants (sorting preserves a multiset), algebraic laws (commutativity, associativity, identity), idempotence, round trips (decode(encode(x)) equals x), reference-model or differential agreement, bounded outputs, valid exceptions for invalid inputs, crash freedom, and state-machine pre/postconditions. A metamorphic relation is a property over related executions, such as f(permute(x)) having the same multiset as f(x), or f(f(x)) equaling f(x). It supplies a partial oracle when an exact expected output is expensive or unavailable, but the relation itself must be justified and tested; a false relation produces false failures and a weak relation can miss faults. Example-based tests remain valuable for named requirements, boundary examples, regressions, and human-readable BDD scenarios. TDD's red-green-refactor loop makes an example or property a short feedback instrument: first encode the desired behavior, then implement the smallest change that satisfies it, then refactor while preserving the executable specification.
+
+PBT assurance is probabilistic and conditional. A passing run says that the predicate held for the sampled cases under the generator, configuration, environment, and oracle; it does not prove universal correctness. The practical unit is therefore the tuple (domain, generator, property, shrinker, runner, evidence). Generator design should make valid and invalid partitions explicit, use recursive size/depth controls, weight boundaries and rare combinations, preserve semantic invariants when constructing valid data, and include targeted examples for known regressions. Stateful generators should model command sequences, state transitions, preconditions, and cleanup. Generator quality should be reviewed using validity/assumption discard rate, distribution and boundary coverage, unique states or behaviors reached, branch/feature coverage as a diagnostic, execution cost, and reproducibility. The generator is part of the test's specification: a beautifully written property over a narrow or biased domain is weak evidence.
+
+Shrinking is a debugging semantics, not merely an optimization. After a failure, a shrinker searches for a simpler failing value or command sequence while retaining the preconditions and failure. Structural shrinking (shorter lists, smaller numbers, fewer commands, simpler trees) should be complemented by domain-aware shrinking that preserves validity, because blindly removing fields or transitions can turn a meaningful failure into an invalid-input failure. Persist the seed, generated case, dependency versions, environment assumptions, and minimized counterexample so a failure is replayable in an IDE, pre-commit hook, and review. When preconditions are sparse, reject-and-retry generation can spend most of its budget discarding cases; coverage-guided mutation, valid-by-construction generators, and corpus seeding are ways to reach rare semantic regions while retaining property checking.",
+  "practical_architecture_and_implementation": "Use one version-controlled contract/specification package per externally consumed interface, with explicit ownership, compatibility policy, and links to the implementation tests. For synchronous HTTP APIs, keep an OpenAPI Description and JSON Schema dialect declaration authoritative for paths, parameters, headers, content types, status codes, examples, and reusable schemas. For event and message APIs, use AsyncAPI channels, operations, message headers, payload schemas, correlation identifiers, bindings, delivery semantics, and examples. Treat schema validation in both directions as a first executable gate: validate requests/events produced by consumers and responses/events produced by providers. Pin the dialect and validator versions, resolve references in a controlled way, and test representative parser/serializer combinations; a structurally valid document can still be semantically ambiguous.
+
+Add an interaction-contract layer. A consumer test records only the request/response or publish/consume interactions the consumer uses, including matching rules for values, headers, status codes, and message metadata. Publish immutable contract artifacts to a broker or repository with consumer, provider, branch, commit, and contract version metadata. Provider verification retrieves the relevant contracts, starts the provider in isolation with deterministic fixtures, replays each interaction, and reports the exact mismatch. A deployment decision should query a compatibility matrix for the proposed provider version against all known consumer versions; a passing provider suite must not be interpreted as proof for consumers that have not published contracts. For anonymous/public APIs, combine provider-owned contract tests with generated consumer examples, backward-compatibility checks, and selected real-client conformance tests. For third-party systems that cannot run verification, use a documented adapter boundary, recorded fixtures, and a small live smoke suite rather than claiming CDC coverage.
+
+Separate structural, interaction, semantic, and workflow tests so failures identify the broken assurance layer. A practical test inventory is: schema/meta-schema validation; example-based unit/TDD tests; consumer contract tests; provider verification; stateful protocol tests; property and metamorphic tests; and a small number of end-to-end journeys. Keep contracts narrow enough to represent consumer needs and broad enough to cover optionality, error paths, boundary values, and version negotiation. Require at least one present and one absent case for optional fields, explicit unknown-field policy, null versus missing behavior, enum and range boundaries, pagination or ordering semantics, idempotency keys, retries, and error payloads. Use contract-diff tooling to classify changes as additive, narrowing, removal, or semantic annotation changes, then require a compatibility decision rather than relying on a version-number heuristic.
+
+Design the property harness as a reusable local test component. Define domain types and generators separately from properties; use size parameters and weighted strategies; make preconditions visible instead of silently discarding most samples; and tag properties by cost and determinism. Include a reference implementation only when its independent assumptions are understood, and include metamorphic relations or invariants where exact outputs are unavailable. Configure deterministic seeds or replay tokens, fixed clocks and schedulers where possible, isolated temporary resources, bounded retries, and a failure artifact containing the smallest case plus the original case. Track generator health (discard rate, distribution, boundary hits, unique states), property mutation or fault-injection sensitivity where appropriate, and time-to-counterexample. A coverage number is a diagnostic signal, not a substitute for a meaningful oracle.
+
+Implement a three-speed developer loop. The IDE/on-save loop runs changed-file examples, contract/schema lint, and a small deterministic property budget, presenting the first mismatching field or minimized counterexample at the source location. The pre-commit loop runs formatting-independent contract validation, changed-interface compatibility diff, affected consumer contracts, and a bounded deterministic property set; it should be offline-capable and fast enough that developers do not routinely bypass it. The local integration loop runs provider verification, stateful/message tests, broader generators, and selected end-to-end workflows in disposable fixtures. Expose the same commands through the IDE, command line, and pre-commit configuration so results do not diverge. A watch mode should rerun only affected properties and contracts after edits, while a manual command should reproduce any recorded seed. Keep expensive or nondeterministic suites opt-in locally with an explicit evidence label; do not hide them behind a green fast loop.
+
+For example-based TDD, write a failing example for a named behavior, implement minimally, and refactor with the full fast suite. For BDD/ATDD, express a small set of stable Given-When-Then scenarios as executable acceptance examples, while keeping step definitions thin and delegating detailed input generation to domain fixtures or properties. Use examples for communication and regression identity, contracts for interface compatibility, and properties for families of behaviors. The layers should cross-check one another where practical: examples can seed PBT regression cases, a minimized property failure becomes a permanent example, and a contract interaction can be replayed against both a mock and a provider. A local failure report should identify whether the failure is schema, contract, property, metamorphic relation, generator, fixture, or implementation, and should show the specification revision and tool versions.
+
+Evidence limits must be visible in engineering reports. Report sample counts, generator assumptions, discard rates, seeds, test budgets, contract population, provider versions, and the kinds of behavior not covered. A green contract suite supports the claim that verified interactions remained compatible; it does not establish business correctness or compatibility with unrepresented consumers. A green PBT run supports sampled confidence conditional on the generator and property; it is not a formal proof. If a property is derived from the same implementation logic as the system under test, shared bugs can make it vacuous. Standards are normative about document syntax and keywords, while research findings are empirical and context-dependent; keep those evidence classes distinct in review and release records.",
+  "primary_evidence": [
+    {
+      "source_title": "QuickCheck: A Lightweight Tool for Random Testing of Haskell Programs",
+      "authors_or_institution": "Koen Claessen and John Hughes; Chalmers University of Technology",
+      "year": 2000,
+      "source_type": "ACM",
+      "doi_or_url": "https://doi.org/10.1145/357766.351266",
+      "verbatim_excerpt": "Properties are described as Haskell functions, and can be automatically tested on random input",
+      "analytical_interpretation": "This seminal ACM paper establishes the executable-predicate plus generator model. Its custom-generator and pitfall discussion supports treating the generator, domain, and property as one specification, while its functional-program setting limits direct generalization to stateful distributed APIs."
+    },
+    {
+      "source_title": "The Oracle Problem in Software Testing: A Survey",
+      "authors_or_institution": "Earl T. Barr, Mark Harman, Phil McMinn, Muzammil Shahbaz, and Shin Yoo",
+      "year": 2015,
+      "source_type": "IEEE",
+      "doi_or_url": "https://doi.org/10.1109/TSE.2014.2372785",
+      "verbatim_excerpt": "The challenge of distinguishing the corresponding desired, correct behaviour from potentially incorrect behavior is called the test oracle problem.",
+      "analytical_interpretation": "The IEEE survey frames contracts, specifications, models, metamorphic relations, and humans as alternative or complementary oracle sources. It justifies explicitly documenting what a schema or property can decide and what still requires domain judgment."
+    },
+    {
+      "source_title": "How Effectively Does Metamorphic Testing Alleviate the Oracle Problem?",
+      "authors_or_institution": "Huai Liu, Fei-Ching Kuo, Dave Towey, and Tsong Yueh Chen",
+      "year": 2014,
+      "source_type": "IEEE",
+      "doi_or_url": "https://doi.org/10.1109/TSE.2013.46",
+      "verbatim_excerpt": "Metamorphic testing is a testing approach which uses metamorphic relations, properties of the software under test",
+      "analytical_interpretation": "The IEEE empirical study reports that diverse relations can approach oracle-level fault detection in its evaluated settings, including relations identified after limited training. For a developer loop, this supports relation-based properties when exact outputs are costly, but relation validity and context remain threats to validity."
+    },
+    {
+      "source_title": "Coverage Guided, Property Based Testing",
+      "authors_or_institution": "Leonidas Lampropoulos, Michael Hicks, and Benjamin C. Pierce; University of Maryland and University of Pennsylvania",
+      "year": 2019,
+      "source_type": "ACM",
+      "doi_or_url": "https://doi.org/10.1145/3360607",
+      "verbatim_excerpt": "Most randomly generated inputs fail to satisfy properties with such sparse preconditions, and so are simply discarded.",
+      "analytical_interpretation": "The ACM OOPSLA paper demonstrates why naive assume-and-reject generators can leave semantic regions untested. Its coverage-guided mutation approach motivates retaining inputs that expand behavior coverage, while the reported advantage is workload-specific and does not remove the need for domain-aware generators."
+    },
+    {
+      "source_title": "Property-Based Testing in Practice",
+      "authors_or_institution": "Harrison Goldstein, Joseph W. Cutler, Daniel Dickstein, Benjamin C. Pierce, and Andrew Head",
+      "year": 2024,
+      "source_type": "ACM",
+      "doi_or_url": "https://doi.org/10.1145/3597503.3639581",
+      "verbatim_excerpt": "Property-based testing (PBT) is a testing methodology where users write executable formal specifications of software components",
+      "analytical_interpretation": "The ACM/IEEE ICSE study interviewed 30 experienced Jane Street users and found strengths in complex-code testing and confidence beyond conventional tests, but weaknesses in writing properties, generators, and evaluating effectiveness. Its single-company, OCaml-heavy sample is strong practice evidence but not a universal adoption estimate."
+    },
+    {
+      "source_title": "Property-Based Testing: Climbing the Stairway to Verification",
+      "authors_or_institution": "Zilin Chen, Christine Rizkallah, Liam O'Connor, Partha Susarla, Gerwin Klein, Gernot Heiser, and Gabriele Keller",
+      "year": 2022,
+      "source_type": "ACM",
+      "doi_or_url": "https://doi.org/10.1145/3567512.3567520",
+      "verbatim_excerpt": "The expected behaviour of the system under test is captured by a functional correctness specification.",
+      "analytical_interpretation": "This ACM SLE paper shows an executable functional specification serving as a bridge between PBT and refinement-based verification in Cogent. It supports layered assurance and specification/implementation refinement tests, while the case studies concern high-assurance systems components rather than general enterprise APIs."
+    },
+    {
+      "source_title": "Students' and Professionals' Perceptions of Test-Driven Development: A Focus Group Study",
+      "authors_or_institution": "Giuseppe Scanniello, Simone Romano, Davide Fucci, Burak Turhan, and Natalia Juristo",
+      "year": 2016,
+      "source_type": "ACM",
+      "doi_or_url": "https://doi.org/10.1145/2851613.2851778",
+      "verbatim_excerpt": "there is a need for live feedback to let developers understand if TDD is being applied correctly",
+      "analytical_interpretation": "This ACM qualitative study links TDD adoption to feedback and reports difficulty with advanced unit-testing techniques and incomplete refactoring. It supports IDE/watch/pre-commit feedback architecture, but focus groups with students and professionals provide perceptions rather than causal productivity or defect-rate proof."
+    },
+    {
+      "source_title": "An Empirical Analysis of Microservices Systems Using Consumer-Driven Contract Testing",
+      "authors_or_institution": "Hamdy Michael Ayas, Hartmut Fischer, Philipp Leitner, and Francisco Gomes; Chalmers University of Technology and University of Gothenburg",
+      "year": 2022,
+      "source_type": "IEEE",
+      "doi_or_url": "https://doi.org/10.1109/SEAA56994.2022.00022",
+      "verbatim_excerpt": "This study drafts a testing architecture including activities and artifacts.",
+      "analytical_interpretation": "The IEEE SEAA repository-mining study examined microservice repositories and four projects using CDC testing, giving evidence for an explicit architecture of activities and artifacts and for separating test levels. Its qualitative, open-source sample does not quantify enterprise-wide effectiveness."
+    },
+    {
+      "source_title": "Ensuring Syntactic Interoperability Using Consumer-Driven Contract Testing",
+      "authors_or_institution": "Georg-Daniel Schwarz, Felix Quast, and Dirk Riehle; Friedrich-Alexander-Universität Erlangen-Nürnberg",
+      "year": 2025,
+      "source_type": "University_Courseware",
+      "doi_or_url": "https://doi.org/10.1002/stvr.70006",
+      "verbatim_excerpt": "The consumer test produces the compatibility specification, encoding the consumer's expectations towards the API codified as a contract file.",
+      "analytical_interpretation": "This university-authored systematic literature review plus action-research study gives the clearest two-phase CDC mechanism: consumer recording followed by provider replay. It recommends CDC when consumers are known and limited, isolated tests are preferred, and learning/setup resources exist; it also reports sparse empirical literature and inability to test uncontrolled external systems."
+    },
+    {
+      "source_title": "OpenAPI Specification v3.1.1",
+      "authors_or_institution": "OpenAPI Initiative; Linux Foundation",
+      "year": 2024,
+      "source_type": "Formal_Standard",
+      "doi_or_url": "https://spec.openapis.org/oas/v3.1.1.html",
+      "verbatim_excerpt": "Note that while schemas can catch many errors, they are not guaranteed to catch all specification violations.",
+      "analytical_interpretation": "This consensus specification is normative for OAS document structure and explicitly limits schema validation. OAS 3.1.1 also defines language-agnostic HTTP interfaces, tooling uses, JSON Schema alignment, and patch-version compatibility guidance; implementers should add semantic contract and behavior tests."
+    },
+    {
+      "source_title": "AsyncAPI Specification v3.0.0",
+      "authors_or_institution": "AsyncAPI Initiative",
+      "year": 2023,
+      "source_type": "Formal_Standard",
+      "doi_or_url": "https://www.asyncapi.com/docs/reference/specification/v3.0.0",
+      "verbatim_excerpt": "The AsyncAPI Specification is a project used to describe message-driven APIs in a machine-readable format.",
+      "analytical_interpretation": "This industry consensus specification provides the event/message counterpart to HTTP interface descriptions: channels, operations, messages, payload schemas, bindings, and validity constraints. Its major.minor tooling compatibility guidance is useful for evolution, but delivery order, retries, deduplication, and business semantics still require executable behavioral tests."
+    },
+    {
+      "source_title": "JSON Schema Draft 2020-12: Validation Vocabulary",
+      "authors_or_institution": "Austin Wright, Henry Andrews, Ben Hutton, and Greg Dennis; JSON Schema and IETF contributors",
+      "year": 2022,
+      "source_type": "Formal_Standard",
+      "doi_or_url": "https://json-schema.org/draft/2020-12/json-schema-validation.html",
+      "verbatim_excerpt": "JSON Schema (application/schema+json) has several purposes, one of which is JSON instance validation.",
+      "analytical_interpretation": "The specification makes structural validation a first-class machine-checkable activity and defines vocabularies for types, requiredness, ranges, formats, dependencies, and content. Teams must pin dialects and distinguish assertion keywords from annotations; structural validity does not establish domain or protocol behavior."
+    },
+    {
+      "source_title": "Semantic Versioning 2.0.0",
+      "authors_or_institution": "Semantic Versioning community; originally authored by Tom Preston-Werner",
+      "year": 2013,
+      "source_type": "Formal_Standard",
+      "doi_or_url": "https://semver.org/spec/v2.0.0.html",
+      "verbatim_excerpt": "MAJOR version when you make incompatible API changes",
+      "analytical_interpretation": "This de facto consensus specification formalizes public-API version communication and immutable released artifacts, with minor for backward-compatible additions and patch for compatible fixes. SemVer is an intent and dependency-resolution convention; contract diffs and behavioral checks are required to discover semantic breaks."
+    },
+    {
+      "source_title": "Property-Based Testing in Python: Empirical Insights",
+      "authors_or_institution": "Isadora de Oliveira; Federal University of Minas Gerais, advised by Marco Túlio de Oliveira Valente and Henrique Santos Camargo Rocha",
+      "year": 2026,
+      "source_type": "University_Courseware",
+      "doi_or_url": "https://homepages.dcc.ufmg.br/~mtov/diss/2026-isadora.pdf",
+      "verbatim_excerpt": "only 18.23% were fully automatable, while most required partial adaptation (30.05%)",
+      "analytical_interpretation": "This 2026 UFMG master's dissertation analyzes 367 real PBTs from 244 Python projects, 213 developer questions, and 203 Ghostwriter candidates. It reports generator strategy difficulty as the leading challenge and limited template automation, providing current evidence for investing in generator education and local diagnostics; the repository, Stack Overflow, and Hypothesis-specific samples limit generalization."
+    }
+  ],
+  "failure_modes_and_antipatterns": [
+    "Schema-only assurance: a document can validate structurally while business meaning, authorization, ordering, retries, idempotency, timing, or error semantics remain wrong.",
+    "Spec drift: implementation, generated clients, documentation, examples, and validators are edited independently, so the apparent source of truth is not executable or current.",
+    "Dialect and parser mismatch: OpenAPI or JSON Schema documents are validated with a different dialect, reference resolver, format policy, or unknown-field policy than production consumers use.",
+    "Consumer blind spot: provider verification covers only consumers that published contracts; an unrepresented client, undocumented field, or anonymous public caller can still break.",
+    "Over-permissive CDC matchers: wildcard values, ignored headers, unconstrained payloads, or optional-everything contracts allow a provider to pass while violating a real consumer assumption.",
+    "Over-constrained CDC: recording incidental values, generated identifiers, ordering, or provider implementation details creates brittle contracts and prevents safe provider evolution.",
+    "Stale or orphaned contracts: contracts are published but not verified, provider versions are not mapped to consumer versions, or old contracts are never retired, producing false confidence and maintenance noise.",
+    "Wrong-fit CDC: a team applies consumer-driven testing to uncontrolled third-party systems, huge anonymous consumer populations, or behavior that requires a full workflow; CDC then cannot provide the claimed coverage.",
+    "Version-label fallacy: SemVer, OpenAPI, or AsyncAPI version increments are treated as proof of compatibility even when a range, default, error meaning, event order, or side effect changed.",
+    "Narrow or biased generators: mostly trivial values, invalid values discarded by assume, insufficient recursive depth, or absent rare combinations leaves important semantic regions untested.",
+    "Generator-property entanglement: the generator silently enforces the same assumption the property is meant to test, making the predicate vacuous or hiding invalid-input behavior.",
+    "Invalid shrinking: a shrinker removes the precondition or protocol setup, changes the failure class, or returns a counterexample that cannot be replayed outside the original run.",
+    "Tautological or duplicated properties: the property reimplements the production algorithm, checks only that a value has the type it was constructed with, or shares the same defect as the system under test.",
+    "Metamorphic relation error: a relation is assumed to hold for all inputs although it has preconditions, is invalid for floating-point or nondeterministic behavior, or is too weak to distinguish faulty outputs.",
+    "Randomness flakiness: uncontrolled seeds, clocks, schedulers, network calls, timeouts, locale, or dependency versions make failures non-reproducible and encourage rerunning until green.",
+    "Evidence inflation: a green finite PBT run is reported as a proof, branch coverage as semantic coverage, or a passing contract as business correctness and end-to-end compatibility.",
+    "TDD/BDD test brittleness: examples assert implementation details or UI wording, step definitions drift from domain rules, and refactoring becomes avoided because the suite encodes incidental structure.",
+    "Feedback-loop bypass: IDE, pre-commit, and CI invoke different commands or versions, local tests are too slow or noisy, and developers disable hooks rather than receive actionable minimized failures.",
+    "Contract explosion: every incidental consumer interaction becomes a permanent contract, creating duplicate coverage, review burden, and pressure to avoid legitimate interface improvements.",
+    "Unbounded local testing: broad generated suites run on every keystroke, starving the developer loop; conversely, excessive budget reduction makes the fast loop statistically and behaviorally weak."
+  ],
+  "maturity_matrix": {
+    "foundational": "Define versioned OpenAPI and/or AsyncAPI documents with pinned JSON Schema dialects; validate documents and request/response or message examples locally. Adopt red-green-refactor examples for core behaviors, a small deterministic property suite for pure functions, and explicit seeds and minimized failures. Add IDE/on-save and pre-commit commands for changed-file tests, schema lint, and contract syntax checks. Record what is structural versus behavioral and treat passing samples as conditional evidence.",
+    "advanced": "Introduce consumer-driven contracts for known service dependencies and provider replay verification, with immutable broker/repository artifacts, consumer/provider/version metadata, compatibility diffs, deprecation windows, and a can-I-deploy matrix. Add stateful protocol tests, metamorphic and differential properties, valid-by-construction generators, domain-aware shrinking, boundary weighting, generator health metrics, and replayable failure capsules. Make IDE, pre-commit, and local provider commands share configuration, and use tiered budgets so feedback remains fast while broader suites remain available.",
+    "expert_2026": "Operate a specification-centered feedback system in which structural schemas, interaction contracts, behavioral properties, examples, and state-machine models are versioned, cross-linked, and tested against implementation and generated artifacts. Use explicit semantic compatibility policy in addition to SemVer; classify additive and narrowing changes against actual consumer contracts; maintain coverage for represented and unrepresented consumers; and document external-system gaps. Apply coverage-guided or corpus-seeded generation only where measurements show sparse semantic regions, preserve deterministic replay and domain-valid shrinking, and expose generator/property health in developer diagnostics. The expert posture is evidence-aware: release claims identify the exact contract population, sampled domains, budgets, seeds, known blind spots, and remaining human or end-to-end oracle work rather than treating any single green layer as universal correctness."
+  }
+}

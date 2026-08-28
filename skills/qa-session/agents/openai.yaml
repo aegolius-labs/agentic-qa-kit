@@ -1,0 +1,4 @@
+interface:
+  display_name: "QA Session"
+  short_description: "Run bounded checks and preserve QA evidence"
+  default_prompt: "Use $qa-session to execute this QA charter and record every attempt."

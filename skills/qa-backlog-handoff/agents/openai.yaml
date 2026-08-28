@@ -1,0 +1,4 @@
+interface:
+  display_name: "QA Backlog Handoff"
+  short_description: "Turn confirmed findings into Bug payloads"
+  default_prompt: "Use $qa-backlog-handoff to prepare this confirmed finding for the backlog."

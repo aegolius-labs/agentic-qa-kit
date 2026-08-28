@@ -1,0 +1,165 @@
+{
+  "subject_id": "SR-02",
+  "subject_title": "Progressive Delivery, Synthetic Monitoring, Traffic Shadowing, and RUM Feedback",
+  "theoretical_foundations": "Progressive delivery treats deployment and exposure as separate control decisions. An immutable artifact may be installed broadly while a feature flag, route weight, ring, region, or cohort controls who can exercise it. This decoupling makes exposure reversible in seconds, but only if every entry point is gated, flag state is versioned and audited, the default is safe, and the flag has an owner and removal date. A canary is therefore a temporary treatment population receiving a candidate change while a contemporaneous control population receives the established version; blue/green keeps complete old and new environments side by side and switches a routing boundary; staged or ring deployment enlarges the exposure in ordered waves; a shadow receives copied inputs while its outputs and side effects are suppressed. These mechanisms reduce blast radius, but they are not interchangeable: a canary tests user-visible behavior, blue/green optimizes cutover and rollback, and a shadow tests production-shaped inputs without proving that writes, user acceptance, or stateful behavior are safe.",
+  "practical_architecture_and_implementation": "A production quality-control plane should connect five independently versioned records: release artifact and configuration, exposure/cohort assignment, observed signal windows, statistical analysis policy, and promotion/rollback decision. Start with an immutable candidate and a control that is as identical as possible except for the intended change. Assign users, devices, accounts, or sessions to a stable cohort by a deterministic hash; persist assignment for the experiment lifetime; exclude internal traffic and mutually interfering experiments; and verify the observed sample ratio before interpreting outcomes. Prefer a small, representative first ring, then explicit pauses or timed stages such as 1%, 5%, 25%, 50%, and 100%, with per-stage minimum event counts and a maximum exposure budget. For stateful services, require backward-compatible schema and protocol changes, idempotent retries, and a tested way to restore the old binary without destroying data. A kill switch must be separate from the deployment artifact and reachable even if the candidate is unhealthy.\n\nThe analysis service should compare candidate and control rather than infer absolute health. Declare one or a few primary guardrails before exposure: availability/error ratio, latency quantiles, saturation, resource use, and domain-specific correctness invariants. Use effect sizes and confidence intervals or anytime-valid confidence sequences; fixed-sample tests must not be repeatedly peeked at, because continuous looks inflate false detection. For count metrics, model event arrivals without assuming a Poisson process when that assumption is unverified. Control familywise or false-discovery risk when many metrics, slices, or experiments are examined. A result of fail should stop exposure and route traffic to the known-good version; pass should promote only when data completeness, cohort balance, minimum duration, and all critical guardrails are satisfied; inconclusive should pause rather than silently promote. Record the exact populations, time windows, analysis-policy version, missingness, verdict, and operator/automation action so that a rollback is evidence-backed and reproducible.\n\nTraffic shadowing must be one-way and fail-closed. Duplicate only an authorized, sampled subset of requests; scrub or tokenize sensitive fields before replay; impose an egress firewall, resource quotas, deadlines, and circuit breakers; use read-only identities, isolated databases or snapshots, fake external providers, and a sink for writes, messages, emails, and payments. Compare normalized responses using status, schema, invariants, error classes, and selected field hashes while ignoring nondeterministic timestamps, IDs, and ordering. Compare distributions of latency, resource usage, and exceptions as well as response differences. A shadow must not return a response to the user, mutate shared state, or overload production; otherwise it has become an uncontrolled canary. Shadow evidence is strongest for compatibility and read-path regressions, weaker for write paths, cache warm-up, long-lived state, and behavior whose correctness requires user feedback.\n\nSynthetic monitoring supplies active, repeatable probes from several regions and network conditions for uptime, critical journeys, APIs, and expected response invariants, including during low-traffic periods. RUM supplies passive field evidence from actual devices, browsers, geographies, networks, accessibility modes, and user journeys. Use synthetic checks for fast detection and known-path diagnosis; use RUM for the distribution and severity of experienced quality. Neither is complete: synthetic scripts miss unmodeled paths and can impose load, while RUM is silent when nobody can reach the service and is biased by active-user mix. Join both to the release, flag, cohort, and region, and stratify before aggregating so Simpson’s paradox, survivorship bias, and a large desktop population do not hide a mobile or regional regression.\n\nPrivacy-aware RUM should collect the minimum fields needed for the decision, use rotating pseudonymous cohort IDs rather than account identifiers, sample adaptively by journey and risk, cap retention, redact payloads and URLs, and publish only aggregated or formally protected results. A privacy impact assessment should precede new fields or new replay paths; aggregation alone is not a formal privacy guarantee. Feed de-identified, release-linked field findings back into the test model: update synthetic journeys from high-frequency failure paths, add anonymized boundary cases to regression corpora, revise workload proportions by region/device/network, and label whether a signal was observed in shadow, canary, or general release. Periodically validate that the feedback set is representative and that the feedback loop is not merely teaching tests to reproduce the current traffic mix.",
+  "primary_evidence": [
+    {
+      "source_title": "CanaryAdvisor: a Statistical-Based Tool for Canary Testing (Demo)",
+      "authors_or_institution": "Alexander Tarvo, Peter F. Sweeney, Nick Mitchell, V. T. Rajan, Matthew Arnold, and Ioana Baldini; IBM Research",
+      "year": 2015,
+      "source_type": "ACM",
+      "doi_or_url": "https://doi.org/10.1145/2771783.2784770",
+      "verbatim_excerpt": "To withstand short-term variations in metric values, CanaryAdvisor employs a statistical approach.",
+      "analytical_interpretation": "The prototype establishes the production-canary analysis pattern: stream metrics from baseline and candidate, compare distributions, and distinguish worse from same, better, or not-yet-decidable. For a 2026 delivery gate, this supports multi-signal analysis and an explicit inconclusive state, while its demo status and cloud-test assumptions mean thresholds and sample-size rules still require service-specific validation."
+    },
+    {
+      "source_title": "Feature Toggles: Practitioner Practices and a Case Study",
+      "authors_or_institution": "Md Tajmilur Rahman, Louis-Philippe Querel, Peter C. Rigby, and Bram Adams; Concordia University and Polytechnique Montréal",
+      "year": 2016,
+      "source_type": "ACM",
+      "doi_or_url": "https://doi.org/10.1145/2901739.2901745",
+      "verbatim_excerpt": "Feature toggles can change the functionality of the system without recompiling the code.",
+      "analytical_interpretation": "Runtime flags decouple code deployment from feature exposure and provide rapid disablement, cohort targeting, and field experimentation. The Chrome case also documents toggle growth, lingering release toggles, and combinatorial configurations; an enterprise must therefore enforce flag ownership, metadata, expiry, cleanup, dependency review, and representative configuration tests."
+    },
+    {
+      "source_title": "Continuous Deployment at Facebook and OANDA",
+      "authors_or_institution": "Tony Savor, Mitchell Douglas, Michael Gentili, Laurie Williams, Kent Beck, and Michael Stumm; Facebook, OANDA, Stanford University, North Carolina State University, and University of Toronto",
+      "year": 2016,
+      "source_type": "ACM",
+      "doi_or_url": "https://doi.org/10.1145/2889160.2889223",
+      "verbatim_excerpt": "Generally, the release of deployed software occurs in stages to contain any issues before general availability.",
+      "analytical_interpretation": "The longitudinal case study supports small, automated, staged production changes, beta or dogfood populations, blue-green switching, dark launches, shadow comparisons, feature flags, monitoring, and automated rollback. It is observational evidence from two organizations rather than a universal causal guarantee; transfer requires checking product risk, architecture, data state, and user tolerance."
+    },
+    {
+      "source_title": "Canary Analysis Service",
+      "authors_or_institution": "Štěpán Davidovič and Betsy Beyer; Google",
+      "year": 2018,
+      "source_type": "ACM",
+      "doi_or_url": "https://research.google/pubs/canary-analysis-service/",
+      "verbatim_excerpt": "The control population is a (possibly strict) subset of the remainder of the service.",
+      "analytical_interpretation": "CAS makes the central validity claim explicit: canarying asks whether the changed population is meaningfully worse than a contemporaneous control, not whether it is absolutely healthy. Its fine-grained, time-bounded population descriptors, passive analysis service, clear PASS/FAIL/NONE verdicts, and multiple-check policy are useful design requirements. Google’s homogeneous infrastructure and learned defaults limit direct generalization, so 2026 systems should test cohort comparability and analysis calibration."
+    },
+    {
+      "source_title": "ShadeNF: A Platform for Online Network Function Verification",
+      "authors_or_institution": "Yu Sun, Hui Lu, Abhinav Srivastava, and Cong Xu; Binghamton University and IBM Research",
+      "year": 2018,
+      "source_type": "ACM",
+      "doi_or_url": "https://doi.org/10.1145/3267809.3275467",
+      "verbatim_excerpt": "The actual verification is operated in a completely isolated environment with desired resources.",
+      "analytical_interpretation": "ShadeNF demonstrates that realistic production traffic can be mirrored into a cloned, isolated system while programmable forwarding preserves the live system’s safety boundary. The enterprise lesson is to isolate compute, network, credentials, state, and egress—not merely discard the response—and to combine replayed traffic with synthetic traffic for uncovered policy paths."
+    },
+    {
+      "source_title": "Rapid Regression Detection in Software Deployments through Sequential Testing",
+      "authors_or_institution": "Michael Lindon, Chris Sanden, and Vaché Shirikian; Netflix",
+      "year": 2022,
+      "source_type": "ACM",
+      "doi_or_url": "https://doi.org/10.1145/3534678.3539099",
+      "verbatim_excerpt": "A major shortcoming of existing approaches is the reliance on fixed-n tests.",
+      "analytical_interpretation": "The KDD paper formalizes sequential stochastic-order and equality-in-distribution tests for continuously monitored canaries, preserving false-detection control while shortening exposure to regressions. It justifies anytime-valid or sequential analysis policies in rollout controllers; teams still need to predeclare practical effect limits, account for dependence, and validate operating power on their own traffic."
+    },
+    {
+      "source_title": "Seven Pitfalls to Avoid when Running Controlled Experiments on the Web",
+      "authors_or_institution": "Thomas Crook, Brian Frasca, Ron Kohavi, and Roger Longbotham; Microsoft",
+      "year": 2009,
+      "source_type": "ACM",
+      "doi_or_url": "https://doi.org/10.1145/1557019.1557139",
+      "verbatim_excerpt": "it’s easy to incorrectly identify the winning Treatment because of Simpson’s paradox.",
+      "analytical_interpretation": "Online rollout analysis can reverse at aggregate level when traffic mix, geography, device, or time composition differs across arms. Production gates should inspect strata, use stable assignment, check sample-ratio mismatch and robots/internal traffic, and treat aggregate wins as provisional until key segments agree or a predeclared hierarchical analysis explains the difference."
+    },
+    {
+      "source_title": "Overlapping Experiment Infrastructure: More, Better, Faster Experimentation",
+      "authors_or_institution": "Diane Tang, Ashish Agarwal, Deirdre O’Brien, and Mike Meyer; Google",
+      "year": 2010,
+      "source_type": "ACM",
+      "doi_or_url": "https://doi.org/10.1145/1835804.1835810",
+      "verbatim_excerpt": "At Google, experimentation is practically a mantra; we evaluate almost every change that potentially affects what our users experience.",
+      "analytical_interpretation": "The platform paper motivates a shared assignment and analysis layer with domains, layers, traffic subsets, holdouts, education, and launch controls. Overlapping tests increase throughput but create interference and attribution risk; 2026 implementations need namespace isolation, exclusion rules, interaction diagnostics, and a durable universal holdout rather than assuming independent experiments."
+    },
+    {
+      "source_title": "Trustworthy Experimentation Under Telemetry Loss",
+      "authors_or_institution": "Jayant Gupchup, Yasaman Hosseinkashi, Pavel Dmitriev, Daniel Schneider, Andrei Jefremov, Martin Ellis, and Ross Cutler; Microsoft",
+      "year": 2018,
+      "source_type": "ACM",
+      "doi_or_url": "https://doi.org/10.1145/3269206.3271747",
+      "verbatim_excerpt": "loss of telemetry data can skew the results of experiments, leading to loss of statistical power",
+      "analytical_interpretation": "A canary verdict is only as trustworthy as assignment and outcome completeness. The paper supports independent data-loss measurement, missingness diagnostics, denominator reconciliation, and conservative pause behavior when data quality is unknown. In RUM, blocked beacons, ad blockers, crashes, and opt-outs can be differential by cohort, so missingness must be treated as a quality signal rather than silently ignored."
+    },
+    {
+      "source_title": "Client-Side Black-Box Monitoring for Web Sites",
+      "authors_or_institution": "Ricardo Filipe, Rui Pedro Paiva, and Filipe Araujo; University of Coimbra",
+      "year": 2017,
+      "source_type": "IEEE",
+      "doi_or_url": "https://doi.org/10.1109/NCA.2017.8171343",
+      "verbatim_excerpt": "Ultimately, only the clients can determine whether a site is up and running in good conditions.",
+      "analytical_interpretation": "Client-observed timings expose network, geography, device, third-party, and server effects that server-only checks miss. The experiments found useful bottleneck separation but also limits when timing causes are mixed; RUM should therefore complement, not replace, service-side and synthetic evidence, with stratification and uncertainty intervals for field cohorts."
+    },
+    {
+      "source_title": "De-Identifying Government Datasets: Techniques and Governance (NIST SP 800-188)",
+      "authors_or_institution": "Simson Garfinkel, Barbara Guttman, Joseph Near, Aref Dajani, and Phyllis Singer; NIST and U.S. Census Bureau",
+      "year": 2023,
+      "source_type": "Formal_Standard",
+      "doi_or_url": "https://doi.org/10.6028/NIST.SP.800-188",
+      "verbatim_excerpt": "Aggregation does not necessarily provide privacy protection, especially when data are presented in multiple data releases.",
+      "analytical_interpretation": "Repeated RUM dashboards, slice queries, and release-linked samples can enable differencing or re-identification even when each view is aggregated. Apply a documented threat model, limit joins and retention, use protected enclaves or formal privacy techniques where needed, and measure utility loss before using field data to retrain workload or regression models."
+    },
+    {
+      "source_title": "The NIST Privacy Framework: A Tool for Improving Privacy through Enterprise Risk Management, Version 1.0",
+      "authors_or_institution": "National Institute of Standards and Technology",
+      "year": 2020,
+      "source_type": "Formal_Standard",
+      "doi_or_url": "https://www.nist.gov/privacy-framework/privacy-framework",
+      "verbatim_excerpt": "Enabling the processing of data or events without association to individuals or devices beyond the operational requirements of the system.",
+      "analytical_interpretation": "The disassociability and selective-collection subcategories support RUM designs using ephemeral cohort tokens, local aggregation, field minimization, and opt-out controls. The framework is risk-management guidance rather than a prescriptive sampling algorithm; teams must document purpose, residual linkage risk, retention, and how privacy choices affect statistical representativeness."
+    },
+    {
+      "source_title": "ISO/IEC 29134:2023, Information technology — Security techniques — Guidelines for privacy impact assessment",
+      "authors_or_institution": "International Organization for Standardization and International Electrotechnical Commission",
+      "year": 2023,
+      "source_type": "Formal_Standard",
+      "doi_or_url": "https://www.iso.org/standard/86012.html",
+      "verbatim_excerpt": "This document gives guidelines for a process on privacy impact assessments, and a structure and content of a PIA report.",
+      "analytical_interpretation": "A new RUM attribute, session replay, shadow payload, or cross-system join should pass a documented privacy impact assessment before production use. ISO/IEC 29134 specifies a PIA process and report structure, not a release-control threshold; use it to record purpose, affected subjects, risks, mitigations, residual risk, and review triggers."
+    },
+    {
+      "source_title": "Synthetic monitoring overview — Cloud Monitoring",
+      "authors_or_institution": "Google Cloud",
+      "year": 2026,
+      "source_type": "Formal_Standard",
+      "doi_or_url": "https://docs.cloud.google.com/monitoring/uptime-checks/introduction",
+      "verbatim_excerpt": "Synthetic monitors periodically issue simulated requests and then record whether those requests were successful.",
+      "analytical_interpretation": "Current cloud practice operationalizes synthetic monitoring as scheduled, externally visible probes recording success, latency, and failure context. Enterprises should maintain a small, high-value journey set across regions and private/public endpoints, alert on consecutive failures, and budget probe load; synthetic success cannot establish that the full field population is healthy."
+    },
+    {
+      "source_title": "Use a canary deployment strategy — Cloud Deploy",
+      "authors_or_institution": "Google Cloud",
+      "year": 2026,
+      "source_type": "Formal_Standard",
+      "doi_or_url": "https://docs.cloud.google.com/deploy/docs/deployment-strategies/canary",
+      "verbatim_excerpt": "you can use deploy analysis with some or all phases (except `stable`) to help determine",
+      "analytical_interpretation": "The current enterprise controller model binds metric analysis to explicit rollout phases and can automate advancement. A vendor-neutral implementation should preserve the same separation of concerns—traffic controller, analysis provider, and policy engine—and define what happens on metric error, missing data, timeout, abort, and rollback rather than treating a tool’s defaults as universal safety evidence."
+    }
+  ],
+  "failure_modes_and_antipatterns": [
+    "Unstable cohort assignment: users switch variants between requests, or assignment is made per pod rather than per user/account, contaminating outcomes and making experience metrics incomparable. Use deterministic sticky assignment and audit exposure.",
+    "Non-representative canary: the first ring is an internal, desktop-heavy, low-volume, or single-region population that misses mobile, geography, peak load, dependency, or accessibility behavior. Define representativeness dimensions and ring expansion criteria.",
+    "Absolute-health fallacy: a canary appears healthy because both candidate and control are failing, or because no control exists. Compare against a contemporaneous control and retain independent synthetic/SLO checks.",
+    "Fixed-n peeking: repeatedly applying a one-shot significance test while traffic arrives inflates false positives and encourages arbitrary early promotion. Use sequential or anytime-valid methods and predeclared stopping boundaries.",
+    "Metric multiplicity and p-value shopping: dozens of metrics, slices, and windows generate a convenient pass or fail by chance. Declare primary guardrails, control familywise/false-discovery risk, and keep exploratory findings separate from the gate.",
+    "Sample-ratio mismatch and telemetry loss: routing, SDK failure, blocked beacons, bots, retries, or filtering change denominators differently by arm. Reconcile assignment to observation, test missingness, and pause on unexplained imbalance.",
+    "Simpson’s paradox and composition drift: an aggregate improvement reverses inside region, device, customer tier, or time strata. Analyze stable strata and report both weighted overall and segment-level effects.",
+    "Flag debt and combinatorial explosion: stale flags, nested dependencies, and undocumented defaults leave dead paths and configurations that were never tested. Require owner, type, expiry, cleanup evidence, dependency graph, and a risk-based configuration matrix.",
+    "Shadow side effects: mirrored requests write to production databases, queues, emails, payments, caches, or external APIs. Enforce read-only credentials, isolated state, fake providers, sinked writes, egress deny rules, and a kill switch.",
+    "Shadow false confidence: response equality is checked without canonicalizing nondeterministic fields, or only happy-path reads are mirrored. Compare invariants and distributions, include error paths and state transitions, and label what shadow cannot prove.",
+    "Shadow overload and feedback loops: duplication consumes production CPU, network, quotas, or dependency capacity, then retries amplify load. Sample, rate-limit, apply budgets/timeouts, monitor incremental cost, and fail closed.",
+    "Rollback that is not reversible: schema migrations, irreversible data writes, cache formats, or external effects make binary rollback unsafe. Use expand/contract compatibility, versioned configuration, idempotency, tested restore procedures, and separate emergency flag-off from artifact rollback.",
+    "Synthetic blind spot: a small scripted journey passes while a third-party dependency, certificate, long-tail route, or low-traffic tenant is broken. Maintain multi-region probes, varied network/device profiles, and RUM correlation.",
+    "RUM privacy and representativeness failure: raw payloads, URLs, identifiers, or session replay are collected without purpose limitation, or aggressive sampling removes rare but severe cohorts. Minimize fields, pseudonymize, conduct a PIA, publish protected aggregates, and monitor sampling bias.",
+    "Automation without an operator contract: a noisy detector repeatedly rolls back healthy changes, or a stale detector learns a dangerous regression as normal. Version analysis policy, preserve evidence, cap retries, provide pause/manual review, and periodically recalibrate on labeled incidents."
+  ],
+  "maturity_matrix": {
+    "foundational": "Use immutable artifacts, health/readiness checks, one reversible feature flag, a blue/green or small canary ring, basic synthetic checks for critical journeys, and a documented manual rollback. Assign stable cohorts, compare candidate with control on error rate and latency, record exposure and verdicts, isolate shadow writes if shadowing is attempted, and perform a minimal privacy review before collecting RUM.",
+    "advanced": "Operate a shared rollout controller with deterministic cohort assignment, ring/region stages, automatic pause and rollback, flag expiry, schema compatibility checks, multi-region synthetic journeys, and RUM stratified by device, region, network, and release. Use predeclared guardrails, effect sizes, confidence intervals or sequential tests, sample-ratio and telemetry-loss checks, normalized shadow differential analysis, privacy impact assessments, retention limits, and a release-linked feedback process that updates regression cases and synthetic workloads.",
+    "expert_2026": "Treat production quality as a closed-loop experiment system: immutable release/config evidence, policy-versioned exposure control, exclusion-aware overlapping experiments, anytime-valid multi-metric decisions, causal and segment diagnostics, and a fail-closed shadow plane with state/egress isolation. Combine synthetic probes, canary/control evidence, and privacy-preserving RUM with explicit uncertainty and missingness; feed de-identified field distributions and confirmed failures into test-model and journey selection under drift checks. Every promotion, hold, and rollback produces a replayable evidence record, while universal holdouts, incident labels, privacy threat models, and periodic calibration expose blind spots rather than allowing automation to silently normalize them."
+  }
+}

@@ -1,0 +1,193 @@
+{
+  "subject_id": "AI-02",
+  "subject_title": "Agentic-System Testing and Autonomous Quality Engineering",
+  "theoretical_foundations": "An agent under test is a closed-loop socio-technical transition system, not a text function. At step t, a policy pi_theta maps the task, observation, memory, and currently advertised capabilities to a proposed action or tool call; the environment applies a transition and returns new observations. The test object is therefore the trajectory tau = {(state_t, observation_t, action_t, result_t, delta-state_t)}, together with the externally visible side effects and the state of any memory, queue, database, filesystem, or other agent. Final-answer quality is necessary but insufficient. A defensible evaluation separates (1) utility and goal completion, (2) safety invariants and prohibited side effects, (3) security and confidentiality, (4) policy and authorization compliance, (5) reliability and consistency across repeated trials, (6) recovery, stopping, and hand-off behavior, and (7) cost, latency, and resource use. A run should report each dimension separately before any aggregate score; otherwise a high task score can hide a catastrophic unsafe action.\n\nAgentBench established the need for multi-turn interactive evaluation across multiple environments and identified poor long-term reasoning, decision-making, and instruction following as major obstacles. AgentDojo adds mutable application state, multiple dynamic tool calls, untrusted tool-returned data, explicit attacker goals, and utility/security checks over environment state. Its central methodological lesson is that an LLM judge or an LLM-simulated environment can itself be fooled; whenever possible, score a concrete state transition against an executable oracle. tau-bench adds simulated user interaction, domain policies, annotated goal states, and pass^k reliability over repeated trials. These benchmarks are complementary rather than interchangeable: AgentBench is broad, AgentDojo is adversarial and stateful, and tau-bench emphasizes user-policy interaction and consistency.\n\nA useful formal test model defines a task goal G, safety invariant set I, authorization policy P, attacker model A, and resource budget B. A run passes only if the final state satisfies G, every intermediate and final state satisfies I, every action is authorized by P, attacker objectives are not achieved, and the budget remains within B. A partial-progress metric may be reported, but must not substitute for the safety gate. Safety properties include noninterference or information-flow constraints, temporal obligations such as update-then-notify, idempotence, bounded retries, and no irreversible action without approval. Liveness matters as well: stop, escalate, and hand-off controls must complete within a bounded time and leave an auditable state.\n\nThe safety theory is layered. Prompt or model guidance can improve reliability, but it is probabilistic. A capability broker and independent policy engine provide deterministic enforcement at the action boundary. Information-flow labels, temporal constraints, and typed tool contracts make data and action policies inspectable; System-Theoretic Process Analysis (STPA) is useful for deriving hazards from stakeholder losses and interaction failures before implementation. NIST AI RMF is voluntary guidance; ISO/IEC 23894 is risk-management guidance; ISO/IEC 42001 is an organizational management-system standard; and NIST SP 800-53 supplies concrete access-control patterns such as least privilege and processing-domain separation. None of these documents, alone, is an agent benchmark or a proof of safety, so their controls must be instantiated as executable tests and evidence records.\n\nThe main disagreement is where to place trust. LLM-as-judge scoring is cheap and flexible but subject to bias, prompt injection, and evaluator drift. Strict symbolic state oracles are reproducible and resistant to judge manipulation but require domain modeling and may miss qualitative harm. Sandboxes and mocks enable scale and reversibility but can omit production timing, permissions, social context, or rare integrations. Human approval reduces risk for irreversible actions but creates notification fatigue and cannot compensate for missing authorization semantics. Thus, a 2026 evaluation should triangulate deterministic state/side-effect oracles, adversarial trajectory review, targeted human review, and carefully bounded model-based analysis.\n\nFor autonomous quality engineering, generated tests, requirements, assertions, repairs, and review comments are untrusted artifacts until validated. ChatAssert demonstrates a useful loop in which static analysis, compiler feedback, and dynamic test output refine candidate oracles; TARGET demonstrates LLM extraction into a constrained DSL followed by syntactic and semantic validation before simulation; MAGE demonstrates specialized agents plus state-checkpoint feedback. These results support an evidence-backed pattern of generate, constrain, execute, inspect, repair, and independently re-run. They do not establish that generated tests are complete, that generated oracles capture business intent, or that a self-repair loop cannot overfit. Generated artifacts therefore require deterministic compilation, sandboxed execution, mutation or differential testing, provenance, and human approval for high-impact changes. An industrial code-review study found resolved automated comments but also increased pull-request closure duration, illustrating that autonomous QA must optimize decision quality and cycle time together.",
+  "practical_architecture_and_implementation": "Use a harness with eight explicit planes: (1) run specification and fixture registry, (2) environment simulator or digital twin, (3) agent runtime and model adapter, (4) capability broker and policy engine, (5) memory service, (6) trajectory and side-effect recorder, (7) oracle/evaluator service, and (8) experiment orchestrator and evidence store. The harness must pin model snapshot, system/developer instructions, tool schemas, policy version, seed, temperature, retrieval index, environment image, clock, and external-data fixtures. Each run receives an immutable run ID and a resettable state snapshot.\n\nThe environment should expose realistic typed objects and APIs rather than a chat transcript: inbox, calendar, tickets, repository, CI system, cloud storage, identity provider, and service dependencies as appropriate. Model mutable state, permissions, concurrency, eventual consistency, rate limits, latency, malformed responses, timeouts, stale records, partial failures, and tool errors. Add trusted and untrusted content channels, including indirect instructions in emails, documents, web pages, issue comments, and tool metadata. Keep a production-like semantic model while replacing credentials, payments, customer data, and physical effects with synthetic or reversible counterparts. Use scenario families, hidden holdouts, metamorphic variants, and seeded adversarial mutations so that agents cannot pass by memorizing prompts.\n\nEvery proposed call passes through an independent broker. The broker authenticates the agent identity, checks tenant and user delegation, resolves the capability to a resource and operation, validates arguments against a typed schema, propagates confidentiality/integrity/provenance labels, evaluates temporal and rate policies, checks the remaining budget, and classifies side-effect risk. Read-only and reversible actions can run automatically within a sandbox. Actions that write, publish, message externally, change permissions, execute code, move money, or affect production require a transaction boundary, dry-run or preview, and either explicit approval or a pre-authorized policy with a bounded scope. The broker must reject malformed, over-privileged, out-of-scope, or policy-conflicting calls even if the model insists. Use ephemeral credentials, per-tool identities, network egress allowlists, separate processing domains, resource quotas, syscall/filesystem restrictions, and secret redaction.\n\nRepresent autonomy as a risk-adaptive policy rather than a single on/off switch. A practical four-tier decision is deny/blocklist for forbidden flows; allowlist for permitted low-risk calls; must-list requirements for actions that must accompany another action; and confirmation/escalation for uncertain or irreversible calls. Add circuit breakers for repeated failures, loop/repetition detection, token and wall-clock ceilings, maximum tool depth, maximum write count, and a kill switch outside the agent process. Stop must cancel queued work, revoke leases and credentials, persist the last consistent snapshot, and report what was completed. Handoff must include the goal, relevant state delta, attempted actions, unresolved uncertainty, policy decisions, and links to the immutable trajectory.\n\nRecord a complete append-only trajectory: user and developer messages, retrieved memory IDs and provenance, tool advertisements, model outputs, chosen action, exact arguments after redaction, broker decision, tool result, state hash before and after, side-effect diff, policy version, latency, tokens, cost, retries, approvals, stop/handoff events, and evaluator outcomes. Do not store chain-of-thought as a prerequisite; record concise rationale fields or structured decision codes where needed for audit. Preserve raw evidence in a protected store and expose a minimized view for ordinary debugging. Use cryptographic hashes or signed events to detect tampering and maintain cross-agent correlation IDs.\n\nEvaluate at three layers. At the trajectory layer, check forbidden actions, tool sequence constraints, information-flow violations, prompt-injection resistance, memory writes, retries, delegation, and handoff timing. At the state layer, compare concrete final state with the annotated goal and check invariants after every mutation, including records created, modified, deleted, shared, or exfiltrated. At the artifact layer, parse and type-check generated tests or code, compile, lint, run unit/integration tests in isolation, run static security analysis, mutation testing, differential/reference comparison, and review coverage and oracle quality. An LLM judge may label qualitative traces, but never authorizes a side effect or overrides deterministic gates.\n\nFor agent memory, separate session, tenant, and long-term stores; attach source, author, timestamp, sensitivity, integrity, and confidence metadata; require a typed schema and provenance for writes; quarantine untrusted content; apply TTL and revocation; and test retrieval under conflicting or poisoned memories. A memory write should be a controlled side effect with review or policy gates, not an automatic consequence of a model summary. For multi-agent systems, issue distinct identities and capability sets, use typed messages with sender, recipient, purpose, expiry, and provenance, prevent unrestricted shared memory, and require policy checks at every handoff and tool call. Test collusion, confused-deputy behavior, privilege laundering through delegation, stale messages, and partial agent failure.\n\nThe autonomous-QA loop should be bounded: select a change or requirement; generate candidate tests, models, assertions, or repairs; validate syntax and semantics; execute in a disposable environment; collect compiler, runtime, static-analysis, mutation, and differential evidence; ask an independent checker to classify results; propose a patch; and stop after a fixed iteration budget or escalate. Keep the source requirement and expected behavior outside the generator-controlled state. Require a human owner for acceptance of new or modified oracles, security exceptions, production-impacting repairs, and changes to the harness itself. Measure defect detection, mutation score, flaky rate, false-positive/false-negative samples, review burden, escape rate, token/tool cost, and p50/p95 latency.\n\nAn enterprise gate should fail closed for critical safety/security invariants, preserve a replayable package for each release, and separate development, staging, canary, and production capabilities. Promote an agent only after benign, adversarial, recovery, long-horizon, load, cost, and drift suites pass on hidden scenarios. Use shadow or canary execution before write access, monitor policy denials and side-effect anomalies, periodically revalidate capability grants, and trigger rollback or human takeover on drift. Treat benchmark numbers as local evidence for a versioned configuration, not a universal claim about agent capability.",
+  "primary_evidence": [
+    {
+      "source_title": "Artificial Intelligence Risk Management Framework (AI RMF 1.0)",
+      "authors_or_institution": "Elham Tabassi, National Institute of Standards and Technology",
+      "year": 2023,
+      "source_type": "Formal_Standard",
+      "doi_or_url": "https://doi.org/10.6028/NIST.AI.100-1",
+      "verbatim_excerpt": "The Framework is intended to be voluntary, rights-preserving, non-sector specific, and use-case agnostic.",
+      "analytical_interpretation": "This is normative guidance about intended use, not a certification or an agent-specific safety guarantee. In the 2026 SDLC, map Govern, Map, Measure, and Manage activities to agent inventories, threat models, trajectory metrics, release gates, incident response, and evidence ownership; retain the distinction between voluntary guidance and mandatory organizational policy."
+    },
+    {
+      "source_title": "Artificial Intelligence Risk Management Framework: Generative Artificial Intelligence Profile",
+      "authors_or_institution": "National Institute of Standards and Technology",
+      "year": 2024,
+      "source_type": "Formal_Standard",
+      "doi_or_url": "https://doi.org/10.6028/NIST.AI.600-1",
+      "verbatim_excerpt": "AI risks can differ from or intensify traditional software risks.",
+      "analytical_interpretation": "The profile supports lifecycle and actor-specific risk treatment. For agents, extend ordinary software testing with indirect-instruction, memory, tool-composition, provenance, human-interaction, and long-horizon scenarios; use the profile as a risk taxonomy and action catalog rather than as a sufficient test oracle."
+    },
+    {
+      "source_title": "ISO/IEC 23894:2023 Information technology — Artificial intelligence — Guidance on risk management",
+      "authors_or_institution": "International Organization for Standardization and International Electrotechnical Commission",
+      "year": 2023,
+      "source_type": "Formal_Standard",
+      "doi_or_url": "https://www.iso.org/standard/77304.html",
+      "verbatim_excerpt": "The application of this guidance can be customized to any organization and its context.",
+      "analytical_interpretation": "Customization is important because agent risk depends on tools, autonomy, data, users, and consequences. In the SDLC, document context, risk appetite, stakeholders, assumptions, and residual risk for each agent workflow; do not treat a generic benchmark pass as context-independent evidence."
+    },
+    {
+      "source_title": "ISO/IEC 42001:2023 Information technology — Artificial intelligence — Management system",
+      "authors_or_institution": "International Organization for Standardization and International Electrotechnical Commission",
+      "year": 2023,
+      "source_type": "Formal_Standard",
+      "doi_or_url": "https://www.iso.org/standard/81230.html",
+      "verbatim_excerpt": "specifies requirements for establishing, implementing, maintaining, and continually improving an Artificial Intelligence Management System.",
+      "analytical_interpretation": "This is an organizational management-system requirement, not a technical agent harness. It can anchor ownership, competence, lifecycle records, corrective action, and continual improvement around agent QA, while technical teams still need executable authorization, sandbox, oracle, and replay controls."
+    },
+    {
+      "source_title": "Security and Privacy Controls for Information Systems and Organizations (NIST SP 800-53 Rev. 5)",
+      "authors_or_institution": "Ron Ross and Victoria Pillitteri, National Institute of Standards and Technology",
+      "year": 2020,
+      "source_type": "Formal_Standard",
+      "doi_or_url": "https://doi.org/10.6028/NIST.SP.800-53r5",
+      "verbatim_excerpt": "Provide separate processing domains to enable finer-grained allocation of user privileges.",
+      "analytical_interpretation": "The AC-6 enhancement translates directly to agent sandboxes and capability brokers: isolate planner, tool adapters, secrets, tenant data, and generated code so a model cannot turn a broad process privilege into an unrestricted side effect. Tailor the control to the system impact level and document exceptions."
+    },
+    {
+      "source_title": "AgentBench: Evaluating LLMs as Agents",
+      "authors_or_institution": "Xiao Liu et al., Tsinghua University, The Ohio State University, and UC Berkeley",
+      "year": 2024,
+      "source_type": "University_Courseware",
+      "doi_or_url": "https://proceedings.iclr.cc/paper_files/paper/2024/hash/e9df36b21ff4ee211a8b71ee8b7e9f57-Abstract-Conference.html",
+      "verbatim_excerpt": "We present AgentBench, a multi-dimensional benchmark that consists of 8 distinct environments",
+      "analytical_interpretation": "The peer-reviewed benchmark demonstrates why agent evaluation needs interactive environments and multiple task families. Adopt its breadth principle, but supplement it with enterprise-specific state oracles, authorization tests, side-effect diffs, hidden holdouts, and cost/latency reporting."
+    },
+    {
+      "source_title": "AgentDojo: A Dynamic Environment to Evaluate Prompt Injection Attacks and Defenses for LLM Agents",
+      "authors_or_institution": "Edoardo Debenedetti, Jie Zhang, Mislav Balunović, Luca Beurer-Kellner, Marc Fischer, and Florian Tramèr, ETH Zurich and Invariant Labs",
+      "year": 2024,
+      "source_type": "University_Courseware",
+      "doi_or_url": "https://proceedings.neurips.cc/paper_files/paper/2024/file/97091a5177d8dc64b1da8bf3e1f6fb54-Paper-Datasets_and_Benchmarks_Track.pdf",
+      "verbatim_excerpt": "AgentDojo requires agents to dynamically call multiple tools in a stateful, adversarial environment.",
+      "analytical_interpretation": "This provides a concrete architecture for testing indirect prompt injection: mutable application state, attacker/user goals, multiple tools, untrusted data, and executable utility/security checks. Enterprise harnesses should preserve those properties and add memory poisoning, identity delegation, concurrency, and production permission boundaries."
+    },
+    {
+      "source_title": "tau-bench: A Benchmark for Tool-Agent-User Interaction in Real-World Domains",
+      "authors_or_institution": "Shunyu Yao, Noah Shinn, Pedram Razavi, and Karthik Narasimhan, Sierra and Princeton University",
+      "year": 2025,
+      "source_type": "University_Courseware",
+      "doi_or_url": "https://openreview.net/forum?id=roNSXZpUDN",
+      "verbatim_excerpt": "compares the database state at the end of a conversation with the annotated goal state.",
+      "analytical_interpretation": "The goal-state comparison is a strong pattern for deterministic evaluation of multi-turn agents, and pass^k exposes inconsistency hidden by a single successful run. Use domain policy fixtures, simulated users, repeated trials, and state-delta oracles, while reporting how simulated users and databases differ from production."
+    },
+    {
+      "source_title": "Towards Verifiably Safe Tool Use for LLM Agents",
+      "authors_or_institution": "Aarya Doshi, Yining Hong, Congying Xu, Eunsuk Kang, Alexandros Kapravelos, and Christian Kästner, Georgia Tech, Carnegie Mellon University, HKUST, and NC State",
+      "year": 2026,
+      "source_type": "ACM",
+      "doi_or_url": "https://doi.org/10.1145/3786582.3786839",
+      "verbatim_excerpt": "enhance reliability but cannot guarantee system safety.",
+      "analytical_interpretation": "The ICSE-NIER position distinguishes probabilistic model safeguards from enforceable information-flow and temporal specifications. In an enterprise SDLC, derive hazards with STPA, encode data labels and sequence constraints, and enforce them at an independent broker; use model detectors as defense-in-depth, never as the sole authorization boundary."
+    },
+    {
+      "source_title": "OpenClaw in the Wild: Security Analysis of Autonomous Agents",
+      "authors_or_institution": "Wanlun Ma, Qing-Long Han, Xiaogang Zhu, Wei Zhou, Junwu Xiong, Zhihang Ren, Sheng Wen, and Yang Xiang, Swinburne University of Technology and collaborators",
+      "year": 2026,
+      "source_type": "IEEE",
+      "doi_or_url": "https://doi.org/10.1109/JAS.2026.126209",
+      "verbatim_excerpt": "memory poisoning, unsafe tool invocation, data exfiltration, and malicious skill abuse are not isolated anomalies.",
+      "analytical_interpretation": "The IEEE case study frames long-lived agents as a chain of trust boundaries: channel, session/state, tool execution, external content, and extension supply chain. Test each boundary and the transitions between them; require memory integrity, capability-scoped mediation, extension governance, and evidence-oriented oversight."
+    },
+    {
+      "source_title": "RedAgent: An Autonomous Agent for Context-Aware Red Teaming of LLM Jailbreaks",
+      "authors_or_institution": "IEEE Transactions on Dependable and Secure Computing authors",
+      "year": 2026,
+      "source_type": "IEEE",
+      "doi_or_url": "https://doi.org/10.1109/TDSC.2026.3665230",
+      "verbatim_excerpt": "we discover 600 vulnerabilities of these real-world applications with only two queries per vulnerability.",
+      "analytical_interpretation": "The result shows that context-specific, agentic red teaming can expose weaknesses missed by generic prompts. Make attack generation adaptive to the target tools, policy, memory, and workflow, but isolate the red-team agent, cap its capabilities, seed only synthetic targets, and independently verify each reported vulnerability."
+    },
+    {
+      "source_title": "TARGET: Traffic Rule-Based Test Generation for Autonomous Driving via Validated LLM-Guided Knowledge Extraction",
+      "authors_or_institution": "Yao Deng, Zhi Tu, Jiaohong Yao, Mengshi Zhang, Tianyi Zhang, and Xi Zheng, Macquarie University and collaborators",
+      "year": 2025,
+      "source_type": "IEEE",
+      "doi_or_url": "https://doi.org/10.1109/TSE.2025.3569086",
+      "verbatim_excerpt": "enabling syntactic and semantic validation for each component.",
+      "analytical_interpretation": "TARGET is evidence for constraining LLM-generated test scenarios in a compositional DSL before simulation, then collecting executable recordings and logs. Apply the same pipeline to agent test plans, tool arguments, policies, and fixtures: parse, type-check, validate semantics, execute in a controlled environment, and retain failure evidence."
+    },
+    {
+      "source_title": "CHATASSERT: LLM-based Test Oracle Generation with External Tools Assistance",
+      "authors_or_institution": "Ishrak Hayet, Adam Scott, and Marcelo d’Amorim, North Carolina State University",
+      "year": 2025,
+      "source_type": "IEEE",
+      "doi_or_url": "https://doi.org/10.1109/TSE.2024.3519159",
+      "verbatim_excerpt": "CHATASSERT uses dynamic and static information to iteratively refine prompts for querying large language models (LLMs).",
+      "analytical_interpretation": "The IEEE study supports tool-augmented oracle generation with compiler and runtime feedback, but its own accuracy limitations imply that generated assertions remain candidates. Require independent reference behavior, mutation/differential tests, review sampling, and a hard iteration budget before an oracle can gate a release."
+    },
+    {
+      "source_title": "Understandable Test Generation Through Capture/Replay and LLMs",
+      "authors_or_institution": "Amirhossein Deljouyi, Delft University of Technology",
+      "year": 2024,
+      "source_type": "ACM",
+      "doi_or_url": "https://doi.org/10.1145/3639478.3639789",
+      "verbatim_excerpt": "these generated tests often pose challenges in terms of comprehension for developers.",
+      "analytical_interpretation": "The ICSE Companion work highlights that executable coverage does not ensure understandable, maintainable tests. Autonomous QA should preserve scenario provenance, meaningful names, reviewable assertions, and user evaluation; measure developer comprehension and maintenance cost alongside coverage."
+    },
+    {
+      "source_title": "A Review on Integrating Autonomy Into System of Systems: Challenges and Research Directions",
+      "authors_or_institution": "Mohammadreza Torkjazi and Ali K. Raz, George Mason University",
+      "year": 2024,
+      "source_type": "IEEE",
+      "doi_or_url": "https://doi.org/10.1109/OJSE.2024.3456037",
+      "verbatim_excerpt": "four overarching challenges for SoASs are identified",
+      "analytical_interpretation": "The IEEE systems-engineering review warns that integrated autonomous systems produce emergence, architecture, integration, and test/evaluation challenges beyond component testing. For multi-agent QA, test interaction contracts, shared semantics, delegation, cross-agent state, and system-level emergent behavior continuously."
+    },
+    {
+      "source_title": "MAGE: A Multi-Agent Engine for Automated RTL Code Generation",
+      "authors_or_institution": "Yujie Zhao, Hejia Zhang, Hanxian Huang, Zhongming Yu, and Jishen Zhao, University of California San Diego",
+      "year": 2025,
+      "source_type": "IEEE",
+      "doi_or_url": "https://doi.org/10.1109/DAC63849.2025.11133191",
+      "verbatim_excerpt": "we design a novel Verilog-state checkpoint checking mechanism that enables early detection of functional errors",
+      "analytical_interpretation": "MAGE provides a concrete pattern for autonomous generation with specialized roles, checkpointing, and targeted feedback. Generalize it cautiously: checkpoint generated artifacts and environment state, use independent judges and deterministic simulation, and prevent a repair agent from changing the test oracle or acceptance criteria it is optimizing."
+    },
+    {
+      "source_title": "Automated Code Review in Practice",
+      "authors_or_institution": "Umut Cihan, Vahid Haratian, Arda İçöz, Mert Kaan Gül, Ömercan Devran, Emircan Furkan Bayendur, Baykal Mehmet Uçar, Eray Tüzün, and collaborators",
+      "year": 2025,
+      "source_type": "IEEE",
+      "doi_or_url": "https://doi.org/10.1109/ICSE-SEIP66354.2025.00043",
+      "verbatim_excerpt": "the overall average pull request closure duration increased from five hours 52 minutes to eight hours 20 minutes",
+      "analytical_interpretation": "The industrial IEEE/ACM study is a useful counterweight to quality-only claims: automation can resolve comments yet lengthen delivery. Enterprise autonomous QA must measure review burden, latency, rework, false alarms, and throughput, and should not assume that more generated feedback improves the engineering system."
+    }
+  ],
+  "failure_modes_and_antipatterns": [
+    "Final-answer-only evaluation: a plausible response can conceal unauthorized reads, writes, data leakage, skipped approvals, or destructive intermediate actions; inspect the full trajectory and state deltas.",
+    "Single-run optimism: stochastic planning and tool failures make one success non-representative; use repeated trials, pass^k, confidence intervals, and fixed seeds plus varied seeds.",
+    "LLM-as-judge as security boundary: a judge can share the same blind spots or be injected by the trace; reserve it for qualitative labels and require deterministic policy/state gates.",
+    "LLM-simulated environment for high-impact claims: a simulator may accept impossible actions or be fooled by the same injection; use executable domain models and concrete state oracles for authorization and side effects.",
+    "Benchmark overfitting and contamination: public prompts, fixtures, or model-training overlap inflate results; maintain versioned hidden holdouts, scenario mutations, and leakage checks.",
+    "Prompt injection through external content: email, documents, web pages, issue comments, tool descriptions, and search results are treated as instructions; separate data from control, label provenance, and enforce at the broker.",
+    "Memory poisoning and stale memory: an attacker writes a plausible rule or secret into long-term retrieval; use typed/provenance-controlled writes, quarantine, TTL, revocation, tenant isolation, and poisoning tests.",
+    "Confused deputy and privilege laundering: a low-privilege planner delegates to a high-privilege worker or tool; bind every call to identity, tenant, purpose, resource, and capability, and reauthorize after handoff.",
+    "Unrestricted shell, filesystem, network, or secret access: a sandbox that shares credentials or egress can turn a harmless plan into production impact; use separate processing domains, ephemeral credentials, quotas, and egress allowlists.",
+    "Irreversible side effects before confirmation: sending, publishing, deleting, paying, changing permissions, or deploying occurs before preview or approval; require dry-run, transaction/undo, two-phase commit, and risk-adaptive confirmation.",
+    "Shared multi-agent memory and identity: agents can collude, confuse authorship, or inherit stale authority; use distinct principals, typed messages, scoped memory, expiry, provenance, and per-hop policy checks.",
+    "Planner drift, loops, and retry storms: the agent repeats failed calls, changes goals, or burns resources; cap depth, retries, tokens, wall-clock, writes, and cost; detect repeated states and trigger circuit breakers.",
+    "Long-horizon compounding error: small wrong assumptions accumulate across dozens of tool calls; checkpoint state, revalidate invariants after mutations, summarize with source links, and require periodic plan/goal reconciliation.",
+    "Context truncation and hidden state loss: old constraints or approvals fall out of context while tools remain available; externalize policy and state in the broker and test long-context eviction explicitly.",
+    "Schema and argument hallucination: natural-language plans produce malformed, ambiguous, or over-broad API arguments; use typed contracts, canonicalization, precondition checks, dry-run previews, and negative tests.",
+    "Reward or metric hacking: the agent satisfies a shallow goal, edits tests, suppresses warnings, or exploits a grader rather than delivering intended quality; keep requirements and oracles outside agent control and use independent mutation/differential checks.",
+    "Self-confirming QA loop: the same generator writes code, tests, oracle, and repair until it passes; separate roles and privileges, freeze acceptance criteria, sample human review, and test against hidden/reference behavior.",
+    "Generated-artifact unsoundness: a test may compile but assert the wrong behavior, have trivial assertions, duplicate existing coverage, or be unreadable; measure semantic validity, mutation score, differential agreement, coverage novelty, and maintainability.",
+    "Repair loop masks a defect: repeated LLM repairs can delete assertions, weaken requirements, or normalize a regression; diff every repair, enforce invariant-preserving transformations, limit iterations, and require owner approval for behavior changes.",
+    "Simulation-to-production gap: mocks omit timing, permission, concurrency, rate limits, data quality, or social context; calibrate simulators with production traces, run shadow/canary tests, and report residual uncertainty.",
+    "Nondeterministic or flaky harness: changing model snapshots, APIs, clocks, retrieval order, or fixtures makes failures irreproducible; pin versions, isolate network, seed randomness, snapshot state, and classify flakes separately.",
+    "Cost and latency runaway: broad exploration, repeated judges, and tool retries exceed SLOs; enforce token/tool/time budgets, report p50/p95 and cost per successful task, and escalate instead of silently degrading safety.",
+    "Unsafe recovery: rollback itself deletes evidence, repeats a hazardous action, or restores stale secrets; make recovery idempotent, transactional, credential-revoking, observable, and human-escalatable.",
+    "Handoff failure and automation bias: the agent escalates without a complete context or humans approve habituated prompts; provide structured handoff packets, bounded response windows, meaningful risk summaries, and audit sampled approvals.",
+    "Overclaiming standards compliance: a risk framework or management-system certificate is treated as proof that an agent is safe; map normative controls to executable tests and retain scope, assumptions, and residual-risk evidence."
+  ],
+  "maturity_matrix": {
+    "foundational": "Inventory every agent, model, tool, memory store, data domain, owner, and side effect. Define task goals, prohibited actions, risk classes, stop/handoff criteria, and resource budgets. Run deterministic resettable mocks with concrete goal-state and side-effect oracles; log complete trajectories and state hashes. Put all writes behind a capability broker, least-privilege identities, sandboxing, and human approval for irreversible actions. Gate generated tests, code, requirements, and oracles on parse/type/compile, isolated execution, static checks, and owner review. Track pass rate, unsafe-action rate, flake rate, cost, latency, and review burden.",
+    "advanced": "Add mutable multi-application environments, domain policies, realistic simulated users, untrusted external content, adaptive prompt-injection/red-team suites, memory provenance and quarantine, multi-agent identity/capability isolation, snapshots and transactional rollback, temporal and information-flow invariants, and repeated-trial pass^k reporting. Run long-horizon, recovery, concurrency, permission-failure, and drift scenarios in CI and pre-release. Use hidden holdouts, mutation/differential testing, artifact provenance, independent evaluators, p50/p95 cost and latency SLOs, canary/shadow execution, and formal escalation packets. Make broker enforcement independent of model prompts and fail closed on critical invariants.",
+    "expert_2026": "Operate a risk-adaptive autonomy platform with capability-scoped agents, signed append-only trajectories, typed cross-agent handoffs, policy/version attestation, revocable memory, and enforceable data-flow plus temporal specifications at every tool boundary. Continuously generate and mutate scenarios from incident and production evidence while protecting hidden holdouts; triangulate formal checks, stateful simulation, adversarial trajectory analysis, human review, and shadow/canary telemetry. Permit autonomous test/oracle/repair loops only inside immutable acceptance criteria, disposable sandboxes, bounded budgets, and independent validation; block self-modification of policies, oracles, and release gates. Revalidate grants, models, retrieval stores, and simulators on drift; quantify utility, safety, security, recovery, consistency, cost, latency, and human workload separately; preserve evidence packages for audit and provide tested external kill, rollback, and human takeover controls."
+  }
+}

@@ -1,0 +1,174 @@
+{
+  "subject_id": "FND-01",
+  "subject_title": "Quality Theory, Quality Models, Testing Standards, and Evidence",
+  "theoretical_foundations": "Software quality is a context-dependent degree to which a product, service, process, or system satisfies stated and implied stakeholder needs under specified conditions; it is not a single intrinsic score. A useful vocabulary separates functional behavior from quality attributes, internal/product properties from quality-in-use outcomes, and process assurance from product verification. Quality attributes are stakeholder concerns such as functional suitability, performance efficiency, compatibility, interaction capability, reliability, security, maintainability, flexibility, and safety. ISO/IEC 25010:2023 organizes these nine product-quality characteristics into a reference model and subordinate characteristics, but it does not decide which characteristics matter most, assign universal weights, or supply every domain-specific metric. Teams therefore convert each selected characteristic into a measurable quality requirement with context, operating conditions, threshold or target, measurement method, and acceptance rule. A quality model is the bridge from stakeholder intent to measurable properties; a metric is evidence about a property, not the property itself.\n\nVerification asks whether a work product conforms to the requirements of the activity that produced it; validation asks whether the resulting product satisfies intended use and user needs. IEEE 1012 treats both as lifecycle processes and includes analysis, evaluation, reviews, inspections, assessments, and testing across system, software, hardware, interfaces, documentation, development, maintenance, and reuse. Quality assurance is broader process governance: planned and independent activities that create justified confidence that lifecycle processes and outputs meet applicable requirements. Quality control is product-focused checking. Testing is one evidence-producing verification/validation activity, usually by executing or examining a test item against expected results and a defined oracle; passing tests support bounded claims under tested conditions and do not establish defect absence. Static reviews and analysis, requirements/design checks, configuration control, and independent assessment are complementary because many failures are not observable through the selected dynamic tests.\n\nAssurance is claim-oriented. ISO/IEC/IEEE 15026 provides the conceptual pattern of claim, context, argument, assumptions, and evidence; an assurance case makes the reasoning inspectable. Evidence should be judged for relevance to the claim, validity of the method and oracle, completeness against the claim scope, independence where required, reproducibility, provenance and integrity, freshness, and explicit uncertainty. An execution log, review record, static-analysis result, trace link, defect disposition, or accepted residual-risk decision is evidence only when its object, version, environment, method, result, and interpretation are known. Evidence increases justified confidence; it is not a guarantee and cannot compensate for an ill-posed requirement or an invalid oracle.\n\nQuality risk connects the concepts. A product risk is the possibility that a product is defective in a specific function, quality attribute, or structural property; a project risk concerns delivery or management conditions. Risk analysis estimates consequence and likelihood, then prioritizes treatments such as requirement clarification, design controls, reviews, static analysis, dynamic tests, operational safeguards, supplier controls, or explicit residual-risk acceptance. Risk-based testing and assurance allocate limited attention to the claims whose failure would matter most; they do not mean that low-ranked requirements can be undocumented or that high coverage is equivalent to low risk. Integrity levels and independence requirements should scale with consequence and uncertainty.\n\nThe standards are complementary rather than interchangeable. ISO/IEC/IEEE 12207:2026 supplies a common, lifecycle-wide process framework and deliberately does not prescribe a particular lifecycle model, method, or technique. ISO/IEC/IEEE 29119-1:2022 supplies concepts; 29119-2:2021 defines organizational, management, and dynamic test processes; and 29119-3:2021 defines test-documentation templates as process outputs. ISO/IEC/IEEE 15289:2019 maps lifecycle processes to information-item purpose and content. IEEE 730-2026 governs software quality-assurance process initiation, planning, control, and execution, while IEEE 1012-2024 defines V&V processes and integrity levels. ISO/IEC/IEEE 15026-1:2025 and 15026-2:2022 address assurance vocabulary and assurance-case structure. NISTIR 8397 and NIST SP 800-218 are guidance, not substitutes for a project-tailored assurance argument or a conformity assessment.\n\nThere are important limitations and disagreements. ISO 25010 is intentionally generic: its categories can omit domain-specific properties, hide interactions among attributes, and encourage false precision when teams select arbitrary weights. Quality-in-use and sociotechnical outcomes can diverge from product metrics. Standards state processes, outputs, and terminology; they do not guarantee competent execution, valid measures, or successful release decisions. 29119 allows tailored conformance when tailoring and rationale are documented, but a template-heavy interpretation can create bureaucracy and incentives to optimize paperwork. Metrics are context-sensitive proxies: one threshold or composite score can mask a severe security, safety, reliability, or usability failure. ACM/SEI evidence also indicates that architecture-quality metrics have less empirical grounding than code metrics and that the most-used architecture assessments still rely heavily on expert judgment. Consequently, a 2026 quality program should combine normative conformance, risk-based engineering judgment, triangulated evidence, and periodic validation that the model still represents stakeholder needs.",
+  "practical_architecture_and_implementation": "Implement a quality-and-evidence architecture as a traceable chain rather than as a test-count dashboard. (1) Establish the context contract: identify stakeholders, intended use, operating conditions, critical functions, hazards, security/privacy obligations, suppliers, and lifecycle boundaries. Tailor ISO/IEC 25010:2023 to a small set of relevant characteristics and subcharacteristics; for each, record a measurable requirement, unit, population or workload, target/threshold, measurement method, acceptance rule, and owner. Preserve both the generic ISO label and the domain-specific interpretation. (2) Establish the risk contract: link every material quality requirement to product/project risks, consequence, likelihood, exposure, risk owner, integrity level, treatment, residual-risk tolerance, and review date. Reassess links whenever requirements, architecture, dependencies, operating context, or evidence changes. (3) Establish the lifecycle contract: map 12207:2026 processes to the organization’s chosen lifecycle, then instantiate 29119-2 organizational, management, and dynamic test processes; use 29119-1 terminology and 29119-3 records. Apply IEEE 730-2026 SQA controls and IEEE 1012-2024 V&V activities, with independence proportionate to integrity level. Include requirements, architecture, implementation, integration, release, maintenance, and reuse/COTS activities; keep static reviews and analysis visible alongside execution-based testing. (4) Establish the information/evidence contract: use 15289:2019 information-item concepts and 15026-2 assurance-case structure. A minimum evidence record should contain claim or requirement identifier and version, ISO attribute, risk rationale, method and oracle, test/review item, build/configuration/environment, tool and version, data or fixture identifier, timestamp, executor/reviewer and independence, actual and expected results, anomalies, defect links, limitations, and disposition. Store records with immutable or auditable provenance and retain enough context for an independent party to reproduce or challenge the conclusion. (5) Establish a decision contract: release status is a decision over claim coverage, evidence quality, unresolved defects, residual risk, and exceptions, not a binary all-tests-passed rule. For each exception, record scope, rationale, compensating control, owner, expiry, and re-verification trigger.\n\nA practical standards map is: ISO/IEC/IEEE 12207:2026 for lifecycle process purpose and outcomes; ISO/IEC/IEEE 25010:2023 for product-quality taxonomy; ISO/IEC/IEEE 29119-1:2022 for concepts and terminology, 29119-2:2021 for test processes, and 29119-3:2021 for test documentation; ISO/IEC/IEEE 15289:2019 for lifecycle information-item content; IEEE 730-2026 for SQA process requirements; IEEE 1012-2024 for system/software/hardware V&V; ISO/IEC/IEEE 15026-1:2025 and 15026-2:2022 for assurance concepts and cases; NISTIR 8397 for a broadly applicable minimum verification baseline; and NIST SP 800-218 for secure-development practices and supply-chain communication. Treat each document according to its normative status and scope. The 2026 editions create a migration concern: 12207:2026 is current, while IEEE 730-2026 states harmonization with 12207:2017 and 15289:2019; organizations should document the edition mapping and resolve terminology or information-item deltas instead of silently mixing clauses. IEEE 1012-2024 is the active revision published in 2025, and ISO/IEC/IEEE 15289:2019 remains current after 2025 confirmation but is marked for revision in 2026.\n\nFor measurement, use a goal-question-measure chain: first state the decision or claim, then identify questions that would reduce uncertainty, then select measures and evidence whose construct validity is defensible. Prefer distributions and trends, stratified by component, version, environment, and risk, over universal single numbers. Use composite quality scores only when weights, scales, missing-data treatment, interactions, and sensitivity are explicitly justified and stakeholders understand what aggregation can hide. Review the model after incidents, major changes, supplier substitutions, and periodic stakeholder feedback. Keep the evidence graph queryable so an auditor, maintainer, or release authority can traverse requirement to risk to treatment to artifact to result to defect to residual-risk decision without relying on a manually reconstructed narrative.\n\nFor 2026 enterprise use, require versioned quality-model profiles per product family, machine-readable trace identifiers, signed or tamper-evident evidence where assurance stakes warrant it, explicit third-party and COTS evidence boundaries, and a documented independence policy. Automate collection and consistency checks where safe, but retain human judgment for interpreting ambiguous requirements, conflicts among quality attributes, evidence sufficiency, and residual risk. A generated report is not assurance until its claims, assumptions, evidence, and argument are reviewed.",
+  "primary_evidence": [
+    {
+      "source_title": "ISO/IEC 25010:2023 — Systems and software engineering — Systems and software Quality Requirements and Evaluation (SQuaRE) — Product quality model",
+      "authors_or_institution": "International Organization for Standardization and International Electrotechnical Commission, ISO/IEC JTC 1/SC 7",
+      "year": 2023,
+      "source_type": "ISO",
+      "doi_or_url": "https://www.iso.org/standard/78176.html",
+      "verbatim_excerpt": "The product quality model is composed of nine characteristics (which are further subdivided into subcharacteristics)",
+      "analytical_interpretation": "This normative reference model provides a shared taxonomy for quality requirements and measurement across stakeholders. In a 2026 SDLC, teams should select and operationalize relevant characteristics rather than treat all nine as equally important or mistake the taxonomy for a complete metric catalogue."
+    },
+    {
+      "source_title": "ISO/IEC/IEEE 29119-1:2022 — Software testing — Part 1: General concepts",
+      "authors_or_institution": "ISO/IEC/IEEE Joint Technical Committee ISO/IEC JTC 1/SC 7",
+      "year": 2022,
+      "source_type": "ISO",
+      "doi_or_url": "https://www.iso.org/obp/ui?_escaped_fragment_=iso%3Astd%3Aiso-iec-ieee%3A29119%3A-1%3Aed-2%3Av1%3Aen",
+      "verbatim_excerpt": "Testing is the primary approach to risk treatment in software development.",
+      "analytical_interpretation": "The standard frames testing as a risk treatment within a broader strategy, not as proof of quality in isolation. Use risk to prioritize test and assurance effort, while retaining reviews, design controls, security measures, and explicit residual-risk decisions for risks testing cannot address."
+    },
+    {
+      "source_title": "ISO/IEC/IEEE 29119-2:2021 — Software testing — Part 2: Test processes",
+      "authors_or_institution": "ISO/IEC/IEEE Joint Technical Committee ISO/IEC JTC 1/SC 7",
+      "year": 2021,
+      "source_type": "ISO",
+      "doi_or_url": "https://www.iso.org/standard/79428.html",
+      "verbatim_excerpt": "This document specifies test processes that can be used to govern, manage and implement software testing",
+      "analytical_interpretation": "Part 2 is normative process guidance spanning organizational, management, and dynamic levels and applicable across lifecycle models. A 2026 implementation should instantiate only the needed processes, document tailoring and rationale, and connect each process output to risk and evidence rather than copy every template."
+    },
+    {
+      "source_title": "ISO/IEC/IEEE 29119-3:2021 — Software testing — Part 3: Test documentation",
+      "authors_or_institution": "ISO/IEC/IEEE Joint Technical Committee ISO/IEC JTC 1/SC 7",
+      "year": 2021,
+      "source_type": "ISO",
+      "doi_or_url": "https://www.iso.org/standard/79429.html",
+      "verbatim_excerpt": "This document specifies software test documentation templates that can be used for any organization, project or testing activity.",
+      "analytical_interpretation": "Documentation is defined as an output of test processes, so an evidence record should preserve process context, expected and actual results, configuration, defects, and decisions. Templates are adaptable information structures, not evidence by themselves."
+    },
+    {
+      "source_title": "ISO/IEC/IEEE 12207:2026 — Systems and software engineering — Software life cycle processes",
+      "authors_or_institution": "International Organization for Standardization and International Electrotechnical Commission, ISO/IEC JTC 1/SC 7 with IEEE",
+      "year": 2026,
+      "source_type": "ISO",
+      "doi_or_url": "https://www.iso.org/standard/90219.html",
+      "verbatim_excerpt": "This document establishes a common framework for software life cycle processes.",
+      "analytical_interpretation": "The current lifecycle standard supplies common process purposes and outcomes across acquisition, supply, development, operation, maintenance, and disposal, including iterative and agile use, while leaving method selection to engineering judgment. Quality teams should map assurance and test outputs to this framework instead of treating testing as a phase detached from lifecycle work."
+    },
+    {
+      "source_title": "IEEE Standard for Software Quality Assurance Processes, IEEE 730-2026",
+      "authors_or_institution": "IEEE Computer Society, Software and Systems Engineering Standards Committee",
+      "year": 2026,
+      "source_type": "IEEE",
+      "doi_or_url": "https://standards.ieee.org/ieee/730/10854/",
+      "verbatim_excerpt": "Requirements for initiating, planning, controlling, and executing the software quality assurance (SQA) processes",
+      "analytical_interpretation": "IEEE 730-2026 is an active SQA process standard and supersedes 730-2014. It gives governance and process-control requirements that complement product-focused testing and V&V; its stated harmonization with 12207:2017 and 15289:2019 requires an explicit edition-migration map when used with 12207:2026."
+    },
+    {
+      "source_title": "IEEE Standard for System, Software, and Hardware Verification and Validation, IEEE 1012-2024",
+      "authors_or_institution": "IEEE Computer Society, Software and Systems Engineering Standards Committee",
+      "year": 2025,
+      "source_type": "IEEE",
+      "doi_or_url": "https://standards.ieee.org/ieee/1012/7324/",
+      "verbatim_excerpt": "V&V processes include the analysis, evaluation, review, inspection, assessment, and testing of products.",
+      "analytical_interpretation": "The active revision is designated 1012-2024 and was published in 2025. Its broad scope and integrity levels support proportionate independence and mixed evidence methods; enterprises should not reduce V&V to automated dynamic tests or limit it to software code when interfaces, hardware, documentation, or reused components are in scope."
+    },
+    {
+      "source_title": "ISO/IEC/IEEE 15289:2019 — Systems and software engineering — Content of life-cycle information items (documentation)",
+      "authors_or_institution": "International Organization for Standardization and International Electrotechnical Commission, ISO/IEC JTC 1/SC 7 with IEEE",
+      "year": 2019,
+      "source_type": "ISO",
+      "doi_or_url": "https://www.iso.org/cms/render/live/en/sites/isoorg/contents/data/standard/07/49/74909.html",
+      "verbatim_excerpt": "This document specifies the purpose and content of all identified systems and software life-cycle and service management information items (documentation).",
+      "analytical_interpretation": "15289 supplies the information-management bridge that lifecycle and test-process standards do not fully detail. Use its information-item purpose/content concepts to make evidence discoverable and auditable, while tailoring document combinations and media to the product lifecycle; do not confuse an information-item template with proof of the underlying claim."
+    },
+    {
+      "source_title": "ISO/IEC/IEEE 15026-1:2025 — Systems and software engineering — Systems and software assurance — Part 1: Vocabulary and concepts",
+      "authors_or_institution": "International Organization for Standardization and International Electrotechnical Commission, ISO/IEC JTC 1/SC 7 with IEEE",
+      "year": 2025,
+      "source_type": "ISO",
+      "doi_or_url": "https://www.iso.org/standard/89808.html",
+      "verbatim_excerpt": "While essential to assurance practice, details regarding exactly how to measure, demonstrate or analyse particular properties are not covered.",
+      "analytical_interpretation": "The current assurance vocabulary deliberately does not prescribe property-specific measurement or analysis. In 2026, organizations must connect assurance claims to domain measures and evidence standards, and must not cite ISO 15026 alone as evidence that a security, safety, reliability, or usability claim is true."
+    },
+    {
+      "source_title": "ISO/IEC/IEEE 15026-2:2022 — Systems and software engineering — Systems and software assurance — Part 2: Assurance case",
+      "authors_or_institution": "International Organization for Standardization and International Electrotechnical Commission, ISO/IEC JTC 1/SC 7 with IEEE",
+      "year": 2022,
+      "source_type": "ISO",
+      "doi_or_url": "https://www.iso.org/standard/80625.html",
+      "verbatim_excerpt": "This document specifies minimum requirements for the structure and its meaning of assurance cases.",
+      "analytical_interpretation": "Assurance cases provide a disciplined claim-argument-evidence structure and common semantics, but the standard does not guarantee the substantive quality of a case. A release authority should challenge assumptions, evidence validity, coverage, independence, and residual uncertainty rather than accept a well-formed diagram at face value."
+    },
+    {
+      "source_title": "Guidelines on Minimum Standards for Developer Verification of Software, NISTIR 8397",
+      "authors_or_institution": "Paul E. Black, Vadim Okun, and Barbara Guttman, National Institute of Standards and Technology",
+      "year": 2021,
+      "source_type": "Formal_Standard",
+      "doi_or_url": "https://doi.org/10.6028/NIST.IR.8397",
+      "verbatim_excerpt": "The document does not address the totality of software verification, but instead recommends techniques that are broadly applicable",
+      "analytical_interpretation": "NISTIR 8397 is federal guidance for a minimum developer-verification baseline, not a complete quality model or conformity standard. Its limitation is useful evidence: enterprises should combine broad baseline checks with requirements/design reviews, risk-specific assurance, independent V&V, and documented evidence of applicability."
+    },
+    {
+      "source_title": "Secure Software Development Framework (SSDF) Version 1.1, NIST SP 800-218",
+      "authors_or_institution": "Karen Scarfone, Murugiah Souppaya, and Donna Dodson, National Institute of Standards and Technology",
+      "year": 2022,
+      "source_type": "Formal_Standard",
+      "doi_or_url": "https://doi.org/10.6028/NIST.SP.800-218",
+      "verbatim_excerpt": "Few software development life cycle (SDLC) models explicitly address software security in detail",
+      "analytical_interpretation": "SSDF guidance supplies a security-development vocabulary and practices that can be integrated into any SDLC, connecting security risk, provenance, review, vulnerability handling, and supplier communication. It complements ISO 25010 security and IEEE/ISO assurance; it is not a replacement for product-quality evidence across all attributes."
+    },
+    {
+      "source_title": "Software Verification and Validation: Its Role in Computer Assurance and Its Relationship with Software Project Management Standards, NIST SP 500-165",
+      "authors_or_institution": "Dolores R. Wallace and Roger U. Fujii, National Institute of Standards and Technology",
+      "year": 1989,
+      "source_type": "Formal_Standard",
+      "doi_or_url": "https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication500-165.pdf",
+      "verbatim_excerpt": "V&V supports the requirements for project management and quality assurance.",
+      "analytical_interpretation": "This foundational NIST report explicitly distinguishes V&V from project management and QA while explaining their complementarity. Its age is a limitation, but the separation remains useful in 2026: process conformance, product evaluation, and release assurance should have related but non-identical responsibilities and evidence."
+    },
+    {
+      "source_title": "An Operational Quality Model of Embedded Software Aligned with ISO 25000",
+      "authors_or_institution": "Yann Argotti, Yasmine Kenfaoui, Claude Baron, Alain Abran, and Philippe Esteban, ACM Transactions on Embedded Computing Systems",
+      "year": 2024,
+      "source_type": "ACM",
+      "doi_or_url": "https://doi.org/10.1145/3691642",
+      "verbatim_excerpt": "However, there is no consensus on the quality characteristics and subcharacteristics of embedded software.",
+      "analytical_interpretation": "This peer-reviewed ACM study reviewed 40 embedded-software quality-model studies, proposed an ISO-aligned operational model with measures, and surveyed 25 specialists. It demonstrates both the value of operationalizing a generic model and the limitation of assuming that ISO categories or weights transfer unchanged across domains; industrial validation remains necessary."
+    },
+    {
+      "source_title": "Toward Simpler, not Simplistic, Quantification of Software Architecture and Metrics",
+      "authors_or_institution": "Ipek Ozkaya, Robert L. Nord, Heiko Koziolek, and Paris Avgeriou, ACM SIGSOFT Software Engineering Notes / Carnegie Mellon Software Engineering Institute",
+      "year": 2015,
+      "source_type": "ACM",
+      "doi_or_url": "https://doi.org/10.1145/2815021.2815037",
+      "verbatim_excerpt": "The most widely used techniques in architecture assessment and decision making rely on expert judgment.",
+      "analytical_interpretation": "The ACM/SEI workshop report identifies a measurement-evidence gap at architecture level and warns against context-free metrics, single-value thresholds, and metric gaming. In 2026, architecture claims should combine explainable measures, stakeholder viewpoints, trends, and expert reasoning with explicit uncertainty rather than presenting an architectural score as objective truth."
+    },
+    {
+      "source_title": "A framework for the measurement of software quality",
+      "authors_or_institution": "Joseph P. Cavano and James A. McCall, ACM SIGMETRICS Performance Evaluation Review",
+      "year": 1978,
+      "source_type": "ACM",
+      "doi_or_url": "https://doi.org/10.1145/800283.811113",
+      "verbatim_excerpt": "The problems encountered defining software quality",
+      "analytical_interpretation": "This seminal ACM paper records that defining and measuring software quality is itself a foundational engineering problem. Its historical framework motivates today’s separation of quality characteristics, measures, and stakeholder goals, while its age cautions against treating any fixed attribute taxonomy as final."
+    }
+  ],
+  "failure_modes_and_antipatterns": [
+    "Checklist or standards cargo cult: teams claim ISO/IEEE alignment because plans and templates exist, without demonstrating quality claims, risk treatment, valid evidence, or outcomes. Mitigate with claim-to-evidence sampling and independent review.",
+    "Test-only quality assurance: late dynamic testing is treated as the whole QA function, while requirements, architecture, design, process, supplier, configuration, and documentation risks remain unchecked. Mitigate by mapping 12207, 730, and 1012 activities across the lifecycle.",
+    "Coverage-as-confidence: statement, branch, requirement, or test-count coverage is used as a proxy for risk reduction or defect absence. Coverage is a bounded signal; pair it with oracle validity, risk coverage, defect history, review evidence, and residual-risk analysis.",
+    "Single-score quality: arbitrary weights or an unexamined weighted average hide a catastrophic security, safety, reliability, usability, or legal failure behind favorable totals. Use disaggregated claims, hard constraints for critical properties, and sensitivity analysis when aggregation is unavoidable.",
+    "Taxonomy without operationalization: an ISO characteristic is named in a plan but lacks a context, workload, unit, threshold, measure, owner, or acceptance rule. Convert every selected quality attribute into an observable requirement and document why omitted attributes are out of scope.",
+    "Stale or synthetic evidence: generated reports, screenshots, or templates omit build identity, environment, tool version, data, expected result, timestamp, or defect disposition, making the conclusion non-reproducible. Enforce provenance and evidence-record completeness.",
+    "Broken traceability: requirements, risks, tests, reviews, defects, waivers, and release decisions are stored in disconnected systems, leaving orphan claims and unverified assumptions. Maintain a traversable, versioned trace graph with automated consistency checks.",
+    "Independence conflict: developers self-certify high-integrity claims or the assessor reports to the delivery owner, weakening challenge and credibility. Define independence by risk/integrity level and preserve reviewer role and conflict records.",
+    "Over-tailoring or under-tailoring 29119: teams either impose every template on low-risk agile work or omit normative processes with no documented rationale. Select a proportionate subset, record tailoring rationale and agreed conformance scope, and retain critical information content.",
+    "Edition drift: 2026 organizations mix 12207:2017, 12207:2026, 730-2014, 730-2026, 1012-2016, 1012-2024, and evolving 15289 references without a migration map. Cite the exact edition and resolve cross-standard terminology and information-item deltas.",
+    "Metric gaming and threshold fixation: teams optimize the measured value, suppress difficult cases, or treat one threshold as universally valid. Use trends/distributions, stratification, adversarial review of measures, and periodic construct-validation against real defects and stakeholder decisions.",
+    "Risk-register theater: risk scores are assigned once and never refreshed after requirement, architecture, dependency, environment, or threat changes. Make risk ownership, review cadence, change triggers, and residual-risk acceptance explicit.",
+    "Attribute siloing: security, safety, reliability, performance, maintainability, and interaction concerns are assessed independently even when mitigations trade one off against another. Record attribute interactions and evaluate architecture decisions against the full stakeholder context.",
+    "Product-quality tunnel vision: teams measure intrinsic product properties while ignoring quality-in-use, operator outcomes, accessibility, organizational constraints, or service context. State the system boundary and validate that product claims support intended use.",
+    "Automation overreach: automated checks are treated as authoritative despite false positives, false negatives, unstable environments, tool limitations, or unreviewed generated evidence. Calibrate tools, retain uncertainty, and require human interpretation for ambiguous or critical claims."
+  ],
+  "maturity_matrix": {
+    "foundational": "Define intended use, stakeholders, system boundary, and a tailored ISO/IEC 25010:2023 profile. Write measurable quality requirements and acceptance criteria; maintain a risk register with consequence, likelihood, owner, treatment, and residual-risk decision. Establish basic 29119-2 test processes, 29119-3 evidence records, lifecycle traceability, configuration identity, and independent review for high-consequence work. Distinguish QA process checks, verification, validation, testing, and release approval; document exact standard editions and justified tailoring.",
+    "advanced": "Operationalize each important quality attribute through goal-question-measure reasoning and domain-specific measures validated with stakeholders. Integrate 12207 lifecycle activities, IEEE 730 SQA controls, IEEE 1012 V&V and integrity levels, 29119 process/documentation outputs, 15289 information-item governance, and 15026 claim-argument-evidence cases. Maintain a versioned requirement-risk-evidence-defect-residual-risk graph with provenance, reproducible environments, trends/distributions, supplier/COTS boundaries, and independent challenge. Review interactions among attributes and update the model after incidents and major changes.",
+    "expert_2026": "Run a continuously governed, product-family quality system aligned to current 12207:2026, IEEE 730-2026, IEEE 1012-2024, ISO 25010:2023, ISO 29119:2021/2022, ISO 15026:2025/2022, 15289:2019, and applicable NIST guidance, with explicit edition-migration maps. Make claims, trace links, evidence provenance, assumptions, uncertainty, residual risk, and exception expiry machine-readable and independently assessable; use signed or tamper-evident records where stakes warrant it. Allocate verification and assurance dynamically from consequence and changing context while avoiding opaque scores, metric gaming, and automation overreach. Treat domain-specific quality profiles, third-party evidence, lifecycle change, quality-attribute conflicts, and quality-in-use feedback as first-class assurance inputs, and continuously test the validity of the quality model itself."
+  }
+}

@@ -1,0 +1,258 @@
+{
+  "subject_id": "CT-02",
+  "subject_title": "Test Selection, Prioritization, Parallelism, and Suite Trust",
+  "theoretical_foundations": "Regression-test selection (RTS), test prioritization (TCP), and test-suite minimization solve different optimization problems. Selection chooses a subset relevant to a change; prioritization orders candidates to maximize an objective such as early fault detection; minimization removes tests that are redundant for a specified coverage criterion. The safe-selection property is conditional, not absolute: a selection is safe only relative to an explicitly stated program/dependency model and assumptions, and means that no test whose behavior may change is omitted. Static control/data-dependence or build-graph reachability is conservative and tends to over-select; dynamic file/class/URL/resource observations are often cheaper and more precise for observed executions but can miss unobserved dependencies, reflection, generated code, configuration, network state, and environment-sensitive behavior. A practical decision is therefore a lattice of modes: retest-all for release or safety gates; safe static impact for ordinary change validation; dynamic or hybrid impact for high-throughput CI only when coverage of dependency sources and periodic full-suite audits bound the residual risk; heuristic selection only as an explicitly probabilistic optimization with an abstain/full-suite path. Empirical comparisons repeatedly find that no RTS technique dominates across all suites, languages, granularities, change types, and cost models; report selection reduction, analysis overhead, safety violations (baseline failures omitted), precision, and fault-detection loss together. A change-impact model should represent a revision as a set of changed source symbols, generated artifacts, APIs/contracts, schemas, build metadata, test code, and runtime resources, then map those nodes through a dependency graph and/or a test-by-coverage matrix. A coverage matrix M[test, entity] supports impacted-test selection by intersecting each test row with changed entities, but coverage is evidence of execution rather than proof that an unexecuted path cannot be affected. History H adds failure recency/frequency, duration, prior selection, and changed-file/test coupling; it is useful for ranking under finite time but is not a safety proof and can reinforce blind spots. Prioritization objectives should be named: APFD approximates average fault-detection position, APFDc incorporates variable test cost, and expected-value ranking can combine predicted fault probability, severity, time, and information gain. The 2024 long-suite evidence supports a simple baseline (short tests with recent failures) in one large dataset, while older and newer research demonstrates that performance is context-dependent; complexity or machine learning does not guarantee better ranking. Parallel test execution changes the objective from one sequence to a set of resource-assigned sequences. A scheduler therefore optimizes makespan and time-to-first-signal subject to precedence, exclusivity, CPU/RAM/GPU/network/database capacities, and dependency edges. Static round-robin sharding is reproducible but can leave stragglers; duration-weighted largest-processing-time (LPT) bin packing is a strong baseline; dynamic work-stealing/pull queues reduce skew but require stable test identity and idempotent result collection. Tests that share mutable state can produce order-dependent outcomes, so parallelism is safe only when independence is demonstrated or conflicts are modeled as graph edges/resources. Flakiness is a property of an execution distribution, not a synonym for a slow test or an infrastructure failure: for fixed code revision, test identity, inputs, runner version, and relevant configuration, a test is flaky when repeated executions produce contradictory outcomes. Separate non-order-dependent (same order, varying outcome), order-dependent victim/brittle behavior (outcome changes with predecessor order), resource/timing/concurrency, external-service, and infrastructure flakes because their repairs differ. One pass and one failure on the same fixed context proves non-determinism in that observation, but failure to observe a contradiction does not prove stability. If failure probability is q, n identical independent reruns miss it with probability (1-q)^n; low-q flakes thus require large budgets or targeted perturbation. Randomized/reversed orders find some order dependencies; coverage/change-based detectors and runtime-log differencing reduce reruns but inherit model and instrumentation false positives/negatives; classifiers are triage aids, not ground truth. Retry semantics must preserve the first outcome and cause, record every attempt, and classify a pass-after-failure as flaky-suspected rather than silently green. Quarantine is a temporary routing state with owner, reason, expiry, residual coverage debt, and scheduled isolated/full-suite runs; an unbounded exclusion list destroys trust. Suite trust is multidimensional. Recommended operational measures (an engineering synthesis, not a universal standard) are: first-pass signal precision = adjudicated regressions / first-run failures; retry-masking rate = failures that pass on retry / first-run failures; flake-event burden = flaky failure events / all failure events; test-level flake prevalence = tests with mixed outcomes / tests observed; selection recall = baseline failing tests selected / baseline failing tests; selection precision = selected impacted tests / selected tests; execution coverage retention = selected covered entities / baseline covered entities; APFD/APFDc for ranking; shard imbalance = max shard duration / mean shard duration; and quarantine age/repair rate. Publish denominator, window, revision/config identity, confidence interval, and adjudication policy. A composite trust score can be useful for a dashboard, but should never replace the component metrics or hide an unmeasured failure mode.",
+  "practical_architecture_and_implementation": "Implement a versioned test-intelligence service with five independently auditable stores: (1) change facts keyed by commit/build, including source diff, generated-file map, API/schema/config changes, dependency-lock changes, and test changes; (2) dependency evidence keyed by test identity and runner/toolchain version, including static graph edges, dynamic file/class/module/resource observations, and validity/coverage timestamps; (3) execution history containing attempt-level outcome, duration, shard, order/seed, CPU/RAM/resource tags, logs, stack traces, and first-versus-retry status; (4) test metadata such as owner, criticality, isolation contract, required resources, known dependencies, and quarantine state; and (5) policy/audit records recording selector version, model inputs, selected and omitted tests, abstentions, retries, and overrides. Canonical test identity must survive renames/parameterization while retaining a lineage map; otherwise history and flake estimates fragment. The decision pipeline is: normalize change -> expand to affected symbols/artifacts/resources -> compute candidate set using a safe static closure where possible -> union dynamic impacted tests and explicitly mandatory tests -> score candidates with cost, risk, severity, recency, failure probability, diversity, and information gain -> apply precedence/resource constraints -> assign to shards -> execute -> persist per-attempt evidence -> reconcile results. Keep a non-skippable safety set for changed tests, contract/security-critical tests, recently failing tests, previously flaky tests under diagnosis, and tests whose dependency evidence is stale or missing. Add an abstain rule when static/dynamic model disagreement, reflection/generated-code uncertainty, dependency freshness, or selector confidence crosses a threshold; abstention expands toward retest-all. Run a scheduled retest-all baseline and compare selected versus omitted outcomes to estimate safety recall and detect stale dependency matrices. For a change-impact implementation, use graph reachability for static closure; for dynamic RTS, store test-to-file/class checksums or content digests and select when a dependency digest changes; for hybrid RTS, require both a conservative static edge and fresh dynamic evidence, then route unknown edges to the safety set. Never treat a passing selected test as evidence that omitted tests are safe without measuring the omission risk. Prioritization should be deterministic for a given model/version and tie-break by stable test ID. A transparent baseline score is score(t) = (w_r risk(t) + w_f failure_probability(t) + w_s severity(t) + w_n novelty(t) + w_d diversity_gain(t)) / max(duration(t), epsilon), with bounded/regularized history features and no score-based override of mandatory tests. Calibrate failure probabilities on temporally separated data; monitor precision/recall, calibration error, drift, and subgroup performance by test type. For finite windows, select by descending score until the budget is consumed, but enforce fairness/aging so a low-history test cannot be starved forever. For sequential ranking, report APFD and APFDc against a retest-all fault baseline. For parallel scheduling, model each runnable unit as (test_id, estimated_duration, resource_vector, mutex/resource claims, precedence/dependent-test edges). Use LPT or weighted greedy bin packing as a reproducible initial assignment, then allow a pull queue to dispatch ready work to workers. A hierarchical topology works at enterprise scale: orchestrator for change/selection/policy; scheduler for DAG/resource admission; workers for isolated processes/containers; artifact/result collector; flake service; and baseline auditor. Assign shards by test method/class where framework semantics and independence permit; otherwise shard at binary/module/suite granularity. Use worker leases, heartbeats, bounded retries, cancellation after policy-defined fail-fast conditions, and idempotent result writes. Preserve shard seed/order and merge JUnit-like results by stable identity, rejecting duplicate or missing shard coverage. Track shard imbalance, queue wait, CPU saturation, I/O/network contention, and resource throttling; dynamically lower concurrency or gate a resource with a semaphore when contention correlates with failures. Framework guidance illustrates the contract: GoogleTest sets a total shard count and index and expects each test function to execute exactly once across shards; Bazel exposes shard index/total and requires runners to acknowledge sharding support; Gradle exposes maxParallelForks and warns that shared resources can create intermittent failures; Gradle Build Services provide a bounded-concurrency mechanism for shared services. For flake detection, maintain at least two paths: low-cost passive detection from contradictory outcomes in normal CI, and active diagnosis on selected tests using reruns, order permutation/reversal, controlled scheduling/time/randomness perturbation, coverage of changed code, or runtime-log comparison. Store an evidence tuple (revision, binary/dependency digest, test ID, input seed, order predecessor hash, runner/tool versions, resource telemetry, attempt outcome). Classify a candidate as NOD only after same-order contradictory evidence; classify OD victim/brittle only when changing predecessor order reproduces the contrast; retain an unknown category when evidence is insufficient. Use sequential stopping: stop when a contradiction is observed, a posterior/confidence threshold is met, or a cost ceiling is reached; report a Wilson/Beta interval for pass/failure probability rather than a binary stable label. A retry should be a diagnostic attempt with preserved first-failure status; a policy may permit merge when the retry passes only for low-criticality tests and only with a recorded flaky signal, while release/safety policies can require the first failure to block. Quarantine records must include start/expiry, owner, root-cause hypothesis, affected coverage, allowed environments, max quarantine duration, and mandatory diagnosis cadence; quarantined tests continue in a scheduled lane and are excluded from neither all baselines nor trust metrics. Repairs should target the mechanism: reset heap/database/filesystem state, remove test-order coupling, replace sleeps with condition-based synchronization and bounded timeouts, control clocks/randomness where the specification allows, use unique resource names, clean up subprocesses, mock unstable external dependencies, and fix genuine product races rather than masking failures. For auto-repair proposals, require patch review and retest-all differential evidence. Enterprise rollout in 2026 should begin with shadow-mode selection (compute but do not omit), then gate low-risk unit suites with fallback and full-suite audits, and finally expand to multi-language hybrid selection and resource-aware distributed scheduling. Every stage must retain an escape hatch, selector/model version, explainable inclusion reason, omitted-test audit, and trust SLOs such as maximum selection safety-violation rate, maximum retry-masking rate, bounded quarantine age, and shard imbalance budget.",
+  "primary_evidence": [
+    {
+      "source_title": "A Safe, Efficient Regression Test Selection Technique",
+      "authors_or_institution": "Gregg Rothermel and Mary Jean Harrold",
+      "year": 1997,
+      "source_type": "ACM",
+      "doi_or_url": "https://doi.org/10.1145/248233.248262",
+      "verbatim_excerpt": "Our algorithms construct control flow graphs for a procedure or program and its modified version.",
+      "analytical_interpretation": "This seminal ACM TOSEM work grounds safe RTS in explicit old/new program models and changed control-flow structure. The safety claim is conditional on the stated assumptions, so a 2026 implementation must publish its modeled dependency boundary and abstain when reflection, generated code, external resources, or build behavior falls outside it."
+    },
+    {
+      "source_title": "An Empirical Study of Regression Test Selection Techniques",
+      "authors_or_institution": "Todd L. Graves, Mary Jean Harrold, Jung-Min Kim, Adam A. Porter, and Gregg Rothermel",
+      "year": 2001,
+      "source_type": "ACM",
+      "doi_or_url": "https://doi.org/10.1145/367008.367020",
+      "verbatim_excerpt": "We conducted an experiment to examine the relative costs and benefits of several regression test selection techniques.",
+      "analytical_interpretation": "The ACM TOSEM comparison evaluates reduction and fault revelation together, supporting a dashboard that reports selection size, analysis/execution overhead, precision, safety, and fault-detection ability rather than speed alone. It also cautions that technique choice is contextual."
+    },
+    {
+      "source_title": "Prioritizing Test Cases for Regression Testing",
+      "authors_or_institution": "Gregg Rothermel, Roland H. Untch, Chengyun Chu, and Mary Jean Harrold",
+      "year": 2001,
+      "source_type": "IEEE",
+      "doi_or_url": "https://doi.org/10.1109/32.962562",
+      "verbatim_excerpt": "Test case prioritization techniques schedule test cases for execution in an order that attempts to increase their effectiveness.",
+      "analytical_interpretation": "This IEEE TSE paper frames prioritization as objective-driven scheduling and evaluates coverage-, additional-coverage-, and fault-exposure-oriented orderings. A 2026 system should state the objective and measure cost-benefit, not treat any ranking heuristic as universally optimal."
+    },
+    {
+      "source_title": "A History-Based Test Prioritization Technique for Regression Testing in Resource Constrained Environments",
+      "authors_or_institution": "Jung-Min Kim and Adam Porter, University of Maryland",
+      "year": 2002,
+      "source_type": "ACM",
+      "doi_or_url": "https://doi.org/10.1145/581339.581357",
+      "verbatim_excerpt": "regression testing is far better modeled as an ordered sequence of testing sessions",
+      "analytical_interpretation": "The ACM ICSE study makes history and finite nightly resources first-class: a local greedy choice can starve tests over repeated sessions. Use historical failure/recency and an aging or fairness term, while retaining periodic full-suite coverage so history does not become a blind spot."
+    },
+    {
+      "source_title": "Practical Regression Test Selection with Dynamic File Dependencies",
+      "authors_or_institution": "Milos Gligoric, Lamyaa Eloussi, and Darko Marinov",
+      "year": 2015,
+      "source_type": "ACM",
+      "doi_or_url": "https://doi.org/10.1145/2771783.2771784",
+      "verbatim_excerpt": "Ekstazi tracks dynamic dependencies of tests on files",
+      "analytical_interpretation": "The ACM ISSTA Ekstazi evaluation demonstrates a practical dynamic RTS design and large multi-project evaluation. Dynamic dependency records can reduce end-to-end time, but they are observations of executed paths; stale records, unobserved resources, reflection, and omitted first-run baselines require conservative fallback and audits."
+    },
+    {
+      "source_title": "A Framework for Checking Regression Test Selection Tools",
+      "authors_or_institution": "Chenguang Zhu, Owolabi Legunsen, August Shi, and Milos Gligoric, University of Texas at Austin and University of Illinois",
+      "year": 2019,
+      "source_type": "IEEE",
+      "doi_or_url": "https://doi.org/10.1109/ICSE.2019.00056",
+      "verbatim_excerpt": "checks the output against rules inspired by existing RTS test suites",
+      "analytical_interpretation": "RTSCHECK operationalizes selector auditing with generated evolving histories and rule-based checks. Enterprise selectors need the same independent differential harness: compare selected outcomes with retest-all, detect omitted newly failing tests, and regression-test the selector itself."
+    },
+    {
+      "source_title": "How Do Static and Dynamic Test Case Prioritization Techniques Perform on Modern Software Systems? An Extensive Study on GitHub Projects",
+      "authors_or_institution": "Qi Luo, Kevin Moran, Lingming Zhang, and Denys Poshyvanyk",
+      "year": 2019,
+      "source_type": "IEEE",
+      "doi_or_url": "https://doi.org/10.1109/TSE.2018.2822270",
+      "verbatim_excerpt": "static techniques can be surprisingly effective, particularly when measured by APFDc.",
+      "analytical_interpretation": "The IEEE TSE study across 58 Java programs shows that simple static rankings can compete with dynamic methods under cost-aware APFDc, and that metric/granularity choices alter conclusions. Measure method- and class-level ranking separately and include test cost in the objective."
+    },
+    {
+      "source_title": "Parallel Test Prioritization",
+      "authors_or_institution": "Jianyi Zhou, Junjie Chen, and Dan Hao, Peking University and Tianjin University",
+      "year": 2021,
+      "source_type": "ACM",
+      "doi_or_url": "https://doi.org/10.1145/3471906",
+      "verbatim_excerpt": "parallel test prioritization aims at generating a set of test sequences",
+      "analytical_interpretation": "This ACM TOSEM work formalizes the difference between one sequential order and multiple resource-assigned sequences. A scheduler should optimize both early detection and makespan, account for variable test time, and evaluate partitioning/shard topology rather than reusing a sequential ranking unchanged."
+    },
+    {
+      "source_title": "Revisiting Test-Case Prioritization on Long-Running Test Suites",
+      "authors_or_institution": "Runxiang Cheng, Shuai Wang, Reyhaneh Jabbarvand, and Darko Marinov",
+      "year": 2024,
+      "source_type": "ACM",
+      "doi_or_url": "https://doi.org/10.1145/3650212.3680307",
+      "verbatim_excerpt": "prioritizing faster tests that recently failed performs the best",
+      "analytical_interpretation": "The ACM ISSTA study uses 21,255 CI builds and long-running suites, finding a simple duration-plus-recent-failure baseline strongest in that dataset. This is useful as a production baseline, not a universal law; validate on local suite composition, failure censoring, and parallel topology."
+    },
+    {
+      "source_title": "An Empirical Analysis of Flaky Tests",
+      "authors_or_institution": "Qingzhou Luo, Farah Hariri, Lamyaa Eloussi, and Darko Marinov, University of Illinois at Urbana-Champaign",
+      "year": 2014,
+      "source_type": "ACM",
+      "doi_or_url": "https://doi.org/10.1145/2635868.2635920",
+      "verbatim_excerpt": "We classify the most common root causes of flaky tests",
+      "analytical_interpretation": "The ACM FSE study examines 201 likely flaky-test-fixing commits in 51 open-source projects and distinguishes mechanisms rather than treating flakiness as one defect class. Use mechanism-specific diagnosis and repair queues for order, timing, concurrency, external dependency, and state-pollution causes."
+    },
+    {
+      "source_title": "Reliable Testing: Detecting State-Polluting Tests to Prevent Test Dependency",
+      "authors_or_institution": "Alex Gyori, August Shi, Farah Hariri, and Darko Marinov, University of Illinois at Urbana-Champaign",
+      "year": 2015,
+      "source_type": "ACM",
+      "doi_or_url": "https://doi.org/10.1145/2771783.2771793",
+      "verbatim_excerpt": "PolDet finds tests that modify some location on the heap shared across tests or on the file system",
+      "analytical_interpretation": "The ACM ISSTA PolDet prototype connects order-dependent failures to concrete shared-state writes and reports 324 candidates, 194 judged relevant, in 6,105 tests. Parallel schedulers should model shared resources as conflicts, and repair should reset or isolate state rather than merely reorder tests."
+    },
+    {
+      "source_title": "DeFlaker: Automatically Detecting Flaky Tests",
+      "authors_or_institution": "Jonathan Bell, Owolabi Legunsen, Michael Hilton, Lamyaa Eloussi, Tifany Yung, and Darko Marinov",
+      "year": 2018,
+      "source_type": "ACM",
+      "doi_or_url": "https://doi.org/10.1145/3180155.3180164",
+      "verbatim_excerpt": "marks as flaky any newly failing test that did not execute any of the changes",
+      "analytical_interpretation": "The ACM ICSE DeFlaker result shows how change coverage can triage a failing test without an expensive rerun, with reported low false-alarm rate in its evaluation. It is a heuristic signal: a test may miss changed code yet expose an indirect regression, so retain retest-all and differential validation."
+    },
+    {
+      "source_title": "iDFlakies: A Framework for Detecting and Partially Classifying Flaky Tests",
+      "authors_or_institution": "Wing Lam, Reed Oei, August Shi, Darko Marinov, and Tao Xie",
+      "year": 2019,
+      "source_type": "IEEE",
+      "doi_or_url": "https://doi.org/10.1109/ICST.2019.00038",
+      "verbatim_excerpt": "detect flaky tests by reordering and rerunning tests in a project",
+      "analytical_interpretation": "The IEEE ICST iDFlakies framework separates same-order non-determinism from order-dependent behavior by rerunning under changed orders. Production diagnosis should preserve order/seed/predecessor evidence and label victim/brittle/unknown rather than assigning one undifferentiated flake flag."
+    },
+    {
+      "source_title": "Understanding Reproducibility and Characteristics of Flaky Tests Through Test Reruns in Java Projects",
+      "authors_or_institution": "Wing Lam, Stefan Winter, Angello Astorga, Victoria Stodden, and Darko Marinov",
+      "year": 2020,
+      "source_type": "IEEE",
+      "doi_or_url": "https://doi.org/10.1109/ISSRE5003.2020.00045",
+      "verbatim_excerpt": "We re-execute each test suite 4000 times",
+      "analytical_interpretation": "The IEEE ISSRE study labels a test flaky when fixed-suite reruns contain both outcomes, finding 107 flaky tests and order sensitivity among tests previously called non-order-dependent. A fixed rerun count is a detection budget, not proof of stability; publish uncertainty and use targeted perturbations."
+    },
+    {
+      "source_title": "A Large-Scale Longitudinal Study of Flaky Tests",
+      "authors_or_institution": "Wing Lam, Stefan Winter, Anjiang Wei, Tao Xie, Darko Marinov, and Jonathan Bell",
+      "year": 2020,
+      "source_type": "ACM",
+      "doi_or_url": "https://doi.org/10.1145/3428270",
+      "verbatim_excerpt": "The percentage of flaky tests that can be detected does increase to 85%",
+      "analytical_interpretation": "The ACM PACMPL longitudinal study of 55 Java projects found that detectors run on newly added or directly modified tests could detect 85% of observed flakes, leaving 15% caused by other changes. This supports tiered diagnosis, but the residual is material enough to require periodic all-test audits."
+    },
+    {
+      "source_title": "FlakeFlagger: Predicting Flakiness Without Rerunning Tests",
+      "authors_or_institution": "Abdulrahman Alshammari, Christopher Morris, Michael Hilton, and Jonathan Bell",
+      "year": 2021,
+      "source_type": "IEEE",
+      "doi_or_url": "https://doi.org/10.1109/ICSE43902.2021.00140",
+      "verbatim_excerpt": "even with this many reruns, some previously identified flaky tests were still not detected.",
+      "analytical_interpretation": "The IEEE/ACM ICSE study reran 24 projects 10,000 times and still missed some known flakes, motivating feature-based prediction as a triage accelerator. Predictions should prioritize expensive active diagnosis and never silently suppress a failure."
+    },
+    {
+      "source_title": "iFixFlakies: A Framework for Automatically Fixing Order-Dependent Flaky Tests",
+      "authors_or_institution": "August Shi, Wing Lam, Reed Oei, Tao Xie, and Darko Marinov",
+      "year": 2019,
+      "source_type": "ACM",
+      "doi_or_url": "https://doi.org/10.1145/3338906.3338925",
+      "verbatim_excerpt": "iFixFlakies searches a test suite for helpers that make the order-dependent tests pass",
+      "analytical_interpretation": "The ACM ESEC/FSE work demonstrates pattern-based repair using existing setup/cleanup helpers and reports success for a subset of truly order-dependent tests. Use auto-repair as a reviewed proposal with retest-all differential evidence; helper reuse cannot cover every timing, external, or product-race flake."
+    },
+    {
+      "source_title": "Detecting Flaky Tests by Controlling Nondeterministic API Behavior",
+      "authors_or_institution": "Hengchen Yuan, Jiefang Lin, and August Shi, University of Texas at Austin",
+      "year": 2026,
+      "source_type": "ACM",
+      "doi_or_url": "https://doi.org/10.1145/3798265",
+      "verbatim_excerpt": "ChaosAPI not only detects more flaky tests than simple rerunning across a wide range of projects",
+      "analytical_interpretation": "This 2026 ACM PACMPL/OOPSLA paper targets nondeterministic APIs such as time, concurrency, and environmental behavior by compliant perturbation. It supports active, cause-directed diagnosis as complementary evidence to passive reruns, while its Java/API scope limits direct generalization to every language and failure mode."
+    },
+    {
+      "source_title": "Addressing Test Flakiness: Practical Approaches in a Database-Reliant Industrial System",
+      "authors_or_institution": "George Vegelien, Carolin Brandt, Bas Graaf, and Andy van Deursen",
+      "year": 2026,
+      "source_type": "ACM",
+      "doi_or_url": "https://doi.org/10.1145/3786583.3786891",
+      "verbatim_excerpt": "raised Exact’s chance of a passing pipeline run from 27% to 95%",
+      "analytical_interpretation": "This 2026 ACM ICSE-SEIP industrial study links database state and resource contention to flakiness and reports improvement after targeted background-task and dirty-data cleanup. The result supports ownership, contention telemetry, and mechanism-specific repair; it is one industrial system, not a universal effect size."
+    },
+    {
+      "source_title": "GoogleTest Advanced Topics: Distributing Test Functions to Multiple Machines",
+      "authors_or_institution": "GoogleTest project maintainers",
+      "year": 2026,
+      "source_type": "Formal_Standard",
+      "doi_or_url": "https://google.github.io/googletest/advanced.html",
+      "verbatim_excerpt": "Across all shards, each test function in the program will be run exactly once.",
+      "analytical_interpretation": "This current official framework contract gives an implementable sharding invariant: shared total shard count, unique index, identical program, and result collection after all shards. Enterprise schedulers should verify the invariant and detect unsupported runners rather than assume any test binary shards safely."
+    },
+    {
+      "source_title": "Bazel Test Encyclopedia: Test Sharding and Runner Contract",
+      "authors_or_institution": "Bazel project maintainers",
+      "year": 2026,
+      "source_type": "Formal_Standard",
+      "doi_or_url": "https://bazel.build/reference/test-encyclopedia",
+      "verbatim_excerpt": "When sharding is enabled, the test runner is launched once per shard.",
+      "analytical_interpretation": "Bazel’s current test-runner specification describes shard index/total, optional runner support acknowledgement, test size/time/resource metadata, and authoritative process exit status. These are useful interoperability fields for a scheduler and audit schema; they do not prove test independence."
+    },
+    {
+      "source_title": "Gradle Performance Guide: Optimize Test Execution",
+      "authors_or_institution": "Gradle project maintainers",
+      "year": 2026,
+      "source_type": "Formal_Standard",
+      "doi_or_url": "https://docs.gradle.org/current/userguide/performance.html",
+      "verbatim_excerpt": "Parallel test execution assumes that tests are isolated.",
+      "analytical_interpretation": "The current official Gradle guidance exposes maxParallelForks and explicitly ties safe speedup to isolation, warning about filesystem, database, and external-service conflicts. Treat isolation as a tested contract and use conflict/resource labels when it is not guaranteed."
+    },
+    {
+      "source_title": "Gradle User Manual: Shared Build Services",
+      "authors_or_institution": "Gradle project maintainers",
+      "year": 2026,
+      "source_type": "Formal_Standard",
+      "doi_or_url": "https://docs.gradle.org/current/userguide/build_services.html",
+      "verbatim_excerpt": "Gradle will allow no more than the specified number of tasks to use the service concurrently.",
+      "analytical_interpretation": "The current Gradle build-service contract is a concrete bounded-concurrency pattern for scarce test resources. Equivalent semaphores/admission controllers can cap database, device, license, or external-service usage and make contention visible to flake analysis."
+    },
+    {
+      "source_title": "ISO/IEC/IEEE 29119-1:2022, Software Testing — Part 1: General Concepts",
+      "authors_or_institution": "International Organization for Standardization, International Electrotechnical Commission, and IEEE",
+      "year": 2022,
+      "source_type": "Formal_Standard",
+      "doi_or_url": "https://www.iso.org/obp/ui?_escaped_fragment_=iso%3Astd%3Aiso-iec-ieee%3A29119%3A-1%3Aed-2%3Av1%3Aen",
+      "verbatim_excerpt": "The impracticality of exhaustive testing and the need for sampling are explained",
+      "analytical_interpretation": "ISO/IEC/IEEE 29119-1’s public concepts page frames testing as risk-based sampling and discusses test models, coverage, metrics, retesting, and regression. It supports documenting why a selected sample is acceptable; it does not mandate one RTS, TCP, flake, or quarantine algorithm."
+    },
+    {
+      "source_title": "ISO/IEC/IEEE 29119-2:2021, Software Testing — Part 2: Test Processes",
+      "authors_or_institution": "International Organization for Standardization, International Electrotechnical Commission, and IEEE",
+      "year": 2021,
+      "source_type": "Formal_Standard",
+      "doi_or_url": "https://www.iso.org/standard/79428.html",
+      "verbatim_excerpt": "This document specifies test processes that can be used to govern, manage and implement software testing",
+      "analytical_interpretation": "The normative process standard is lifecycle-agnostic and provides a governance anchor for selection policy, execution records, monitoring, incidents, completion criteria, and tailoring rationale. Conformance should be distinguished from local engineering recommendations such as trust thresholds or retry rules."
+    }
+  ],
+  "failure_modes_and_antipatterns": [
+    "Unsafe selector presented as safe: a heuristic based on changed filenames, shallow call graphs, or stale dynamic observations omits a changed-behavior test. Mitigation is a conservative closure, explicit unknown-edge handling, retest-all differential audits, and a measured safety-violation budget.",
+    "Coverage-as-proof: line or branch coverage is treated as evidence that uncovered tests cannot regress. Coverage records executed behavior, not all semantic or resource dependencies; retain contract, integration, configuration, and mandatory risk tests.",
+    "Dynamic-dependency blind spot: reflection, generated code, plugins, resource files, network/database calls, subprocesses, and unobserved branches are absent from a prior-run dependency matrix. Add static edges, runtime instrumentation, freshness/unknown flags, and fallback to full or expanded selection.",
+    "History lock-in and starvation: ranking only recent failures repeatedly runs the same tests while unobserved or newly added tests age indefinitely. Add aging/fairness, diversity, mandatory changed tests, and periodic full-suite baselines.",
+    "Metric gaming: optimizing APFD, pass rate, or wall-clock time alone can favor cheap redundant tests, hide expensive critical tests, or ignore missed faults. Report APFDc, selection recall/precision, analysis cost, first-pass signal precision, and fault severity together.",
+    "Sequential ranking copied into parallel execution: the first items in one order are placed on one worker, causing stragglers, poor early-signal behavior, or duplicated resource contention. Use duration/resource-aware bin packing plus ready-work scheduling and evaluate time-to-first-signal and makespan.",
+    "Static round-robin imbalance: equal test counts are assumed to mean equal work. Long-tail durations, retries, and setup costs create idle workers; use duration estimates, LPT baseline, dynamic pull queues, and shard-imbalance telemetry.",
+    "Parallel shared-state race: tests write common files, heap/static state, databases, devices, ports, or external services and pass sequentially but fail concurrently. Detect pollution, declare mutex/resource claims, isolate identifiers, or constrain concurrency.",
+    "Retry laundering: a failure that passes on retry is reported only as pass. Preserve the first failure, all attempt outcomes, order/seed/environment, and classify pass-after-failure as a flake signal subject to policy.",
+    "Unbounded retry amplification: automatic retries consume the entire CI budget, mask rare deterministic regressions, and distort failure statistics. Use bounded diagnostic retries, stop rules, retry budgets, and separate first-run from retry metrics.",
+    "Fixed rerun-count fallacy: N clean reruns are treated as proof that a test is deterministic. Low-probability flakes can evade any finite sample; publish confidence intervals, detection power assumptions, and active perturbation strategy.",
+    "Order randomization without reproduction: a random order reveals a failure but the seed, predecessor set, shard, and worker resource state are not captured. Persist replay tokens and classify victim/brittle/polluter relationships.",
+    "Model-only flake prediction: a classifier’s label is used to suppress failures despite domain shift, class imbalance, or weak ground truth. Use predictions for triage/diagnosis scheduling; require observed contradictory outcomes or independent evidence for quarantine.",
+    "Permanent quarantine: a flaky test is excluded indefinitely, creating coverage debt and making the suite appear healthier than it is. Require owner, expiry, residual coverage, diagnosis cadence, periodic execution, and escalation on expiry.",
+    "Repair by sleep or reordering: increasing delays or pinning a lucky test order reduces observed failures but preserves shared-state/race causes and increases runtime. Repair state ownership, synchronization predicates, cleanup, clocks/randomness, and external boundaries.",
+    "Selector/scheduler opacity: omitted tests, ranking inputs, resource decisions, and retry transitions cannot be explained or reproduced. Version models and policies, retain decision traces, and offer a retest-all escape hatch.",
+    "Trust score collapse: one composite dashboard number hides whether noise, omissions, shard contention, or quarantines caused a decline. Keep component denominators and confidence intervals visible; treat the composite only as navigation.",
+    "Assuming vendor/framework semantics are universal: a GoogleTest/Bazel/Gradle sharding contract is applied to a runner that does not support it or has different fixture/setup semantics. Probe support, verify coverage exactly once, and test framework-specific isolation assumptions."
+  ],
+  "maturity_matrix": {
+    "foundational": "Run retest-all on merge/release-critical paths and establish stable test identity, attempt-level results, duration, order/seed, and resource telemetry. Add transparent changed-file/module heuristics only in shadow mode. Use deterministic static sharding at safe suite/binary boundaries, bounded one-time diagnostic retries that preserve first failures, and a manual flake quarantine with owner and expiry. Baseline trust with pass/fail counts, first-pass failure burden, mixed-outcome prevalence, retry-masking rate, selection recall against retest-all, and shard imbalance.",
+    "advanced": "Adopt versioned static-plus-dynamic impact models with freshness and unknown-edge handling, mandatory safety sets, abstention, and scheduled retest-all differential audits. Add coverage/change/history features to a calibrated deterministic priority score with fairness/aging and APFDc measurement. Use duration/resource-aware LPT assignment followed by dynamic pull scheduling, precedence/conflict edges, bounded resource semaphores, and per-shard replay metadata. Operate active flake diagnosis using same-order reruns, order permutations, controlled timing/randomness, coverage, and runtime-log comparison; classify NOD/OD/resource/infrastructure mechanisms and route quarantine into a monitored lane. Set SLOs for safety violations, retry masking, quarantine age, calibration, and shard skew.",
+    "expert_2026": "Operate a multi-language test-intelligence control plane that joins change graphs, static/dynamic dependency evidence, coverage, historical failures, duration distributions, resource vectors, and flake posteriors while preserving an auditable decision trace. Use hybrid safe closure plus risk-budgeted heuristics with confidence-aware abstention, mandatory full-suite and changed-contract lanes, temporal model validation, drift/subgroup calibration, and automatic fallback. Schedule a dependency/resource DAG across hierarchical workers with dynamic work stealing, admission control, contention telemetry, retry-aware makespan/early-signal optimization, exactly-once shard reconciliation, and deterministic replay. Treat flakes as distributions with sequential stopping and Wilson/Beta uncertainty, apply perturbation/causal diagnosis, and require reviewed mechanism-level repair or bounded quarantine. Publish a trust scorecard with component metrics (selection safety recall/precision, APFDc, first-pass signal precision, flake burden, retry masking, coverage debt, repair age, shard imbalance), evidence windows, denominators, confidence intervals, and policy/model versions; use 2026 research classifiers and API perturbation detectors as triage accelerators rather than opaque gates."
+  }
+}
