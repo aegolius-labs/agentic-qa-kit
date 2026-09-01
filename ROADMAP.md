@@ -1,6 +1,6 @@
 # Agentic QA Kit Roadmap
 
-Last updated: 2026-08-27
+Last updated: 2026-08-31
 
 ## Product goal
 
@@ -36,6 +36,7 @@ Create a Codex-first QA plugin that can autonomously perform full or partial, ri
 
 ### M1 - Installable plugin foundation
 
+- [x] Create the private aegolius-labs/agentic-qa-kit GitHub repository and establish main with the validated foundation.
 - [x] Create and validate the `.codex-plugin/plugin.json` shape.
 - [x] Add focused skills for orchestration, discovery, sessions, reproduction, reporting, and backlog handoff.
 - [x] Add UI metadata and concise starter prompts.
@@ -92,7 +93,7 @@ Create a Codex-first QA plugin that can autonomously perform full or partial, ri
 
 ## Current checkpoint
 
-Foundation implementation completed on 2026-08-27. The plugin manifest and all six skills pass the bundled Codex validators; 14 local unit tests pass; and a disposable CLI smoke run completed initialization, session creation, attempt recording, confirmed-finding recording, summary, backlog export, closeout, and whole-ledger validation. The next gate is Q01 installed-plugin behavioral evaluation, followed by Q02 heterogeneous-repository forward tests. Deeper technique packs and production/agentic assurance remain intentionally open.
+Foundation implementation completed on 2026-08-27 and was pushed to the private aegolius-labs/agentic-qa-kit GitHub repository on 2026-08-31. The plugin manifest and all six skills pass the bundled Codex validators; 14 local unit tests pass; and a disposable CLI smoke run completed initialization, session creation, attempt recording, confirmed-finding recording, summary, backlog export, closeout, and whole-ledger validation. The next gate is Q01 installed-plugin behavioral evaluation, followed by Q02 heterogeneous-repository forward tests. Deeper technique packs and production/agentic assurance remain intentionally open.
 
 ## Ranked work items
 
