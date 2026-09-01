@@ -40,7 +40,8 @@ Create a Codex-first QA plugin that can autonomously perform full or partial, ri
 - [x] Create and validate the `.codex-plugin/plugin.json` shape.
 - [x] Add focused skills for orchestration, discovery, sessions, reproduction, reporting, and backlog handoff.
 - [x] Add UI metadata and concise starter prompts.
-- [ ] Install from a local marketplace and evaluate skill activation in a fresh Codex task.
+- [x] Install and enable the plugin from the personal marketplace.
+- [ ] Execute the tracked activation suite in fresh Codex tasks and retain its observations.
 
 ### M2 - Deterministic evidence ledger
 
@@ -93,18 +94,23 @@ Create a Codex-first QA plugin that can autonomously perform full or partial, ri
 
 ## Current checkpoint
 
-Foundation implementation completed on 2026-08-27 and was pushed to the private aegolius-labs/agentic-qa-kit GitHub repository on 2026-08-31. The plugin manifest and all six skills pass the bundled Codex validators; 14 local unit tests pass; and a disposable CLI smoke run completed initialization, session creation, attempt recording, confirmed-finding recording, summary, backlog export, closeout, and whole-ledger validation. The next gate is Q01 installed-plugin behavioral evaluation, followed by Q02 heterogeneous-repository forward tests. Deeper technique packs and production/agentic assurance remain intentionally open.
+Foundation implementation completed on 2026-08-27 and was pushed to the private aegolius-labs/agentic-qa-kit GitHub repository on 2026-08-31. The plugin is installed and enabled from the personal marketplace at version 0.1.0+codex.20260901011244. Q01 is in progress: the 36-case activation matrix and execution runbook cover every skill across direct, indirect, incomplete, negative, follow-up, and authorization prompts, while observed behavioral runs remain pending in fresh Codex tasks. Q02 heterogeneous-repository forward tests follow Q01. Deeper technique packs and production/agentic assurance remain intentionally open.
 
 ## Ranked work items
 
 ### Q01 - Validate the installed plugin and activation boundaries
 
-- **Status:** Not started
+- **Status:** In progress
 - **Importance:** Critical
 - **Complexity:** Medium
 - **Depends on:** M1 structural validation, M2 ledger tests
-- **Approach:** Install through a local marketplace and run direct, indirect, incomplete, negative, follow-up, and authorization-sensitive prompts for all six skills.
+- **Approach:** Install through a local marketplace and run the 36 cases in evals/q01-activation-cases.json, following evals/README.md, across direct, indirect, incomplete, negative, follow-up, and authorization-sensitive prompts for all six skills.
 - **Done when:** Expected skills activate, unrelated requests do not, bundled references resolve, partial workflows resume correctly, and no write occurs without the applicable authority.
+- **Progress:**
+  - [x] Install and enable agentic-qa-kit@personal.
+  - [x] Add one case for every skill/category pair and validate the matrix contract.
+  - [ ] Execute all cases in fresh tasks and retain immutable transcript references.
+  - [ ] Triage failures, rerun affected cases after fixes, and publish the Q01 result.
 
 ### Q02 - Forward-test heterogeneous repositories
 
