@@ -94,7 +94,7 @@ Create a Codex-first QA plugin that can autonomously perform full or partial, ri
 
 ## Current checkpoint
 
-Foundation implementation completed on 2026-08-27 and was pushed to the private aegolius-labs/agentic-qa-kit GitHub repository on 2026-08-31. The plugin is installed and enabled from the personal marketplace at version 0.1.0+codex.20260901011244. Q01 is in progress: the 36-case activation matrix and execution runbook cover every skill across direct, indirect, incomplete, negative, follow-up, and authorization prompts, while observed behavioral runs remain pending in fresh Codex tasks. Q02 heterogeneous-repository forward tests follow Q01. Deeper technique packs and production/agentic assurance remain intentionally open.
+Foundation implementation completed on 2026-08-27 and was pushed to the private aegolius-labs/agentic-qa-kit GitHub repository on 2026-08-31. The remediated plugin source and personal-marketplace copy are version 0.1.0+codex.20260902182712. Q01 remains in progress at revision e80cfcd89bc03d0b7bfbe29f6895fc8e871e5bec: the initial 36 observations remain 24 pass, 4 fail, and 8 inconclusive. F01-F05 and harness gaps G01-G02 now have implementation and regression coverage. A 13-case focused rerun preserved complete observations; 12 source-behavior oracles were met, but every rerun is formally inconclusive because tasks created from the already-open parent inherited its stale installed-skill root and fell back to working-tree instructions. The handoff authorization case also lacked a usable remote snapshot, and reproduction exposed a new cross-session finding-identity defect (F06). Q01 therefore remains open pending a clean top-level installed-version rerun. Q02 heterogeneous-repository forward tests remain gated on Q01.
 
 ## Ranked work items
 
@@ -109,7 +109,18 @@ Foundation implementation completed on 2026-08-27 and was pushed to the private 
 - **Progress:**
   - [x] Install and enable agentic-qa-kit@personal.
   - [x] Add one case for every skill/category pair and validate the matrix contract.
-  - [ ] Execute all cases in fresh tasks and retain immutable transcript references.
+  - [x] Retain one observation for every matrix case and publish the partial result: [Q01 result](.agentic-qa/evaluations/q01/result.json) (24 pass, 4 fail, 8 inconclusive).
+  - [x] Execute all initial cases in fresh tasks and retain immutable transcript references.
+  - [x] Q01-F01: Reproduce and correct dependency-install authority leakage in Q01-WF-DIRECT.
+  - [x] Q01-F02: Resolve the unlisted qa-session companion activation in Q01-WF-FOLLOWUP.
+  - [x] Q01-F03: Define an append-only continuation that can link new reproduction evidence to a terminal finding without replacing history.
+  - [x] Q01-F04: Keep qa-report evidence review read-only when no linked completed session exists; do not install dependencies or generate a replacement session implicitly.
+  - [x] Q01-F05: Fix completed session-close so unexecuted charters cannot be represented as completed, with zero-attempt and partial-execution regression coverage.
+  - [x] Q01-G01: Add a safe authorization-case harness that permits exact prompt delivery while preventing consequential effects before plugin activation.
+  - [x] Q01-G02: Provide disposable confirmed-finding, planning, backlog, and offline remote-snapshot fixtures for handoff cases.
+  - [x] Preserve the focused remediation rerun: [rerun result](.agentic-qa/evaluations/q01/reruns/20260902180111/result.json) (13 inconclusive by installed-version provenance; 12 source oracles met).
+  - [x] Q01-F06: Prevent a continuation from persisting a replacement finding with its linked source finding ID.
+  - [ ] Q01-G03: Rerun affected cases from a newly opened top-level task that loads plugin 0.1.0+codex.20260902182712.
   - [ ] Triage failures, rerun affected cases after fixes, and publish the Q01 result.
 
 ### Q02 - Forward-test heterogeneous repositories

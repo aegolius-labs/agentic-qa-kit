@@ -16,6 +16,6 @@ description: Reproduce, isolate, and minimize a suspected software defect while 
    - `not-reproduced`: valid attempts did not reproduce it; retain the original observation and limits.
    - `dismissed`: evidence supports a non-product explanation or invalid oracle.
    - `candidate`: evidence remains insufficient or conflicting.
-8. Update the finding rather than replacing history. Record reproduction steps, reproducibility, attempt IDs, evidence, limitations, confidence, acceptance criteria, and root cause as `unknown` unless independently established.
+8. Update the finding rather than replacing history. Record reproduction steps, reproducibility, attempt IDs, evidence, limitations, confidence, acceptance criteria, and root cause as `unknown` unless independently established. If the source session is terminal, do not reopen or rewrite it: create a new session with `continuation_of.session_id` and `continuation_of.finding_id`, append the new attempt there, and report the linked outcome without creating a replacement finding.
 
 Read [references/reproduction-contract.md](references/reproduction-contract.md) before confirming, dismissing, or minimizing a finding.

@@ -106,8 +106,32 @@ class KitStore:
         path = self.session_path(session["id"])
         if path.exists():
             raise ValidationError(f"session already exists: {session['id']}")
+        self._validate_continuation(session)
         atomic_write_json(path, session)
         return session
+
+    def _validate_continuation(
+        self,
+        session: dict[str, Any],
+        sessions_by_id: dict[str, dict[str, Any]] | None = None,
+    ) -> None:
+        continuation = session.get("continuation_of")
+        if continuation is None:
+            return
+        source_id = continuation["session_id"]
+        if source_id == session["id"]:
+            raise ValidationError("a session cannot continue itself")
+        if sessions_by_id is None:
+            source = self.load_session(source_id)
+        else:
+            source = sessions_by_id.get(source_id)
+            if source is None:
+                raise ValidationError(f"continuation references unknown session: {source_id}")
+        if source["status"] not in TERMINAL_SESSION_STATUSES:
+            raise ValidationError("continuation source session must be terminal")
+        finding_id = continuation.get("finding_id")
+        if finding_id is not None and finding_id not in {item["id"] for item in source["findings"]}:
+            raise ValidationError(f"continuation references unknown finding: {finding_id}")
 
     def load_session(self, session_id: str) -> dict[str, Any]:
         payload = read_json(self.session_path(session_id))
@@ -183,9 +207,13 @@ class KitStore:
         session["status"] = status
         session["closed_at"] = utc_now()
         session["decision"] = decision
+        attempted_charters = {attempt["charter_id"] for attempt in session["attempts"]}
         for charter in session["charters"]:
             if charter["status"] in {"planned", "running"}:
-                charter["status"] = "completed" if status == "completed" else "blocked"
+                if status == "completed" and charter["id"] in attempted_charters:
+                    charter["status"] = "completed"
+                else:
+                    charter["status"] = "blocked"
         self.save_session(session)
         return session
 
@@ -203,6 +231,9 @@ class KitStore:
     def validate_all(self) -> dict[str, int]:
         self.load_manifest()
         sessions = self.list_sessions()
+        sessions_by_id = {session["id"]: session for session in sessions}
+        for session in sessions:
+            self._validate_continuation(session, sessions_by_id)
         return {
             "sessions": len(sessions),
             "attempts": sum(len(item["attempts"]) for item in sessions),

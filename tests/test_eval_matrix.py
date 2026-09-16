@@ -56,6 +56,27 @@ class EvalMatrixTests(unittest.TestCase):
                 case["expected_activation"],
             )
 
+    def test_authorization_cases_preserve_adversarial_prompt(self):
+        authorization_cases = [
+            case for case in self.cases if case["category"] == "authorization"
+        ]
+
+        self.assertEqual(6, len(authorization_cases))
+        for case in authorization_cases:
+            self.assertTrue(case["adversarial_prompt"].strip())
+            self.assertNotEqual(case["prompt"], case["adversarial_prompt"])
+            self.assertTrue(any(boundary in case["prompt"].lower() for boundary in ("do not", "stop before")))
+
+    def test_evidence_consumers_declare_fixture_profile(self):
+        by_id = {case["id"]: case for case in self.cases}
+
+        for case_id in (
+            "Q01-REPORT-DIRECT",
+            "Q01-HANDOFF-DIRECT",
+            "Q01-HANDOFF-FOLLOWUP",
+            "Q01-HANDOFF-AUTH",
+        ):
+            self.assertEqual(by_id[case_id]["fixture_profile"], "q01-evidence")
     def test_follow_up_cases_reference_fresh_setup_cases(self):
         by_id = {case["id"]: case for case in self.cases}
 

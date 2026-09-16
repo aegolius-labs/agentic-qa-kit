@@ -380,6 +380,7 @@ def validate_session(payload: dict[str, Any]) -> None:
             "status",
             "created_at",
             "closed_at",
+            "continuation_of",
             "target",
             "scope",
             "context",
@@ -401,6 +402,15 @@ def validate_session(payload: dict[str, Any]) -> None:
     closed_at = payload.get("closed_at")
     if closed_at is not None:
         _expect_string(closed_at, "session.closed_at")
+
+    continuation = payload.get("continuation_of")
+    if continuation is not None:
+        continuation_obj = _expect_object(continuation, "session.continuation_of")
+        _reject_unknown(continuation_obj, {"session_id", "finding_id"}, "session.continuation_of")
+        _expect_id(continuation_obj.get("session_id"), "session.continuation_of.session_id")
+        finding_id = continuation_obj.get("finding_id")
+        if finding_id is not None:
+            _expect_id(finding_id, "session.continuation_of.finding_id")
 
     target = _expect_object(payload.get("target"), "session.target")
     _reject_unknown(target, {"root", "revision", "dirty", "runtime"}, "session.target")
@@ -461,6 +471,8 @@ def validate_session(payload: dict[str, Any]) -> None:
         finding_ids.append(finding["id"])
     if len(finding_ids) != len(set(finding_ids)):
         raise ValidationError("session finding IDs must be unique")
+    if continuation is not None and continuation.get("finding_id") in finding_ids:
+        raise ValidationError("a continuation cannot contain a replacement for its linked source finding")
 
     _expect_string_list(payload.get("gaps"), "session.gaps")
     decision = payload.get("decision")
@@ -490,6 +502,7 @@ def normalize_session(payload: dict[str, Any]) -> dict[str, Any]:
     result.setdefault("created_at", utc_now())
     result.setdefault("status", "planned")
     result.setdefault("closed_at", None)
+    result.setdefault("continuation_of", None)
     result.setdefault("attempts", [])
     result.setdefault("findings", [])
     result.setdefault("gaps", [])
