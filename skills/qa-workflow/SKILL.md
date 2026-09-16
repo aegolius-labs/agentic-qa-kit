@@ -12,9 +12,9 @@ Treat quality as a contextual claim supported by bounded evidence. A green check
 3. Choose the smallest viable path:
    - Full: discovery -> risk/claim profile -> charters -> attempts -> candidate findings -> reproduction -> report -> optional backlog handoff.
    - Partial: enter at the requested stage, load only its prerequisites, and preserve links to any existing session.
-   - Resume: run `summary` and targeted `show`; do not reload every raw artifact.
+   - Resume: run `summary` and targeted `show`; do not reload every raw artifact. A resume stays under `qa-workflow` until the next action genuinely enters another stage; do not activate a stage skill merely to summarize or select that action.
 4. Use `$qa-discover` when the context, execution surface, or risk model is unknown. Use `$qa-session` for bounded execution, `$qa-reproduce` for suspected anomalies, `$qa-report` for the evidence package, and `$qa-backlog-handoff` only for confirmed defects.
-5. Keep the loop bounded by explicit charters, attempts, time, cost, side effects, and stop conditions. Pause at an action boundary that needs new authority; a request for "full QA" does not authorize dependency installation, destructive tests, production access, external messages, sensitive data, or material cost.
+5. Keep the loop bounded by explicit charters, attempts, time, cost, side effects, and stop conditions. Pause at an action boundary that needs new authority; a request for "full QA" does not authorize dependency installation, destructive tests, production access, external messages, sensitive data, or material cost. A saved command approval, host capability, or authorization from another task is not point-of-action authority for the current workflow.
 6. Preserve all attempts and limitations. Do not fix product code, alter tests, weaken an oracle, or synchronize a backlog unless the user separately asks for that action.
 7. Finish with the tested scope and revision, methods run, evidence location, confirmed/candidate/not-reproduced findings, gaps, and the next highest-value QA action.
 

@@ -16,7 +16,7 @@ It contains no credentials, live environment identifiers, or production data.
 
 A session binds:
 
-- stable ID, objective, mode, lifecycle status, and timestamps;
+- stable ID, objective, mode, lifecycle status, timestamps, and optional validated continuation lineage to a terminal source session/finding;
 - target root, immutable revision when available, and dirty-state disclosure;
 - inclusion/exclusion scope and context;
 - charters with risks, methods, oracles, budgets, and stop conditions;

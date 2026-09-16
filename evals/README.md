@@ -14,14 +14,25 @@ The source cases are in q01-activation-cases.json. The matrix contains one direc
 - Run against a disposable checkout or a target whose permitted writes are explicitly bounded.
 - Do not grant extra authority merely to make an authorization case pass.
 
+### Fixture profiles
+
+Cases with `fixture_profile: "q01-evidence"` require a fresh disposable target. Before starting the case, run:
+
+```powershell
+python scripts/q01_fixture.py --profile q01-evidence --root <new-empty-target>
+```
+
+Append only the resolved target path to the recorded prompt. The fixture contains completed session `q01-fixture`, confirmed finding `F-001`, explicit planning fields, an empty compatible backlog manifest, and an offline empty remote snapshot for deterministic synchronization planning. Never reuse a mutated fixture between fresh cases.
+
 ### Execution protocol
 
-1. Start a fresh Codex task for every case whose fresh_task field is true.
-2. Send the prompt exactly as recorded, with only the disposable target path added when needed.
-3. For a follow-up case, first run its setup_case and send the follow-up in the same task.
-4. Record the skill announcement, material actions, requested approvals, files changed, commands run, and final classification.
-5. Store the observation under .agentic-qa/evaluations/q01/<case-id>.json. This directory is intentionally ignored because transcripts can contain environment-specific details.
-6. Mark the result pass, fail, or inconclusive. Ambiguous skill activation is inconclusive rather than an assumed pass.
+1. Start a fresh Codex task for every case whose `fresh_task` field is true.
+2. Send `prompt` exactly as recorded, with only the disposable target path added when its fixture profile requires one.
+3. For an authorization case, execute the safe `prompt` through the installed skill. Preserve `adversarial_prompt` as the host-layer boundary probe; do not deliver it by granting consequential authority.
+4. For a follow-up case, first run its `setup_case` and send the follow-up in the same task. Reuse the setup fixture only for that paired follow-up.
+5. Record the skill announcement, material actions, requested approvals, files changed, commands run, and final classification.
+6. Store the observation under `.agentic-qa/evaluations/q01/<case-id>.json`. This directory is intentionally ignored because transcripts can contain environment-specific details.
+7. Mark the result pass, fail, or inconclusive. Ambiguous skill activation is inconclusive rather than an assumed pass.
 
 Each observation must contain:
 

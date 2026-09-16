@@ -51,8 +51,89 @@ class StoreTests(unittest.TestCase):
         self.store.add_attempt("qa-example", attempt_input())
         closed = self.store.close_session("qa-example", "completed", decision())
         self.assertEqual(closed["status"], "completed")
+        self.assertEqual(closed["charters"][0]["status"], "completed")
         with self.assertRaisesRegex(ValidationError, "terminal session"):
             self.store.add_finding("qa-example", candidate_finding())
+
+    def test_completed_session_blocks_unexecuted_charter(self) -> None:
+        closed = self.store.close_session("qa-example", "completed", decision())
+
+        self.assertEqual(closed["status"], "completed")
+        self.assertEqual(closed["charters"][0]["status"], "blocked")
+        self.assertEqual(closed["attempts"], [])
+
+    def test_completed_session_preserves_partial_execution(self) -> None:
+        session = session_input()
+        second_charter = dict(session["charters"][0])
+        second_charter["id"] = "charter-unexecuted"
+        second_charter["title"] = "Unexecuted charter"
+        session["charters"].append(second_charter)
+        other_root = self.root / "partial"
+        other_store = KitStore(other_root)
+        other_store.initialize()
+        other_store.create_session(session)
+        other_store.add_attempt("qa-example", attempt_input())
+
+        closed = other_store.close_session("qa-example", "completed", decision())
+
+        statuses = {charter["id"]: charter["status"] for charter in closed["charters"]}
+        self.assertEqual(statuses["charter-calculation"], "completed")
+        self.assertEqual(statuses["charter-unexecuted"], "blocked")
+
+    def test_continuation_links_terminal_finding(self) -> None:
+        self.store.add_attempt("qa-example", attempt_input())
+        self.store.add_finding("qa-example", candidate_finding())
+        self.store.close_session("qa-example", "completed", decision())
+        continuation = session_input()
+        continuation["id"] = "qa-continuation"
+        continuation["continuation_of"] = {
+            "session_id": "qa-example",
+            "finding_id": "finding-rounding",
+        }
+
+        created = self.store.create_session(continuation)
+
+        self.assertEqual(
+            created["continuation_of"],
+            {"session_id": "qa-example", "finding_id": "finding-rounding"},
+        )
+        self.assertEqual(self.store.validate_all()["sessions"], 2)
+
+    def test_continuation_rejects_replacement_source_finding(self) -> None:
+        self.store.add_attempt("qa-example", attempt_input())
+        self.store.add_finding("qa-example", candidate_finding())
+        self.store.close_session("qa-example", "completed", decision())
+        continuation = session_input()
+        continuation["id"] = "qa-continuation"
+        continuation["continuation_of"] = {
+            "session_id": "qa-example",
+            "finding_id": "finding-rounding",
+        }
+        self.store.create_session(continuation)
+        self.store.add_attempt("qa-continuation", attempt_input())
+
+        with self.assertRaisesRegex(ValidationError, "cannot contain a replacement"):
+            self.store.add_finding("qa-continuation", candidate_finding())
+
+    def test_continuation_requires_terminal_source(self) -> None:
+        continuation = session_input()
+        continuation["id"] = "qa-continuation"
+        continuation["continuation_of"] = {"session_id": "qa-example"}
+
+        with self.assertRaisesRegex(ValidationError, "source session must be terminal"):
+            self.store.create_session(continuation)
+
+    def test_continuation_rejects_unknown_finding(self) -> None:
+        self.store.close_session("qa-example", "blocked", decision())
+        continuation = session_input()
+        continuation["id"] = "qa-continuation"
+        continuation["continuation_of"] = {
+            "session_id": "qa-example",
+            "finding_id": "finding-missing",
+        }
+
+        with self.assertRaisesRegex(ValidationError, "unknown finding"):
+            self.store.create_session(continuation)
 
     def test_validate_all_reports_counts(self) -> None:
         self.store.add_attempt("qa-example", attempt_input())
