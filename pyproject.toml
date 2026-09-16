@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "agentic-qa-kit"
 version = "0.1.0"
-description = "Evidence-centered QA workflows for autonomous Codex agents"
+description = "Evidence-centered QA workflows for autonomous coding agents"
 readme = "README.md"
 requires-python = ">=3.11"
 authors = [{ name = "Aegolius Labs" }]
