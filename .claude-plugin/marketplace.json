@@ -1,0 +1,31 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "aegolius-labs-qa",
+  "description": "Aegolius Labs quality assurance tooling for Claude Code",
+  "owner": {
+    "name": "Aegolius Labs",
+    "url": "https://github.com/aegolius-labs"
+  },
+  "plugins": [
+    {
+      "name": "agentic-qa-kit",
+      "displayName": "Agentic QA Kit",
+      "version": "0.1.0",
+      "description": "Evidence-centered QA workflows for autonomous coding agents",
+      "author": {
+        "name": "Aegolius Labs",
+        "url": "https://github.com/aegolius-labs"
+      },
+      "category": "development",
+      "keywords": [
+        "quality-assurance",
+        "quality-engineering",
+        "software-testing",
+        "evidence",
+        "reproduction"
+      ],
+      "source": "./",
+      "homepage": "https://github.com/aegolius-labs/agentic-qa-kit"
+    }
+  ]
+}

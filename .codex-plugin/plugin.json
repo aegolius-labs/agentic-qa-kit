@@ -1,7 +1,7 @@
 {
   "name": "agentic-qa-kit",
   "version": "0.1.0+codex.20260902182712",
-  "description": "Evidence-centered QA workflows for autonomous Codex agents",
+  "description": "Evidence-centered QA workflows for autonomous coding agents",
   "author": {
     "name": "Aegolius Labs",
     "url": "https://github.com/aegolius-labs"

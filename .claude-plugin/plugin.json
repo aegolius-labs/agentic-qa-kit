@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
+  "name": "agentic-qa-kit",
+  "displayName": "Agentic QA Kit",
+  "version": "0.1.0",
+  "description": "Evidence-centered QA workflows for autonomous coding agents",
+  "author": {
+    "name": "Aegolius Labs",
+    "url": "https://github.com/aegolius-labs"
+  },
+  "homepage": "https://github.com/aegolius-labs/agentic-qa-kit",
+  "repository": "https://github.com/aegolius-labs/agentic-qa-kit",
+  "license": "PolyForm-Noncommercial-1.0.0",
+  "keywords": [
+    "quality-assurance",
+    "quality-engineering",
+    "software-testing",
+    "evidence",
+    "reproduction"
+  ]
+}
