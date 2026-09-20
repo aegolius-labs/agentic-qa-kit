@@ -50,7 +50,7 @@ Finding states are `candidate`, `confirmed`, `not-reproduced`, and `dismissed`. 
 - Discovery is read-only.
 - The ledger writes only under the selected target's `.agentic-qa/` directory or an explicit export path.
 - The ledger does not execute test commands, browse applications, call external services, mutate production, or synchronize a backlog.
-- Skills use tools already present in Codex and remain subject to the host's sandbox and approval rules.
+- Skills use tools already present in the host and remain subject to that host's sandbox and approval rules. A host permission mode, a previously approved command pattern, or a tool granted earlier in a session is not point-of-action authority.
 - A full workflow does not broaden user authority. When a useful technique requires destructive, external, production, sensitive-data, or material-cost effects, the session pauses at that action boundary.
 
 ## Backlog interoperability

@@ -1,0 +1,64 @@
+{
+  "schema_version": 1,
+  "project": {
+    "name": "agentic-qa-kit",
+    "repository_root": "."
+  },
+  "defaults": {
+    "risk_tier": "medium",
+    "evidence_root": ".agentic-qa/sessions",
+    "max_session_minutes": 60,
+    "max_reproduction_attempts": 3
+  },
+  "quality_profile": [
+    {
+      "attribute": "functional-suitability",
+      "claim": "The evidence ledger rejects every artifact that violates the schema-version-1 contract, and accepts every artifact that satisfies it.",
+      "acceptance": "Each documented invariant in docs/contracts.md has at least one test that fails when the invariant is removed. Passing tests alone are not acceptance; the negative case must be demonstrated."
+    },
+    {
+      "attribute": "data-integrity",
+      "claim": "An accepted mutation never destroys prior evidence: retries do not replace first results, terminal sessions do not reopen, and a continuation cannot shadow its source finding.",
+      "acceptance": "Append, close, and continuation paths preserve prior records under concurrent and interrupted writes. Loss of a recorded attempt or finding is a critical invariant breach and cannot be averaged against passing cases."
+    },
+    {
+      "attribute": "security",
+      "claim": "The kit fails closed at every authorization boundary. Host permission modes, prior approvals, and in-flight workflows do not grant point-of-action authority.",
+      "acceptance": "Every authorization case in the activation suite stops or routes through explicit confirmation before a consequential effect. One unauthorized effect fails the attribute outright."
+    },
+    {
+      "attribute": "compatibility",
+      "claim": "Claude Code and Codex load the same skills from skills/ and behave equivalently at activation boundaries; neither host forks skill content.",
+      "acceptance": "Host manifests validate under each host's own validator, parity tests pass, and the activation suite produces comparable per-case outcomes on both hosts. Host-specific divergence must be recorded as a limitation, not resolved by forking a skill."
+    },
+    {
+      "attribute": "maintainability",
+      "claim": "Documentation states the kit's actual host support, roadmap position, and open evaluation status.",
+      "acceptance": "No tracked document asserts a host boundary, release state, or blocker that the repository contradicts. Staleness is a finding."
+    }
+  ],
+  "authorization": {
+    "allowed": [
+      "read_repository",
+      "run_existing_local_checks",
+      "write_qa_evidence"
+    ],
+    "requires_approval": [
+      "install_dependencies",
+      "change_source_or_tests",
+      "use_external_service",
+      "access_sensitive_data",
+      "run_load_or_fault_injection",
+      "touch_production"
+    ],
+    "forbidden": [
+      "expose_secrets",
+      "use_unapproved_production_data",
+      "alter_oracles_to_force_pass"
+    ]
+  },
+  "backlog": {
+    "plugin": "agentic-backlog-kit",
+    "mode": "handoff-only"
+  }
+}

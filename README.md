@@ -1,6 +1,6 @@
 # Agentic QA Kit
 
-Agentic QA Kit is a Codex-first plugin for evidence-centered software quality assurance. It equips agents to discover unfamiliar codebases, design risk-based QA work, run bounded sessions, identify and reproduce defects, preserve auditable evidence, and hand confirmed work to a backlog system.
+Agentic QA Kit is a plugin for evidence-centered software quality assurance, supported on Claude Code and Codex. It equips agents to discover unfamiliar codebases, design risk-based QA work, run bounded sessions, identify and reproduce defects, preserve auditable evidence, and hand confirmed work to a backlog system.
 
 The design is derived from `Modern_Quality_Engineering_2026.md`: quality is a contextual claim supported by versioned evidence, not a test count or a green dashboard.
 
@@ -13,7 +13,7 @@ The design is derived from `Modern_Quality_Engineering_2026.md`: quality is a co
 - `qa-report`: normalize attempts and findings into an evidence package and QA session report.
 - `qa-backlog-handoff`: generate a reviewed Bug payload and optionally feed it to Agentic Backlog Kit.
 
-The skills use Codex's existing repository, shell, browser, and connector capabilities. The first release deliberately has no MCP server: the local ledger supplies deterministic artifact handling while the agent selects the tools already available in the host.
+The skills use the host's existing repository, shell, browser, and connector capabilities. The first release deliberately has no MCP server: the local ledger supplies deterministic artifact handling while the agent selects the tools already available in the host.
 
 ## Local ledger
 
@@ -34,9 +34,32 @@ Generated target-project state lives under `.agentic-qa/`. A session record bind
 
 This repository does not manage a backlog. `qa-backlog-handoff` emits one `Bug` item compatible with the Agentic Backlog Kit ingestion contract. It does not prioritize, schedule, synchronize, or mutate GitHub. Those actions remain explicit workflows in `agentic-backlog-kit`.
 
+## Installing
+
+`skills/` is the single source of truth for behavior on every host and is
+auto-discovered. Each host reads its own thin manifest: `.claude-plugin/` for
+Claude Code, `.codex-plugin/plugin.json` for Codex. Skill content is never forked
+per host.
+
+Claude Code, from a checkout of this repository's parent directory:
+
+```powershell
+claude plugin marketplace add ./agentic-qa-kit
+claude plugin install agentic-qa-kit@aegolius-labs-qa
+```
+
+The same user-scoped install serves both the Claude Code CLI and the desktop app.
+
+For Codex, add this plugin to a local or repository marketplace and install it
+from the Plugins Directory.
+
 ## Plugin development
 
-The required manifest is `.codex-plugin/plugin.json`, with focused skills under `skills/`. For installed testing, add this plugin to a local or repository marketplace, install it from the Plugins Directory, start a new task, and exercise direct, indirect, incomplete, negative, and authorization-sensitive prompts.
+For installed testing, install through a local marketplace, start a new
+top-level task, and exercise direct, indirect, incomplete, negative, and
+authorization-sensitive prompts. Note that a Claude Code directory marketplace
+installs in place, so the install resolves to the working tree; see
+`evals/README.md` for what that does and does not evidence.
 
 Development checks:
 

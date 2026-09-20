@@ -7,6 +7,10 @@ build/
 dist/
 *.egg-info/
 
-# Local plugin evaluation and generated QA evidence.
-.agentic-qa/
+# Generated QA evidence and local plugin evaluation transcripts. Only
+# .agentic-qa/manifest.json is tracked state: it declares this repository as a
+# QA target of itself (Q09 dogfooding). Everything else the ledger writes is
+# session-local, can contain environment-specific detail, and is disposable.
+.agentic-qa/*
+!.agentic-qa/manifest.json
 .eval-workspaces/

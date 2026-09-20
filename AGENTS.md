@@ -2,7 +2,7 @@
 
 ## Purpose
 
-This repository packages Codex skills and a deterministic, dependency-free Python evidence ledger for autonomous and assisted software quality assurance.
+This repository packages host-portable agent skills and a deterministic, dependency-free Python evidence ledger for autonomous and assisted software quality assurance. Claude Code is the primary host and Codex is supported alongside it; `skills/` is the single source of truth for behavior on both.
 
 ## Invariants
 
