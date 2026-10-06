@@ -50,6 +50,20 @@ claude plugin install agentic-qa-kit@aegolius-labs-qa
 
 The same user-scoped install serves both the Claude Code CLI and the desktop app.
 
+A marketplace added from GitHub (`claude plugin marketplace add
+aegolius-labs/agentic-qa-kit`) installs a cached copy. To take new skills,
+refresh the marketplace, update, and restart Claude Code:
+
+```bash
+claude plugin marketplace update aegolius-labs-qa
+claude plugin update agentic-qa-kit@aegolius-labs-qa
+```
+
+Claude Code shows the plugin's version as a short commit id, not a release
+number: the Claude Code manifests declare no version on purpose, so that each
+commit counts as a new version. A GitHub install made before 2026-10-06 is stuck
+at `0.1.0` and says it is already up to date; uninstall and install it once.
+
 For Codex, add this plugin to a local or repository marketplace and install it
 from the Plugins Directory.
 

@@ -2,7 +2,6 @@
   "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
   "name": "agentic-qa-kit",
   "displayName": "Agentic QA Kit",
-  "version": "0.1.0",
   "description": "Evidence-centered QA workflows for autonomous coding agents",
   "author": {
     "name": "Aegolius Labs",
