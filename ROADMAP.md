@@ -89,8 +89,8 @@ Claude Code is the primary host and Codex is supported alongside it. `skills/` i
 
 ### M7 - Release readiness
 
-- [ ] Add clean-checkout Windows and Linux CI.
-- [ ] Run plugin and skill structural validation in CI.
+- [x] Add clean-checkout Windows and Linux CI. CI runs on Linux, Windows and macOS with Python 3.11-3.14 (2026-10-14).
+- [x] Run plugin and skill structural validation in CI. `scripts/validate_plugin.py` runs Claude Code's bundled validator and fails on any warning not documented in `CLAUDE.md` (2026-10-14).
 - [ ] Run installed-plugin behavioral evaluations with recorded artifacts.
 - [ ] Establish token/byte budgets for discovery, session summaries, and reports.
 - [ ] Complete security, contribution, support, licensing, changelog, and release documentation.

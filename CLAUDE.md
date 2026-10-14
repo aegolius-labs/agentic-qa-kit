@@ -72,6 +72,10 @@ first installed copy forever. `tests/test_host_manifest_parity.py` fails if a
 version is added back. Any other warning from either manifest is a failure, and
 `skills/` must keep passing `--strict`.
 
+`python scripts/validate_plugin.py` runs all three validations and enforces
+exactly this: CI runs it on every pull request. If an accepted warning changes,
+update its allowlist and this section together.
+
 ## Installing locally
 
 ```powershell
