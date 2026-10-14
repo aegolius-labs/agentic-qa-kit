@@ -2,16 +2,31 @@ name: test
 
 on:
   push:
+    branches: [main]
   pull_request:
 
+permissions:
+  contents: read
+
 jobs:
-  test:
-    runs-on: ubuntu-latest
+  suite:
+    name: suite (${{ matrix.os }}, ${{ matrix.python }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        # Every minor version pyproject.toml claims. The classifiers must list
+        # the same set; tests/test_supported_platforms.py fails if they drift.
+        python: ["3.11", "3.12", "3.13", "3.14"]
+    defaults:
+      run:
+        shell: bash
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
         with:
-          python-version: "3.11"
+          python-version: ${{ matrix.python }}
       - name: Run unit tests
         env:
           PYTHONPATH: src
@@ -24,3 +39,31 @@ jobs:
           python -m build
           python -m pip install --force-reinstall dist/*.whl
           aqk --help
+
+  plugin:
+    name: plugin and skill validation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.11"
+      - name: Install Claude Code's bundled validator
+        run: npm install --global @anthropic-ai/claude-code@2.1.300
+      - name: Validate manifests and skills
+        run: python scripts/validate_plugin.py
+
+  # One stable check name for branch protection, whatever the matrix holds.
+  test:
+    needs: [suite, plugin]
+    if: ${{ always() }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require every platform and the plugin validation to pass
+        env:
+          SUITE: ${{ needs.suite.result }}
+          PLUGIN: ${{ needs.plugin.result }}
+        run: |
+          echo "suite=$SUITE plugin=$PLUGIN"
+          test "$SUITE" = success
+          test "$PLUGIN" = success
