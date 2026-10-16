@@ -1,6 +1,6 @@
 # Agentic QA Kit Roadmap
 
-Last updated: 2026-09-19
+Last updated: 2026-10-16
 
 ## Product goal
 
@@ -91,7 +91,7 @@ Claude Code is the primary host and Codex is supported alongside it. `skills/` i
 
 - [x] Add clean-checkout Windows and Linux CI. CI runs on Linux, Windows and macOS with Python 3.11-3.14 (2026-10-14).
 - [x] Run plugin and skill structural validation in CI. `scripts/validate_plugin.py` runs Claude Code's bundled validator and fails on any warning not documented in `CLAUDE.md` (2026-10-14).
-- [ ] Run installed-plugin behavioral evaluations with recorded artifacts.
+- [x] Run installed-plugin behavioral evaluations with recorded artifacts. The Q01 Claude Code lane result is committed under `evals/results/` (2026-10-16).
 - [ ] Establish token/byte budgets for discovery, session summaries, and reports.
 - [ ] Complete security, contribution, support, licensing, changelog, and release documentation.
 - [ ] Publish `0.1.0` with explicit limitations and evaluation evidence.
@@ -117,6 +117,11 @@ mode, because a directory marketplace resolves the install to the working tree.
 That same property is the lane's standing limitation and is recorded on every
 observation: the lane evidences the skills as written, not a published artifact.
 
+The Claude Code lane ran all 36 cases on 2026-10-16: 34 pass and 2 fail, with
+no inconclusive observation. Both failures are activation misses traced to skill
+descriptions (Q01-F07), and the lane surfaced one unresolved authorization rule
+(Q01-F08). Q01 closes once those are fixed and rerun.
+
 Q09 is now the active item. The repository declares itself a QA target
 (`.agentic-qa/manifest.json` is tracked; generated session evidence stays
 ignored), which is the precondition for dogfooding. No self-QA session has been
@@ -136,7 +141,7 @@ proof required.
 - **Progress:**
   - [x] Install and enable agentic-qa-kit@personal.
   - [x] Add one case for every skill/category pair and validate the matrix contract.
-  - [x] Retain one observation for every matrix case and publish the partial result: [Q01 result](.agentic-qa/evaluations/q01/result.json) (24 pass, 4 fail, 8 inconclusive).
+  - [x] Retain one observation for every matrix case and publish the partial result (24 pass, 4 fail, 8 inconclusive). The Codex lane result stayed under the ignored `.agentic-qa/evaluations/q01/` and was never committed, so only its counts survive here.
   - [x] Execute all initial cases in fresh tasks and retain immutable transcript references.
   - [x] Q01-F01: Reproduce and correct dependency-install authority leakage in Q01-WF-DIRECT.
   - [x] Q01-F02: Resolve the unlisted qa-session companion activation in Q01-WF-FOLLOWUP.
@@ -145,12 +150,15 @@ proof required.
   - [x] Q01-F05: Fix completed session-close so unexecuted charters cannot be represented as completed, with zero-attempt and partial-execution regression coverage.
   - [x] Q01-G01: Add a safe authorization-case harness that permits exact prompt delivery while preventing consequential effects before plugin activation.
   - [x] Q01-G02: Provide disposable confirmed-finding, planning, backlog, and offline remote-snapshot fixtures for handoff cases.
-  - [x] Preserve the focused remediation rerun: [rerun result](.agentic-qa/evaluations/q01/reruns/20260902180111/result.json) (13 inconclusive by installed-version provenance; 12 source oracles met).
+  - [x] Preserve the focused remediation rerun, also local only (13 inconclusive by installed-version provenance; 12 source oracles met).
   - [x] Q01-F06: Prevent a continuation from persisting a replacement finding with its linked source finding ID.
   - [-] Q01-G03: Retired unmet. A clean Codex top-level installed-version rerun stays desirable but is a Codex-lane provenance concern, not a skill defect, and no longer gates this item. Tracked under Q10.
   - [x] Q01-G04: Define the Claude Code primary lane, its install procedure, its observation fields, and its standing working-tree provenance limitation in evals/README.md.
-  - [ ] Q01-G05: Install the plugin, then execute all 36 cases on the Claude Code lane from fresh top-level sessions, recording host, surface, and install location per observation.
+  - [x] Q01-G05: Install the plugin, then execute all 36 cases on the Claude Code lane from fresh top-level sessions, recording host, surface, and install location per observation. `scripts/q01_claude_code.py` runs the lane headlessly; [Claude Code lane result](evals/results/q01-claude-code-2026-10-16.json) (34 pass, 2 fail, CLI surface, 2026-10-16).
   - [ ] Triage Claude Code lane failures, rerun affected cases after fixes, and publish the Q01 lane result.
+  - [ ] Q01-F07: `qa-session` did not activate for Q01-SESS-INDIRECT and `qa-backlog-handoff` did not activate for Q01-HANDOFF-INCOMPLETE. Correct both descriptions and rerun those cases with their negatives.
+  - [ ] Q01-F08: Decide whether a bounded concurrency probe in a disposable directory is `run_load_or_fault_injection`. Five lane runs ran one without asking and three asked first; the skills must state one rule.
+  - [ ] Q01-G06: Exercise the desktop surface. The 2026-10-16 lane ran the headless CLI only.
 
 ### Q02 - Forward-test heterogeneous repositories
 
