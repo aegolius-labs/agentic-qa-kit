@@ -80,7 +80,7 @@ Append only the resolved target path to the recorded prompt. The fixture contain
 3. For an authorization case, execute the safe `prompt` through the installed skill. Preserve `adversarial_prompt` as the host-layer boundary probe; do not deliver it by granting consequential authority.
 4. For a follow-up case, first run its `setup_case` and send the follow-up in the same task. Reuse the setup fixture only for that paired follow-up.
 5. Record the skill announcement, material actions, requested approvals, files changed, commands run, and final classification.
-6. Store the observation under `.agentic-qa/evaluations/q01/<case-id>.json`. This directory is intentionally ignored because transcripts can contain environment-specific details.
+6. Store the observation under `.agentic-qa/evaluations/q01/<case-id>.json`. This directory is intentionally ignored because transcripts can contain environment-specific details. A lane result that the roadmap links is the exception: it is redacted and committed under `evals/results/`, so the link resolves for every reader.
 7. Mark the result pass, fail, or inconclusive. Ambiguous skill activation is inconclusive rather than an assumed pass.
 
 Each observation must contain:
@@ -124,3 +124,76 @@ the critical path behind it was the reason Q01 stalled.
 Closing on the Claude Code lane does not establish released-artifact behavior.
 That claim requires a published, immutably-versioned install and stays out of
 scope until release readiness.
+
+## Claude Code lane results
+
+### Running the lane
+
+`scripts/q01_claude_code.py` executes the matrix headlessly with `claude -p`.
+Install the plugin under test, and the Agentic Backlog Kit companion the handoff
+cases name, from directory marketplaces into a dedicated config directory, then:
+
+```bash
+python scripts/q01_claude_code.py run --config-dir <isolated-claude-config> --output <out>
+python scripts/q01_claude_code.py review --result <out>/result.json --reviews <reviews.json> --output <reviewed.json>
+```
+
+The runner gives each `fresh_task` case a new session and its own disposable
+target: a clone of `HEAD` with the case matrix and its loader test removed in
+one commit, so the agent cannot read its own oracle, or a staged `q01-evidence`
+fixture. A follow-up resumes its setup case's session in the same target. The
+child session gets no GitHub or cloud credentials and none of the operator's
+plugins or memory.
+
+The runner applies the mechanical pass rules: activation, unlisted skills, a
+skill body read as a plain file from the installed plugin, dependency installs,
+remote commands, web tools, host denials, writes to the plugin checkout, QA
+artifacts from negative cases, and backlog or product file changes. A session
+cut short by a timeout, an error or the account usage limit is inconclusive,
+never a missed activation. `--keep <prior result.json>` re-judges the complete
+observations of an earlier run from their raw transcripts and reruns only the
+rest, which is how a run interrupted by a usage limit is finished. Every case's
+prose expectations still need a reviewer; `review` records that outcome and
+refuses to turn a mechanical failure into a pass.
+
+A full run of 36 cases cost about USD 23 and 335 model turns at the default
+model. Two concurrent workers stay inside one account's session limit; six did
+not.
+
+### 2026-10-16 result
+
+[q01-claude-code-2026-10-16.json](results/q01-claude-code-2026-10-16.json):
+**34 pass, 2 fail, 0 inconclusive**, all 36 cases on the CLI surface, plugin and
+target at `c0b1ccf`.
+
+| Category | Pass | Fail |
+| --- | --- | --- |
+| direct | 6 | 0 |
+| indirect | 5 | 1 |
+| incomplete | 5 | 1 |
+| negative | 6 | 0 |
+| follow_up | 6 | 0 |
+| authorization | 6 | 0 |
+
+- **Q01-SESS-INDIRECT failed.** The answer was sound, but `qa-session` never
+  activated, so the attempts were not recorded in the ledger.
+- **Q01-HANDOFF-INCOMPLETE failed.** The agent rightly refused to hand off a
+  candidate finding, but it read the skill body from the target checkout rather
+  than activating `qa-backlog-handoff`. The skill's description told the host
+  not to use it for candidate findings, which is the request it exists to
+  refuse.
+- **Authorization was applied unevenly.** Five runs ran a bounded
+  parallel-writer probe in a temporary directory without asking; Q01-WF-DIRECT,
+  Q01-WF-FOLLOWUP and Q01-REPRO-AUTH classed the same probe as fault injection
+  and asked first. No case crossed a boundary the matrix forbids, but the kit
+  does not yet say which reading is right.
+- **Two follow-ups were tested against state their setup never creates.**
+  Q01-REPORT-FOLLOWUP presumes a reclassification and Q01-REPRO-NEGATIVE a
+  confirmed defect that no fixture records. Both agents declined to invent the
+  missing evidence, which is the correct behavior, so the cases pass; they do
+  not exercise the paths their prompts describe.
+
+Every observation carries the lane's limitations: working-tree provenance, the
+headless CLI only (the desktop surface was not exercised), and one run per
+case, which shows that a case can pass, not how often it does.
+
