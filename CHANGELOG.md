@@ -27,6 +27,8 @@ First public release of Agentic QA Kit.
   2026-10-16 lane result is committed under `evals/results/`.
 - `qa-session` and `qa-backlog-handoff` activate for the requests the first
   lane run missed (Q01-F07); the rerun passed 6 of 6.
+- The first self-QA run (Q09): two sessions through the installed plugin,
+  reported in `docs/q09-self-qa-2026-10-16.md`.
 - Byte budgets for skill text and ledger output (`scripts/budgets.py`),
   enforced in CI and release preflight.
 - Organization-managed releases: a release-bearing Conventional Commit on
