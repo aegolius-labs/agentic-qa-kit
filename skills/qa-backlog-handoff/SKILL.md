@@ -1,6 +1,6 @@
 ---
 name: qa-backlog-handoff
-description: Convert a confirmed QA finding into a validated Agentic Backlog Kit Bug payload and, when explicitly requested, feed it into that kit. Use after reproduction and evidence review; do not use for candidate findings, prioritization, sprint planning, or implicit GitHub synchronization.
+description: Turn a QA finding into Agentic Backlog Kit work: check eligibility, export a validated Bug payload for a confirmed finding, and, when explicitly requested, feed it into that kit. Use for any request to make a backlog item, bug, or issue from a QA finding, including a candidate or inconclusive one, which it rejects with the reason; do not use for prioritization, sprint planning, or implicit GitHub synchronization.
 ---
 
 # Hand off a confirmed defect
