@@ -1,6 +1,6 @@
 ---
 name: qa-session
-description: Plan and execute a bounded QA session against a codebase, recording exact attempts, observations, oracles, evidence, and candidate findings. Use for exploratory, functional, regression, static, integration, or scoped non-functional testing; do not use to claim release approval or to fix defects unless separately requested.
+description: Plan and execute a bounded QA session against a codebase, recording exact attempts, observations, oracles, evidence, and candidate findings. Use for exploratory, functional, regression, static, integration, or scoped non-functional testing, including checking whether one behavior holds by running the narrowest existing tests under a time or attempt limit; do not use to claim release approval or to fix defects unless separately requested.
 ---
 
 # Run a bounded QA session

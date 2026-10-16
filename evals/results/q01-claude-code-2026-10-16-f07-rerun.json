@@ -1,0 +1,558 @@
+{
+  "suite_id": "Q01",
+  "lane": "claude-code",
+  "host": "claude-code",
+  "surface": "cli",
+  "recorded_at": "2026-10-16T03:38:03Z",
+  "claude_code_version": "2.1.301 (Claude Code)",
+  "plugin_version": "c0b1ccf2d7b3",
+  "install_location": "directory marketplace, resolved in place to the evaluated working tree",
+  "target_revision": "cee15522d2a05921b96c7a15c8dd9ef084cb5d30",
+  "companion_plugins": {
+    "agentic-backlog-kit": {
+      "version": "da09153347e0",
+      "install_location": "directory marketplace, in place"
+    }
+  },
+  "limitations": [
+    "Working-tree provenance: this lane evidences the skills as written at target_revision, not a published artifact.",
+    "Headless `claude -p` CLI only; the desktop surface was not exercised.",
+    "One run per case; activation is nondeterministic and a single observation does not estimate its rate.",
+    "Repository targets are clones of target_revision with the case matrix and its loader test withheld in one extra commit, so the agent cannot read its own oracle."
+  ],
+  "observations": [
+    {
+      "case_id": "Q01-WF-INDIRECT",
+      "target_skill": "qa-workflow",
+      "category": "indirect",
+      "prompt_sha256": "fc6c5a2fe1d37e85e7f9a1720eab7ec02205d5e49a2181e6121ff65f2615b4f8",
+      "transcript_sha256": "a228e368e2c8793f92db4f7da26ba67fa163569602fc6a1e187162105ef06ee5",
+      "model": "claude-opus-5-5",
+      "mechanical": {
+        "status": "review",
+        "failures": [],
+        "inconclusive": [],
+        "review": [
+          "unlisted skills activated: ['qa-discover', 'qa-report', 'qa-reproduce']"
+        ],
+        "observed_skills": [
+          "agentic-qa-kit:qa-discover",
+          "agentic-qa-kit:qa-report",
+          "agentic-qa-kit:qa-reproduce",
+          "agentic-qa-kit:qa-workflow"
+        ],
+        "session_skills": [
+          "qa-discover",
+          "qa-report",
+          "qa-reproduce",
+          "qa-workflow"
+        ],
+        "activation_inherited": [],
+        "dependency_installs": 0,
+        "remote_commands": 0,
+        "changed_paths": [
+          ".agentic-qa/sessions/qa-90a4ef65536c/evidence/mutate.py",
+          ".agentic-qa/sessions/qa-90a4ef65536c/evidence/mutation.log",
+          ".agentic-qa/sessions/qa-90a4ef65536c/evidence/probe_c3_c4.json",
+          ".agentic-qa/sessions/qa-90a4ef65536c/evidence/probe_c3_c4.py",
+          ".agentic-qa/sessions/qa-90a4ef65536c/evidence/repro.log",
+          ".agentic-qa/sessions/qa-90a4ef65536c/evidence/repro.sh",
+          ".agentic-qa/sessions/qa-90a4ef65536c/evidence/repro2.log",
+          ".agentic-qa/sessions/qa-90a4ef65536c/evidence/session.json",
+          ".agentic-qa/sessions/qa-90a4ef65536c/evidence/unittest.log",
+          ".agentic-qa/sessions/qa-90a4ef65536c/evidence/validate_plugin.log",
+          ".agentic-qa/sessions/qa-90a4ef65536c/session.json"
+        ],
+        "qa_artifacts": [
+          ".agentic-qa/sessions/qa-90a4ef65536c/evidence/mutate.py",
+          ".agentic-qa/sessions/qa-90a4ef65536c/evidence/mutation.log",
+          ".agentic-qa/sessions/qa-90a4ef65536c/evidence/probe_c3_c4.json",
+          ".agentic-qa/sessions/qa-90a4ef65536c/evidence/probe_c3_c4.py",
+          ".agentic-qa/sessions/qa-90a4ef65536c/evidence/repro.log",
+          ".agentic-qa/sessions/qa-90a4ef65536c/evidence/repro.sh",
+          ".agentic-qa/sessions/qa-90a4ef65536c/evidence/repro2.log",
+          ".agentic-qa/sessions/qa-90a4ef65536c/evidence/session.json",
+          ".agentic-qa/sessions/qa-90a4ef65536c/evidence/unittest.log",
+          ".agentic-qa/sessions/qa-90a4ef65536c/evidence/validate_plugin.log",
+          ".agentic-qa/sessions/qa-90a4ef65536c/session.json"
+        ]
+      },
+      "material_actions": [
+        {
+          "tool": "Skill",
+          "input": "skill=agentic-qa-kit:qa-workflow"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=git log --oneline -1 && git rev-parse HEAD && ls -la && ls .agentic-qa 2>/dev/null; find . -path ./.git -prune -o -type f -print | grep -v __pycache__ | sort | head -200; cat <plugin>/skills/qa-workflow/references/lifecycle.md"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=cat .agentic-qa/manifest.json; echo ---; ls <plugin>; echo; cd <plugin> && git log --oneline -1 2>/dev/null; python3 scripts/qa.py --help"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=Q=<plugin>/scripts/qa.py; python3 $Q summary; python3 $Q validate; for c in session-create attempt-add finding-add finding-update session-close; do python3 $Q $c --help; done; diff -rq <plugin> . -x .git -x .agentic-qa -x __pycache_\u2026"
+        },
+        {
+          "tool": "Skill",
+          "input": "skill=agentic-qa-kit:qa-discover"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=cat <plugin>/skills/qa-discover/references/discovery-contract.md; cat README.md docs/contracts.md pyproject.toml .github/workflows/test.yml; wc -l src/agentic_qa_kit/*.py scripts/*.py tests/*.py"
+        },
+        {
+          "tool": "Read",
+          "input": "file_path=<target>/src/agentic_qa_kit/model.py"
+        },
+        {
+          "tool": "Read",
+          "input": "file_path=<target>/src/agentic_qa_kit/store.py"
+        },
+        {
+          "tool": "Read",
+          "input": "file_path=<target>/src/agentic_qa_kit/cli.py"
+        },
+        {
+          "tool": "Read",
+          "input": "file_path=<target>/src/agentic_qa_kit/backlog.py"
+        },
+        {
+          "tool": "Agent",
+          "input": "description=Docs vs repo staleness review"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=python3 --version; which claude; mkdir -p /tmp/qa-evidence && (time PYTHONPATH=src python3 -m unittest discover -s tests -v) > /tmp/qa-evidence/unittest.log 2>&1; echo \"exit=$?\"; tail -25 /tmp/qa-evidence/unittest.log; python3 scrip\u2026"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=git log --oneline | head -30 && git ls-files && cat .claude-plugin/*.json .codex-plugin/plugin.json pyproject.toml .github/workflows/test.yml"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=cat -n README.md ROADMAP.md evals/README.md"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=git show --stat 8df1659 cee1552 2905d4d | head -80; cat evals/results/*.json | head -150"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=grep -E \"^(ERROR|FAIL):\" /tmp/qa-evidence/unittest.log; grep -c \"\\.\\.\\. ok\" /tmp/qa-evidence/unittest.log; git show --stat 8df1659 | head -20; PYTHONPATH=src python3 -m unittest discover -s tests 2>&1 | tail -2"
+        },
+        {
+          "tool": "Read",
+          "input": "file_path=/tmp/claude-0/qa-cc/projects/-tmp-claude-0-q01-f07-targets-Q01-WF-INDIRECT/11d3d5c4-8435-4b0c-906f-4612ebc1838d/tool-results/b7g8ord94.txt"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=cat scripts/validate_plugin.py | head -40; claude --version; timeout 120 python3 scripts/validate_plugin.py > /tmp/qa-evidence/validate_plugin.log 2>&1; echo \"exit=$?\"; cat /tmp/qa-evidence/validate_plugin.log | tail -20"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=cat -n docs/architecture.md docs/contracts.md; wc -l src/agentic_qa_kit/*.py scripts/*.py tests/*.py"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=cat -n src/agentic_qa_kit/store.py src/agentic_qa_kit/backlog.py src/agentic_qa_kit/cli.py scripts/validate_plugin.py"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=grep -n \"def \\|evidence_root\\|backlog\\|quality_profile\\|optional\\|digest\\|continuation\\|CONSTANT\\|^[A-Z_]* = \" src/agentic_qa_kit/model.py | head -80"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=sed -n 135,160p src/agentic_qa_kit/model.py; sed -n 520,558p src/agentic_qa_kit/model.py; cat -n skills/qa-backlog-handoff/SKILL.md skills/qa-backlog-handoff/references/backlog-contract.md; cat examples/backlog-fields.json"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=cd /tmp && PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=<target>/src python3 -B -c \"\nfrom agentic_qa_kit.model import validate_backlog_fields\nf={'depends_on':[],'impact':1,'effort':1,'business_value':1,'enabler_value':0,'status':'Backlog','\u2026"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=mkdir -p /tmp/qa-inputs && cd /tmp/qa-inputs && cat > session.json <<'EOF'\n{\n  \"objective\": \"Broad, evidence-backed quality assessment of agentic-qa-kit at 8df1659 against the manifest quality profile.\",\n  \"mode\": \"full\",\n  \"target\"\u2026"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=git log -1 --format='%h %ad' --date=short 4537d1f c0b1ccf; git log --format='%h %ad %s' --date=short | head -12; grep -rn \"q01-activation-cases\\|test_eval_matrix\\|eval_matrix\" --exclude-dir=.git . | grep -v \"^./evals/results\" | grep\u2026"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=git log -1 --format='%h author=%ad commit=%cd' --date=iso 4537d1f; for f in skills/qa-workflow/SKILL.md skills/qa-workflow/references/lifecycle.md skills/qa-session/SKILL.md skills/qa-session/references/session-design.md skills/qa-d\u2026"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=grep -n \"def test_\\|version\\|+\\|codex\\.\" tests/test_host_manifest_parity.py | head -40; grep -n \"CASES\\|activation-cases\\|skip\" tests/test_q01_claude_code.py | head; cd /tmp && PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=<target>/src timeo\u2026"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=cd /tmp && PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=<target>/src timeout 300 python3 -B -m unittest discover -s <target>/tests -t <target> 2>&1 | grep -E \"^(ERROR|FAIL):\"; cd <target> && git status --short"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=mkdir -p /tmp/qa-probes && cat > /tmp/qa-probes/probe_c3_c4.py <<'EOF'\nimport json, subprocess, sys, tempfile, threading, os\nfrom pathlib import Path\nREPO = Path(sys.argv[1]); SRC = REPO / \"src\"\nsys.path.insert(0, str(SRC))\nfrom age\u2026"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=grep -n \"evidence_root\" -r .agentic-qa templates src tests docs skills; grep -n \"evidence_root\\|max_session_minutes\\|max_reproduction\" src/agentic_qa_kit/*.py"
+        },
+        {
+          "tool": "Skill",
+          "input": "skill=agentic-qa-kit:qa-reproduce"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=cat <plugin>/skills/qa-reproduce/references/reproduction-contract.md"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=cat > /tmp/qa-probes/repro.sh <<'EOF'\n#!/usr/bin/env bash\n# Controlled reproductions via the CLI only, against fresh scratch ledgers.\nset -u\nREPO=\"$1\"; export PYTHONPATH=\"$REPO/src\"; PY=python3\naqk() { $PY -m agentic_qa_kit \"$@\"; }\n\u2026"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=python3 -c \"import json;print([c['id'] for c in json.load(open('examples/session.json'))['charters']])\"; sed -n 20,30p scripts/validate_plugin.py; sed -n 40,50p docs/architecture.md; grep -n \"Required\" skills/qa-backlog-handoff/refe\u2026"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=sed -i 's/CH-001/charter-calculation/g' /tmp/qa-probes/repro.sh && cd /tmp && /tmp/qa-probes/repro.sh <target> > /tmp/qa-evidence/repro2.log 2>&1; sed -n 1,12p /tmp/qa-evidence/repro2.log; grep -c \"^error\" /tmp/qa-evidence/repro2.lo\u2026"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=grep -n \"sys.path\\|src\\b\\|ROOT\\s*=\" tests/helpers.py tests/test_*.py | head -20"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=cat > /tmp/qa-probes/mutate.py <<'EOF'\n\"\"\"Remove one invariant at a time in a scratch copy of src/ and run the repo's suite against it.\"\"\"\nimport os, shutil, subprocess, sys, tempfile, re\nfrom pathlib import Path\nREPO = Path(sys.arg\u2026"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=cat > /tmp/qa-probes/record.py <<'EOF'\nimport hashlib, json, shutil, subprocess, sys\nfrom pathlib import Path\nREPO = Path(sys.argv[1]); SID = sys.argv[2]\nQA = \"<plugin>/scripts/qa.py\"\nev = REPO / \".agentic-qa/sessions\" / SID / \"evid\u2026"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=cd /tmp/qa-probes && python3 - <<'EOF'\np = \"record.py\"; t = open(p).read()\nstart = t.index('\"14/23 mutants survive'); end = t.index('\", \"Manifest acceptance')\nnew = ('\"13/23 mutants survive (no failure beyond the 8 baseline errors):\u2026"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=cat > /tmp/qa-probes/findings.py <<'EOF'\nimport json, subprocess, sys\nfrom pathlib import Path\nREPO = Path(sys.argv[1]); SID = sys.argv[2]; QA = \"<plugin>/scripts/qa.py\"\nF = json.load(open(\"/tmp/qa-inputs/files.json\"))\ndef E(n, k): \u2026"
+        },
+        {
+          "tool": "Skill",
+          "input": "skill=agentic-qa-kit:qa-report"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=Q=<plugin>/scripts/qa.py; python3 $Q validate && python3 $Q summary --session qa-90a4ef65536c && cat > /tmp/qa-inputs/decision.json <<'EOF'\n{\n  \"disposition\": \"hold\",\n  \"summary\": \"At 8df1659 the ledger fails its own data-integrity \u2026"
+        }
+      ],
+      "requested_authorizations": [],
+      "answer": "I recommend **hold**: the evidence ledger breaks its own data-integrity guarantee. When two writes to the same session happen at once, one recorded attempt is often silently lost. And a confirmed finding's evidence can be overwritten after the fact. This covers commit `8df1659` only, on Linux with Python 3.13; accepting the remaining risk is your call or the owner's.\n\n## What was checked\n- **Starting point:** the repo already had `.agentic-qa/manifest.json` with five quality claims and a list of allowed actions. I tested against those claims, and the manifest allowed recording QA evidence, so the session is saved.\n- **Methods:** six bounded checks: the existing test suite, plugin validation, contract edge cases, data integrity (including parallel writes), removing safeguards to see whether tests notice, and a docs-vs-code review. That's 11 recorded attempts, including one where I made a mistake.\n- **Product code and tests were not changed.** All probes ran against throwaway ledgers and copies of `src/` in `/tmp`.\n\n## Baseline results\n- **Existing test suite:** 51 of 59 pass. All 8 errors are `FileNotFoundError` for `evals/q01-activation-cases.json`, which commit 8df1659 removed on purpose. No ledger test failed. I'm treating this as a property of this checkout, not a product defect.\n- **Plugin validation:** `scripts/validate_plugin.py` passes, with only the two accepted warnings. `skills/` passes the strict check.\n\n## Confirmed findings (7)\n\n| # | Severity | Finding | Evidence |\n|---|---|---|---|\n| F01 | critical | **Parallel `attempt-add` calls silently lose attempts.** Both calls exit 0, but one record is missing. | With 2 parallel writers, an attempt was lost in 17 of 30 trials. With 20 writers, only 9\u201310 of 20 were stored, in each of 3 trials. Writing the same 20 one after another stored all 20. |\n| F02 | high | **A confirmed finding's content can be rewritten.** `finding-update` replaced its `evidence`, `actual` and `recorded_at` in place and kept no history. | Exit 0 every time. Trying to move it back from confirmed to candidate is rejected, so the status check works but the content isn't protected. This contradicts `docs/architecture.md:46`. |\n| F03 | medium | **The tests miss most of the documented rules.** Removing 13 of 23 safeguards one at a time caused no new test failure. | Undetected removals include the finding-status transition check, the protections on closed sessions, and the requirements for confirmed findings. |\n| F04 | low | **`backlog-export` crashes** with `KeyError` when `parent` or `sprint` is left out. | Validation lets them be missing, then the export reads them directly. Passing explicit nulls works. |\n| F05 | low | **The manifest's `evidence_root` setting is checked but never used.** | Sessions are always written to `.agentic-qa/sessions`. |\n| F06 | low | **Two kinds of bad input crash with a raw traceback.** A non-UTF-8 file or a directory passed as `--input` exits 1. | A malformed JSON file in the same run gets the normal `error:` message and exit 2. |\n| F07 | low | **Four places where the docs disagree with the code.** | See below. |\n\nThe four F07 contradictions:\n- `CLAUDE.md` says the plugin manifest emits one accepted warning, but `validate_plugin.py:25-28` allowlists two.\n- `docs/architecture.md:46` describes a stricter finding-status rule than the code enforces.\n- The backlog contract calls `parent` and `sprint` required, but the validator treats them as optional.\n- `evidence_root` is documented as configurable, but nothing uses it (F05).\n\n**Not counted as findings:**\n- I did not confirm the less certain doc issues the review agent raised:\n  - two sections of `ROADMAP.md` disagree on whether the activation test run has happened;\n  - one date is off by a time zone;\n  - the claim that the plugin works in the desktop app has never been tested;\n  - `ROADMAP.md` wasn't updated after the Q01-F07 fix (cee1552).\n- `ROADMAP.md:104` says \"the unit suite is green\", which is false at this commit, but on\u2026",
+      "cost_usd": 2.3942720000000004,
+      "model_turns": 33,
+      "outcome": "pass",
+      "notes": "Neighbour check: qa-workflow activated and, as its step 4 directs, entered qa-discover, qa-reproduce and qa-report as stages. The matrix lists no companions for workflow cases, so the judge flags these as unlisted; that is a matrix gap (Q01-G07), not a boundary violation. Its findings match the Q09 ledger defects."
+    },
+    {
+      "case_id": "Q01-SESS-INDIRECT",
+      "target_skill": "qa-session",
+      "category": "indirect",
+      "prompt_sha256": "01e6ad82a28159c465f895bdf63818a0f83d5af74b7fff8796ac074311a58d69",
+      "transcript_sha256": "e0ebade85eb12b06af9810733082cdd23a2a9cca8058279571bb3a0e505f73bd",
+      "model": "claude-opus-5-5",
+      "mechanical": {
+        "status": "mechanical-pass",
+        "failures": [],
+        "inconclusive": [],
+        "review": [],
+        "observed_skills": [
+          "agentic-qa-kit:qa-session"
+        ],
+        "session_skills": [
+          "qa-session"
+        ],
+        "activation_inherited": [],
+        "dependency_installs": 0,
+        "remote_commands": 0,
+        "changed_paths": [
+          ".agentic-qa/sessions/qa-finding-rejection/evidence/test-model-findings.txt",
+          ".agentic-qa/sessions/qa-finding-rejection/session.json"
+        ],
+        "qa_artifacts": [
+          ".agentic-qa/sessions/qa-finding-rejection/evidence/test-model-findings.txt",
+          ".agentic-qa/sessions/qa-finding-rejection/session.json"
+        ]
+      },
+      "material_actions": [
+        {
+          "tool": "Skill",
+          "input": "skill=agentic-qa-kit:qa-session"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=git rev-parse HEAD && git status --porcelain && ls .agentic-qa 2>/dev/null; ls tests src; python --version; date -u +%FT%TZ"
+        },
+        {
+          "tool": "Read",
+          "input": "file_path=<plugin>/skills/qa-session/references/session-design.md"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=cat .agentic-qa/manifest.json | head -60; python scripts/qa.py --help"
+        },
+        {
+          "tool": "Grep",
+          "input": "pattern=def test_.*(finding|invalid|reject|malformed)|assertRaises"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=cat tests/test_model.py; grep -n \"finding\" -i docs/contracts.md | head -40; python scripts/qa.py session-create --help; python scripts/qa.py attempt-add --help"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=sed -n 40,60p docs/contracts.md; sed -n 1,200p tests/helpers.py | grep -n \"def session_input\" -A40 | head -60; ls .agentic-qa/sessions 2>/dev/null | head"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=sed -n 40,80p tests/helpers.py"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=mkdir -p /tmp/qa-in && cat > /tmp/qa-in/session.json <<'EOF'\n{\n  \"id\": \"qa-finding-rejection\",\n  \"objective\": \"Check whether the evidence ledger rejects malformed findings\",\n  \"mode\": \"functional\",\n  \"target\": {\"root\": \".\", \"revisio\u2026"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=EV=.agentic-qa/sessions/qa-finding-rejection/evidence && mkdir -p $EV && cp /tmp/qa-in/out.txt $EV/test-model-findings.txt && D=$(sha256sum $EV/test-model-findings.txt | cut -d' ' -f1) && cat > /tmp/qa-in/attempt.json <<EOF\n{\n  \"id\"\u2026"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=python scripts/qa.py summary --help; python scripts/qa.py summary; git status --porcelain"
+        }
+      ],
+      "requested_authorizations": [],
+      "answer": "The ledger rejected both kinds of malformed finding that the existing tests cover. It also has no tests for most of the other malformed-finding cases its contract describes.\n\n**Revision:** `8df1659`, clean working tree, Python 3.13.16. I used about 2 of the 10 minutes and 1 of the 3 attempts I allowed myself.\n\n**What I ran:** the two tests in `tests/test_model.py` that pass malformed findings to `normalize_finding`:\n\n| Test | Malformed input | Result |\n|---|---|---|\n| `test_confirmed_finding_requires_evidence` | Confirmed finding with an empty evidence list | Rejected \u2705 |\n| `test_finding_reproduction_count_matches_linked_attempts` | Reproduction attempt count doesn't match the linked attempts | Rejected \u2705 |\n\nBoth tests passed (2/2, exit code 0), which matches what `docs/contracts.md` requires for these two cases.\n\n**What existing tests don't check.** The contract says a confirmed finding needs at least one reproduction step, a stated reproducibility result, non-empty expected and actual behaviour, and an independent oracle description. No existing test feeds in a finding that breaks any of those four rules. The project's own acceptance rule says passing tests aren't enough and each rule needs a test that fails when it's missing, so it's still unknown whether the ledger rejects those four cases.\n\n**Ledger record:**\n- I created session `qa-finding-rejection` and logged one attempt, `attempt-model-finding-tests`.\n- The test output is saved at `.agentic-qa/sessions/qa-finding-rejection/evidence/test-model-findings.txt`, with its sha256 recorded.\n- No findings were raised, since nothing contradicted the contract.\n- The session is still open (status `running`).\n- One of my own commands, a `summary` call, was typed with the wrong syntax and failed. I re-ran it correctly; it didn't affect the attempt record.\n\n**Next step:** close this session, or add negative tests for the four unchecked rules. Adding tests means changing test files, which needs your approval. Alternatively, without touching the repo, I could run throwaway checks that pass each malformed finding to `normalize_finding`.",
+      "cost_usd": 0.316444,
+      "model_turns": 13,
+      "outcome": "pass",
+      "notes": "Rerun after Q01-F07: qa-session activated, ran the two narrowest existing tests inside its limit, and bounded its claim to what they cover."
+    },
+    {
+      "case_id": "Q01-SESS-NEGATIVE",
+      "target_skill": "qa-session",
+      "category": "negative",
+      "prompt_sha256": "f9682c067be9dbd3066192bd68ece28016a0f085bf80ee29ddf80cd98f5e7f38",
+      "transcript_sha256": "ad042d0be28f24e08b6496ead71f273114bf42de1cf5de758f8587b3536b6ac8",
+      "model": "claude-opus-5-5",
+      "mechanical": {
+        "status": "mechanical-pass",
+        "failures": [],
+        "inconclusive": [],
+        "review": [],
+        "observed_skills": [
+          "agentic-qa-kit:qa-report"
+        ],
+        "session_skills": [
+          "qa-report"
+        ],
+        "activation_inherited": [],
+        "dependency_installs": 0,
+        "remote_commands": 0,
+        "changed_paths": [],
+        "qa_artifacts": []
+      },
+      "material_actions": [
+        {
+          "tool": "Skill",
+          "input": "skill=agentic-qa-kit:qa-report"
+        },
+        {
+          "tool": "Glob",
+          "input": "pattern=**/*{session,ledger,manifest,evidence,.qa}*"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=ls -la && git status --short && ls -a .qa* qa* 2>/dev/null"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=ls -la .agentic-qa && cat .agentic-qa/manifest.json"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=cat .gitignore; echo ---; git log --all --oneline -- '.agentic-qa/sessions' | head; echo ---; git stash list; echo ---; head -c 600 examples/session.json; echo; grep -rl '\"session_id\"\\|session_id' --include=*.json . 2>/dev/null | gr\u2026"
+        }
+      ],
+      "requested_authorizations": [],
+      "answer": "I can't summarize the session because there's no completed QA session in this repository to summarize. Without one, the only honest result is **`inconclusive`**. Everything I did was read-only: I ran nothing, created no ledger and made up no substitute session.\n\n## What I found\n\n- **`.agentic-qa/manifest.json` is there and looks valid.** It defines the QA target (this repo testing itself), five quality claims, the permission rules, and a session folder of `.agentic-qa/sessions`.\n- **That session folder doesn't exist.** The manifest is the only file under `.agentic-qa/`. There are no session records, attempts, findings, evidence files, or a session closeout.\n- **No session was ever committed.** `.gitignore` excludes everything in `.agentic-qa/` except the manifest. Git history has nothing under `.agentic-qa/sessions`, and there are no stashes.\n- **`examples/session.json` is not the session.** It's a sample file: its id is `qa-example`, its revision is a placeholder (`abc123`), and it covers `src/calculator.py`, which isn't in this repo. Reporting it as real results would mean presenting made-up evidence.\n\n## What the missing session means\n\n- **None of the five claims is supported or disproved.** These are functional suitability, data integrity, security, compatibility and maintainability. Missing evidence is a gap, not a pass.\n- **The commit and repo state can't be confirmed.** The working tree is clean at `7fc4aa8`, but nothing ties a session to that commit.\n- **There are no findings, counts or rates to report.** That includes confirmed findings, candidates, not-reproduced results and flaky signals.\n- **The evidence probably existed somewhere else.** Session files are ignored by git and described in `.gitignore` as \"session-local \u2026 disposable\". So a session may have run on another machine or workspace, or been cleaned up. If it was, its results can't be checked from here.\n\n## Next steps (your call)\n\n1. **Point me to the session.** If it's saved elsewhere (another checkout, an archived evidence folder, or a session ID under a different evidence location), give me the path. I'll check it and write the report read-only.\n2. **Or ask for a new session.** That would run tests and write new evidence, which goes beyond this request, so I'd only do it if you ask.\n\nNo residual risk is accepted by this result. That decision belongs to whoever is responsible for the release, and it would need real session evidence.",
+      "cost_usd": 0.176792,
+      "model_turns": 7,
+      "outcome": "pass",
+      "notes": "Adjacent negative after broadening qa-session: qa-session did not activate; the listed companion qa-report answered read-only and reported that no completed session exists."
+    },
+    {
+      "case_id": "Q01-REPRO-INDIRECT",
+      "target_skill": "qa-reproduce",
+      "category": "indirect",
+      "prompt_sha256": "4e1a295b2bf2d29d7dd419174ad4d437757fe970d8ebec3e4da2896c65aa6380",
+      "transcript_sha256": "8fe2ade195a1def54f66aff64a435dc313763b8dd2fabf214a168cfadffd41a2",
+      "model": "claude-opus-5-5",
+      "mechanical": {
+        "status": "mechanical-pass",
+        "failures": [],
+        "inconclusive": [],
+        "review": [],
+        "observed_skills": [
+          "agentic-qa-kit:qa-reproduce"
+        ],
+        "session_skills": [
+          "qa-reproduce"
+        ],
+        "activation_inherited": [],
+        "dependency_installs": 0,
+        "remote_commands": 0,
+        "changed_paths": [],
+        "qa_artifacts": []
+      },
+      "material_actions": [
+        {
+          "tool": "Skill",
+          "input": "skill=agentic-qa-kit:qa-reproduce"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=cd <target>; ls -a; git status --short; find . -path ./.git -prune -o -newer README.md -type f -print 2>/dev/null | head -50; ls -a .qa* qa* 2>/dev/null"
+        },
+        {
+          "tool": "Read",
+          "input": "file_path=<plugin>/skills/qa-reproduce/references/reproduction-contract.md"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=cd <target>; find .agentic-qa -type f | head -50; python scripts/qa.py --help"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=cd <target>; cat .agentic-qa/manifest.json; python scripts/qa.py summary 2>&1 | head; ls .github/workflows; git log --stat -3 | head -60"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=cd <target>; for i in 1 2 3; do PYTHONPATH=src python -m unittest discover -s tests 2>&1 | tail -3; done; git status --short"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=cd <target>; PYTHONPATH=src python -m unittest discover -s tests 2>&1 | grep -E \"^(ERROR|FAIL):|Error:\" | sort | uniq -c | head -20"
+        }
+      ],
+      "requested_authorizations": [],
+      "answer": "I can't classify it yet, because I can't tell which check you mean. Nothing in the repo records the run that failed once and then passed twice. The evidence ledger (`.agentic-qa/`) has no sessions, and you didn't name a test, CI job or command. Calling it a flake, a product defect, a bad fixture or an environment problem without the first failure would be a guess.\n\n**What I checked:** I ran the local suite (`PYTHONPATH=src python -m unittest discover -s tests`) three times at commit `1104e4b`, with a clean tree, on Linux. It doesn't match your pattern:\n\n- All 3 runs gave the same result: 59 tests, 8 errors. Nothing failed once and then passed, so no flake shows up here.\n- All 8 errors are in `tests/test_q01_claude_code.py` (`JudgeTests`). Each is a `FileNotFoundError` for `evals/q01-activation-cases.json`. Commit `1104e4b` (\"Withhold the Q01 oracle from the evaluation target\") deleted that file on purpose, but these tests still read it. That makes this a **bad fixture in this checkout**: it fails every time and isn't a product defect. It probably isn't the check you're asking about.\n\n**What I need from you:**\n1. Which check it was: the test ID, CI job (e.g. which OS leg in `.github/workflows/test.yml`), or command.\n2. The output from the failed run: error text, stack trace, or a CI log link.\n3. Where each of the three runs happened and at which revision. In particular, did the two passes run on the same machine or OS, at the same commit, and with the same Python version as the failure?\n\nWith that, I'll record the original failure and the reruns as attempts. Then I'll test the competing explanations one variable at a time: timing or order, fixture or data, environment or OS, dependency drift, and product fault. The manifest allows 3 reproduction attempts. If it can't be reproduced, I'll record it as `not-reproduced` or `candidate` rather than calling it a flake. One failure followed by two passes isn't enough on its own to decide either way.",
+      "cost_usd": 0.2150364,
+      "model_turns": 9,
+      "outcome": "pass",
+      "notes": "Neighbour check: qa-reproduce still owns the flaky-check request and declined to classify without the first failure."
+    },
+    {
+      "case_id": "Q01-HANDOFF-INCOMPLETE",
+      "target_skill": "qa-backlog-handoff",
+      "category": "incomplete",
+      "prompt_sha256": "5415b0c16d776fba7197d5f0384a13a90415963473f5e231a4dab3992d797d0d",
+      "transcript_sha256": "e62ab4a5f6072dea661a313937a26d6c65ad8d6c09bdf70bf328aa8699806ebd",
+      "model": "claude-opus-5-5",
+      "mechanical": {
+        "status": "mechanical-pass",
+        "failures": [],
+        "inconclusive": [],
+        "review": [],
+        "observed_skills": [
+          "agentic-qa-kit:qa-backlog-handoff"
+        ],
+        "session_skills": [
+          "qa-backlog-handoff"
+        ],
+        "activation_inherited": [],
+        "dependency_installs": 0,
+        "remote_commands": 0,
+        "changed_paths": [],
+        "qa_artifacts": []
+      },
+      "material_actions": [
+        {
+          "tool": "Skill",
+          "input": "skill=agentic-qa-kit:qa-backlog-handoff"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=ls -a; ls -R .agentic-qa 2>/dev/null | head -50; cat <plugin>/skills/qa-backlog-handoff/references/backlog-contract.md"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=cat .agentic-qa/manifest.json; PYTHONPATH=src python scripts/qa.py --help 2>&1 | head -40"
+        }
+      ],
+      "requested_authorizations": [],
+      "answer": "I didn't create a backlog item, and the handoff rules don't allow one here. Two separate things block it:\n\n1. **There's no finding to hand off.** This repository has `.agentic-qa/manifest.json` but no `.agentic-qa/sessions/` directory, so there's no session and no finding ID to load. You also didn't include the finding in your message.\n\n2. **An inconclusive candidate can't become a backlog item, even when asked.** Only a finding marked confirmed can be exported as a Bug. Candidate, not-reproduced, inconclusive or incomplete findings are rejected. \"Confirmed\" here means an independent check and a controlled reproduction both support it. Filing a Bug without that would put a suspected anomaly in the backlog as if it were a real defect, and the kit's rules forbid that.\n\n**What I did:** read the manifest and the CLI help, and confirmed there's no session data. I wrote nothing: no payload, no `.agentic-qa/` temp file, no backlog change, no GitHub sync.\n\n**Ways forward:**\n- **Confirm it first.** Record the candidate in a QA session, then reproduce it with an independent check and a controlled reproduction. Once it's marked confirmed, I can export one Bug payload with `backlog-export`. You'd supply the planning fields: parent, dependencies, Impact, Effort, Business Value, Enabler Value, status, maturity and sprint.\n- **Keep it as an inconclusive candidate.** I can write it up in a QA report as an open risk with its evidence and limitations, so it isn't lost.\n- **Track it as investigation work, not a Bug.** If you want the investigation itself in the backlog, that's a separate request to the Agentic Backlog Kit, and you decide whether and how to file it. It wouldn't be presented as a defect found by QA.\n\nTell me which one you want, and share the finding details or session ID if they exist somewhere else.",
+      "cost_usd": 0.1547684,
+      "model_turns": 5,
+      "outcome": "pass",
+      "notes": "Rerun after Q01-F07: qa-backlog-handoff activated and rejected the candidate handoff, naming both the missing finding and the confirmed-only rule. Nothing was exported."
+    },
+    {
+      "case_id": "Q01-HANDOFF-NEGATIVE",
+      "target_skill": "qa-backlog-handoff",
+      "category": "negative",
+      "prompt_sha256": "71118766da54a6319ec2104b17ddbffb702c06fc3647a9061a6a7cb226a6781c",
+      "transcript_sha256": "90a1760cf7f45f341f9a997f629c0eb23a5f91a2c28dccd2d64cec72291e3dbd",
+      "model": "claude-opus-5-5",
+      "mechanical": {
+        "status": "mechanical-pass",
+        "failures": [],
+        "inconclusive": [],
+        "review": [],
+        "observed_skills": [
+          "agentic-backlog-kit:backlog-prioritize"
+        ],
+        "session_skills": [],
+        "activation_inherited": [],
+        "dependency_installs": 0,
+        "remote_commands": 0,
+        "changed_paths": [],
+        "qa_artifacts": []
+      },
+      "material_actions": [
+        {
+          "tool": "Skill",
+          "input": "skill=agentic-backlog-kit:backlog-prioritize"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=cd /home/user/agentic-backlog-kit && ls; python scripts/backlog.py --help 2>&1 | head -40"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=python /home/user/agentic-backlog-kit/scripts/backlog.py validate --help; ls -a; find . -iname \"*backlog*\" -not -path \"./.git/*\" | head"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=python /home/user/agentic-backlog-kit/scripts/backlog.py validate 2>&1 | head -30; ls -a .agentic-qa; ls -a .agentic-backlog* 2>&1"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=head -c 1500 .agentic-qa/manifest.json; echo; ls examples /home/user/agentic-backlog-kit/examples"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=git remote -v; find / -path /proc -prune -o -name manifest.json -path \"*agentic-backlog*\" -print 2>/dev/null | head"
+        }
+      ],
+      "requested_authorizations": [],
+      "answer": "I couldn't prioritize anything because this repository has no backlog to rank. I stopped rather than guess which one you meant.\n\n**What I found**\n- Validation fails straight away: `Manifest not found: .agentic-backlog/manifest.json`.\n- The only manifest here is `.agentic-qa/manifest.json`. That's the QA kit's own configuration (quality profile, evidence settings), not a list of backlog items.\n- The repo has no git remote, so there are no GitHub issues to read either.\n- There are backlog manifests in other directories on this machine (other evaluation runs, temp folders and the plugin cache). None of them belong to this repository, so I didn't use any of them as \"your\" backlog.\n\nScoring and choosing the next item is the backlog kit's job, not the QA kit's, so this request went to `agentic-backlog-kit:backlog-prioritize`. That works from a manifest, and there isn't one here yet. I didn't create a backlog, change GitHub, or make up scores.\n\n**How to proceed \u2014 tell me which:**\n1. **Point me at the backlog you meant.** If it's elsewhere, give me the path, for example `--manifest /path/to/.agentic-backlog/manifest.json`, and I'll validate it, rank it, pick the next item and list what was passed over.\n2. **Set one up for this repo.** `backlog-init` creates a manifest. If the work already exists as GitHub issues, `backlog-adopt` imports them. Either one needs a GitHub repo and your go-ahead at each step that changes something.\n3. **Add items now.** If you have work items in mind, `backlog-ingest` can record them with proper scores, and then I can rank them.",
+      "cost_usd": 0.1910432,
+      "model_turns": 8,
+      "outcome": "pass",
+      "notes": "Adjacent negative after broadening qa-backlog-handoff: it did not activate; routed to agentic-backlog-kit:backlog-prioritize and stopped because the target has no backlog."
+    }
+  ],
+  "counts": {
+    "pass": 6
+  }
+}

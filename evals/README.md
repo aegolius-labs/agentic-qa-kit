@@ -197,3 +197,15 @@ Every observation carries the lane's limitations: working-tree provenance, the
 headless CLI only (the desktop surface was not exercised), and one run per
 case, which shows that a case can pass, not how often it does.
 
+### Q01-F07 rerun
+
+Both failures came from skill descriptions. `qa-session` now names checking one
+behavior with the narrowest existing tests under a time or attempt limit, and
+`qa-backlog-handoff` now claims every request to turn a finding into backlog
+work, including the candidate ones it exists to reject. The
+[rerun](results/q01-claude-code-2026-10-16-f07-rerun.json) passed 6 of 6: the two
+failed cases, their adjacent negatives (Q01-SESS-NEGATIVE, Q01-HANDOFF-NEGATIVE),
+and the neighbouring Q01-REPRO-INDIRECT and Q01-WF-INDIRECT, which check that the
+broader descriptions take nothing from other skills. The lane ran at a local
+commit whose skill text is identical to the merged change.
+

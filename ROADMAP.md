@@ -118,9 +118,10 @@ That same property is the lane's standing limitation and is recorded on every
 observation: the lane evidences the skills as written, not a published artifact.
 
 The Claude Code lane ran all 36 cases on 2026-10-16: 34 pass and 2 fail, with
-no inconclusive observation. Both failures are activation misses traced to skill
+no inconclusive observation. Both failures were activation misses traced to skill
 descriptions (Q01-F07), and the lane surfaced one unresolved authorization rule
-(Q01-F08). Q01 closes once those are fixed and rerun.
+(Q01-F08). The two activation misses are fixed and pass on rerun; Q01 closes
+once Q01-F08 is decided.
 
 Q09 is now the active item. The repository declares itself a QA target
 (`.agentic-qa/manifest.json` is tracked; generated session evidence stays
@@ -156,7 +157,8 @@ proof required.
   - [x] Q01-G04: Define the Claude Code primary lane, its install procedure, its observation fields, and its standing working-tree provenance limitation in evals/README.md.
   - [x] Q01-G05: Install the plugin, then execute all 36 cases on the Claude Code lane from fresh top-level sessions, recording host, surface, and install location per observation. `scripts/q01_claude_code.py` runs the lane headlessly; [Claude Code lane result](evals/results/q01-claude-code-2026-10-16.json) (34 pass, 2 fail, CLI surface, 2026-10-16).
   - [ ] Triage Claude Code lane failures, rerun affected cases after fixes, and publish the Q01 lane result.
-  - [ ] Q01-F07: `qa-session` did not activate for Q01-SESS-INDIRECT and `qa-backlog-handoff` did not activate for Q01-HANDOFF-INCOMPLETE. Correct both descriptions and rerun those cases with their negatives.
+  - [x] Q01-F07: `qa-session` did not activate for Q01-SESS-INDIRECT and `qa-backlog-handoff` did not activate for Q01-HANDOFF-INCOMPLETE. Both descriptions now name the missed request; the [rerun](evals/results/q01-claude-code-2026-10-16-f07-rerun.json) passes both cases, their two negatives and two neighbouring cases (6 of 6, 2026-10-16).
+  - [ ] Q01-G07: List the stage skills as allowed companions on the positive `qa-workflow` cases. `qa-workflow` is told to enter `qa-discover`, `qa-session`, `qa-reproduce` and `qa-report` as stages, so the judge's "unlisted skill" flag on those cases needs a reviewer every time.
   - [ ] Q01-F08: Decide whether a bounded concurrency probe in a disposable directory is `run_load_or_fault_injection`. Five lane runs ran one without asking and three asked first; the skills must state one rule.
   - [ ] Q01-G06: Exercise the desktop surface. The 2026-10-16 lane ran the headless CLI only.
 
