@@ -3,8 +3,9 @@ from __future__ import annotations
 import json
 import os
 import tempfile
+from contextlib import contextmanager
 from pathlib import Path
-from typing import Any
+from typing import Any, Iterator
 
 from .model import (
     FINDING_STATUSES,
@@ -26,6 +27,63 @@ FINDING_TRANSITIONS = {
     "not-reproduced": {"not-reproduced"},
     "dismissed": {"dismissed"},
 }
+
+# History a finding accumulates. Entries may be appended, never removed or
+# rewritten, so an update cannot erase evidence that was already recorded.
+APPEND_ONLY_FINDING_FIELDS = ("attempt_ids", "evidence", "limitations")
+# What was observed. Fixed once a finding leaves `candidate`; a later
+# observation belongs in a new attempt or a continuation, not in an edit.
+SETTLED_FINDING_FIELDS = ("title", "summary", "expected", "actual", "oracle")
+
+
+@contextmanager
+def exclusive_lock(path: Path) -> Iterator[None]:
+    """Hold an OS-level exclusive lock on `path` for one read-modify-write.
+
+    The lock belongs to the open file, so the operating system releases it when
+    the holder exits, even after a crash; there is no stale lock to clear.
+    """
+
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with open(path, "a+b") as handle:
+        if os.name == "nt":
+            import msvcrt
+
+            handle.seek(0)
+            while True:
+                try:
+                    msvcrt.locking(handle.fileno(), msvcrt.LK_LOCK, 1)
+                    break
+                except OSError:
+                    continue
+            try:
+                yield
+            finally:
+                handle.seek(0)
+                msvcrt.locking(handle.fileno(), msvcrt.LK_UNLCK, 1)
+        else:
+            import fcntl
+
+            fcntl.flock(handle.fileno(), fcntl.LOCK_EX)
+            try:
+                yield
+            finally:
+                fcntl.flock(handle.fileno(), fcntl.LOCK_UN)
+
+
+def _check_finding_history(current: dict[str, Any], updated: dict[str, Any]) -> None:
+    if updated["recorded_at"] != current["recorded_at"]:
+        raise ValidationError("finding.recorded_at cannot change")
+    for field in APPEND_ONLY_FINDING_FIELDS:
+        before = current.get(field) or []
+        if updated[field][: len(before)] != before:
+            raise ValidationError(f"finding.{field} is append-only; existing entries cannot be removed or changed")
+    if current["status"] != "candidate":
+        for field in SETTLED_FINDING_FIELDS:
+            if updated.get(field) != current.get(field):
+                raise ValidationError(
+                    f"finding.{field} is fixed once a finding is {current['status']}; record new observations as attempts"
+                )
 
 
 def atomic_write_json(path: Path, payload: dict[str, Any]) -> None:
@@ -100,14 +158,20 @@ class KitStore:
         session_id = self._session_id(session_id)
         return self.control_root / "sessions" / session_id / "session.json"
 
+    def session_lock(self, session_id: str):
+        """Serialize writers to one session; every read-modify-write holds it."""
+
+        return exclusive_lock(self.session_path(session_id).with_name(".session.lock"))
+
     def create_session(self, input_payload: dict[str, Any]) -> dict[str, Any]:
         self.load_manifest()
         session = normalize_session(input_payload)
         path = self.session_path(session["id"])
-        if path.exists():
-            raise ValidationError(f"session already exists: {session['id']}")
-        self._validate_continuation(session)
-        atomic_write_json(path, session)
+        with self.session_lock(session["id"]):
+            if path.exists():
+                raise ValidationError(f"session already exists: {session['id']}")
+            self._validate_continuation(session)
+            atomic_write_json(path, session)
         return session
 
     def _validate_continuation(
@@ -143,6 +207,10 @@ class KitStore:
         atomic_write_json(self.session_path(payload["id"]), payload)
 
     def add_attempt(self, session_id: str, input_payload: dict[str, Any]) -> dict[str, Any]:
+        with self.session_lock(session_id):
+            return self._add_attempt(session_id, input_payload)
+
+    def _add_attempt(self, session_id: str, input_payload: dict[str, Any]) -> dict[str, Any]:
         session = self.load_session(session_id)
         if session["status"] in TERMINAL_SESSION_STATUSES:
             raise ValidationError("cannot add an attempt to a terminal session")
@@ -162,6 +230,10 @@ class KitStore:
         return attempt
 
     def add_finding(self, session_id: str, input_payload: dict[str, Any]) -> dict[str, Any]:
+        with self.session_lock(session_id):
+            return self._add_finding(session_id, input_payload)
+
+    def _add_finding(self, session_id: str, input_payload: dict[str, Any]) -> dict[str, Any]:
         session = self.load_session(session_id)
         if session["status"] in TERMINAL_SESSION_STATUSES:
             raise ValidationError("cannot add a finding to a terminal session")
@@ -176,6 +248,10 @@ class KitStore:
         return finding
 
     def update_finding(self, session_id: str, finding_id: str, input_payload: dict[str, Any]) -> dict[str, Any]:
+        with self.session_lock(session_id):
+            return self._update_finding(session_id, finding_id, input_payload)
+
+    def _update_finding(self, session_id: str, finding_id: str, input_payload: dict[str, Any]) -> dict[str, Any]:
         session = self.load_session(session_id)
         if session["status"] in TERMINAL_SESSION_STATUSES:
             raise ValidationError("cannot update a finding in a terminal session")
@@ -191,6 +267,7 @@ class KitStore:
         updated = normalize_finding(merged)
         if updated["status"] not in FINDING_TRANSITIONS[current["status"]]:
             raise ValidationError(f"invalid finding transition: {current['status']} -> {updated['status']}")
+        _check_finding_history(current, updated)
         unknown_attempts = sorted(set(updated["attempt_ids"]) - {item["id"] for item in session["attempts"]})
         if unknown_attempts:
             raise ValidationError(f"finding references unknown attempts: {', '.join(unknown_attempts)}")
@@ -199,6 +276,10 @@ class KitStore:
         return updated
 
     def close_session(self, session_id: str, status: str, decision: dict[str, Any]) -> dict[str, Any]:
+        with self.session_lock(session_id):
+            return self._close_session(session_id, status, decision)
+
+    def _close_session(self, session_id: str, status: str, decision: dict[str, Any]) -> dict[str, Any]:
         session = self.load_session(session_id)
         if session["status"] in TERMINAL_SESSION_STATUSES:
             raise ValidationError("session is already terminal")

@@ -53,6 +53,16 @@ Confirmed findings require:
 - non-empty expected and actual behavior; and
 - an independent oracle description.
 
+A finding update keeps its history:
+
+- `recorded_at` never changes;
+- `attempt_ids`, `evidence` and `limitations` only grow, and existing entries are never removed or rewritten; and
+- once a finding leaves `candidate`, its `title`, `summary`, `expected`, `actual` and `oracle` are fixed. A later observation is a new attempt, or a continuation when the session is closed.
+
+## Concurrent writers
+
+Every change to a session holds an exclusive operating-system lock on `.session.lock` beside `session.json` for the whole read-modify-write, so parallel writers are serialized and none loses another's record. The lock is released when its holder exits, including after a crash. It covers processes on one machine sharing a local filesystem; network filesystems may not honor it.
+
 ## Backlog handoff
 
 The export is a single Agentic Backlog Kit `Bug` add payload. It requires explicit planning inputs and includes the QA session/finding IDs in the description. Export does not ingest or synchronize the item.
