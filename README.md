@@ -67,6 +67,34 @@ at `0.1.0` and says it is already up to date; uninstall and install it once.
 For Codex, add this plugin to a local or repository marketplace and install it
 from the Plugins Directory.
 
+## Limitations
+
+What 0.1.0 does not establish, so nobody has to infer it:
+
+- **Activation evidence is narrow.** The Q01 Claude Code lane ran every case
+  once, on the headless CLI, against the skills as written at a commit. It shows
+  that each case can pass. It does not show how often a case passes, how the
+  desktop app behaves, or how this published artifact behaves. See
+  [the lane result](evals/README.md#claude-code-lane-results).
+- **Codex is supported but less evidenced.** The Codex lane's observations are
+  inconclusive on provenance (roadmap item Q10).
+- **The ledger trusts the agent.** It validates structure and history rules, but
+  it does not run tests or check that evidence files say what an attempt
+  claims. Evidence digests are optional.
+- **Locking is local.** Writers are serialized with an operating-system file
+  lock, which network filesystems may not honor.
+- **No backlog of its own.** Handoff produces one Agentic Backlog Kit `Bug`
+  payload. Ingestion and GitHub synchronization happen in that kit, under its
+  plan and confirmation rules.
+- **Known open findings** are tracked in [ROADMAP.md](ROADMAP.md), including
+  the Q09 self-QA results.
+
+## License
+
+Agentic QA Kit is source-available under the
+[PolyForm Noncommercial License 1.0.0](LICENSE.md). Commercial use needs a
+separate license; see [COMMERCIAL.md](COMMERCIAL.md).
+
 ## Plugin development
 
 For installed testing, install through a local marketplace, start a new

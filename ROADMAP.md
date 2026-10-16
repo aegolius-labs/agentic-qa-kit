@@ -92,9 +92,9 @@ Claude Code is the primary host and Codex is supported alongside it. `skills/` i
 - [x] Add clean-checkout Windows and Linux CI. CI runs on Linux, Windows and macOS with Python 3.11-3.14 (2026-10-14).
 - [x] Run plugin and skill structural validation in CI. `scripts/validate_plugin.py` runs Claude Code's bundled validator and fails on any warning not documented in `CLAUDE.md` (2026-10-14).
 - [x] Run installed-plugin behavioral evaluations with recorded artifacts. The Q01 Claude Code lane result is committed under `evals/results/` (2026-10-16).
-- [ ] Establish token/byte budgets for discovery, session summaries, and reports.
-- [ ] Complete security, contribution, support, licensing, changelog, and release documentation.
-- [ ] Publish `0.1.0` with explicit limitations and evaluation evidence.
+- [x] Establish token/byte budgets for discovery, session summaries, and reports. `scripts/budgets.py --check` bounds skill text and resume output in bytes and runs in CI and release preflight (2026-10-16). Agent-written reports are measured per Q01 observation rather than budgeted.
+- [x] Complete security, contribution, support, licensing, changelog, and release documentation: `SECURITY.md`, `CONTRIBUTING.md`, `SUPPORT.md`, `LICENSE.md` and `COMMERCIAL.md` (PolyForm Noncommercial 1.0.0, owner decision 2026-10-16), `CHANGELOG.md` and `docs/release.md`.
+- [ ] Publish `0.1.0` with explicit limitations and evaluation evidence. The organization release workflow cuts it from this change's `feat:` merge once the `v0.0.0` baseline tag exists on `c0b1ccf`.
 
 ## Current checkpoint
 
