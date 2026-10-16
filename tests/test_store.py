@@ -1,13 +1,19 @@
 from __future__ import annotations
 
+import json
+import subprocess
+import sys
 import tempfile
 import unittest
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 from agentic_qa_kit.model import ValidationError
 from agentic_qa_kit.store import KitStore
 
-from tests.helpers import attempt_input, candidate_finding, decision, session_input
+from tests.helpers import attempt_input, candidate_finding, confirmed_finding, decision, session_input
+
+QA = Path(__file__).resolve().parents[1] / "scripts" / "qa.py"
 
 
 class StoreTests(unittest.TestCase):
@@ -139,6 +145,61 @@ class StoreTests(unittest.TestCase):
         self.store.add_attempt("qa-example", attempt_input())
         self.store.add_finding("qa-example", candidate_finding())
         self.assertEqual(self.store.validate_all(), {"sessions": 1, "attempts": 1, "findings": 1})
+
+
+    def test_update_cannot_rewrite_a_confirmed_observation(self) -> None:
+        self.store.add_attempt("qa-example", attempt_input())
+        self.store.add_finding("qa-example", confirmed_finding())
+        for field, value in (("actual", "10.005 rounds to 10.01."), ("expected", "Anything.")):
+            with self.subTest(field=field), self.assertRaisesRegex(ValidationError, f"finding.{field} is fixed"):
+                self.store.update_finding("qa-example", "finding-rounding", {field: value})
+        with self.assertRaisesRegex(ValidationError, "recorded_at cannot change"):
+            self.store.update_finding("qa-example", "finding-rounding", {"recorded_at": "2026-09-01T00:00:00Z"})
+        self.assertEqual(self.store.load_session("qa-example")["findings"][0]["actual"], "10.005 rounds to 10.00.")
+
+    def test_update_cannot_erase_recorded_evidence(self) -> None:
+        self.store.add_attempt("qa-example", attempt_input())
+        self.store.add_finding("qa-example", candidate_finding())
+        for field in ("evidence", "limitations"):
+            with self.subTest(field=field), self.assertRaisesRegex(ValidationError, f"finding.{field} is append-only"):
+                self.store.update_finding("qa-example", "finding-rounding", {field: []})
+
+    def test_update_may_append_evidence_and_limitations(self) -> None:
+        self.store.add_attempt("qa-example", attempt_input())
+        self.store.add_finding("qa-example", confirmed_finding())
+        finding = confirmed_finding()
+        extra = {"kind": "log", "location": ".agentic-qa/sessions/qa-example/evidence/extra.log"}
+        updated = self.store.update_finding(
+            "qa-example",
+            "finding-rounding",
+            {
+                "evidence": finding["evidence"] + [extra],
+                "limitations": finding["limitations"] + ["Only one locale was exercised"],
+            },
+        )
+        self.assertEqual(updated["evidence"][-1], extra)
+        self.assertEqual(len(updated["limitations"]), 2)
+
+    def test_concurrent_writers_lose_no_records(self) -> None:
+        writers = 12
+        inputs = []
+        for index in range(writers):
+            attempt = attempt_input()
+            attempt["id"] = f"attempt-parallel-{index:02d}"
+            path = self.root / f"attempt-{index}.json"
+            path.write_text(json.dumps(attempt), encoding="utf-8")
+            inputs.append(path)
+
+        def add(path: Path) -> int:
+            command = [sys.executable, str(QA), "attempt-add", "qa-example", "--root", str(self.root), "--input", str(path)]
+            return subprocess.run(command, capture_output=True, text=True, check=False).returncode
+
+        with ThreadPoolExecutor(writers) as pool:
+            codes = list(pool.map(add, inputs))
+
+        self.assertEqual(codes, [0] * writers)
+        stored = {item["id"] for item in self.store.load_session("qa-example")["attempts"]}
+        self.assertEqual(stored, {f"attempt-parallel-{index:02d}" for index in range(writers)})
 
 
 if __name__ == "__main__":

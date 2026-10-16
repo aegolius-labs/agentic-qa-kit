@@ -255,6 +255,8 @@ proof required.
   - [ ] Execute at least one bounded session with real attempts and record them with `attempt-add`.
   - [ ] Produce an evidence package and a disposition, and record the limitations the session could not close.
   - [ ] Feed anything confirmed back into this roadmap as tracked work rather than an inline fix.
+  - [x] Q09-F01: Concurrent writers to one session silently lost records; 16 parallel `attempt-add` calls all exited 0 and left 1 record. Every session write now holds an OS file lock, with a 12-writer regression test (2026-10-16).
+  - [x] Q09-F02: `finding-update` could rewrite a confirmed finding's `actual`, `expected` and `recorded_at` and erase a candidate's evidence. History fields are now append-only and observation fields are fixed once a finding leaves `candidate` (2026-10-16).
 
 ### Q10 - Restore the Codex secondary lane
 
