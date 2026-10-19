@@ -8,6 +8,15 @@ computed version and promotes that section when it publishes.
 
 ## [Unreleased]
 
+### Changed
+
+- `qa-session` and `qa-reproduce` state that a bounded concurrency probe
+  confined to a disposable temporary directory is a local check and needs no
+  approval (Q01-F08, owner decision 2026-10-19). Load, fault injection and
+  anything outside that directory still need approval.
+
+## [0.1.0] - 2026-10-19
+
 First public release of Agentic QA Kit.
 
 ### Added
@@ -55,3 +64,4 @@ See [Limitations](README.md#limitations). In short:
   the desktop surface, or how often a case passes.
 - The authorization rule for bounded local concurrency probes is not yet
   stated in the skills (Q01-F08).
+

@@ -10,7 +10,7 @@ description: Reproduce, isolate, and minimize a suspected software defect while 
 3. Establish a controlled baseline in the same valid environment. Re-run within the configured attempt budget and record every outcome; do not label a one-off infrastructure error as a product defect.
 4. Form explicit competing hypotheses: product fault, test/oracle fault, fixture/data issue, environment/configuration issue, order/timing/concurrency nondeterminism, dependency drift, or operator error.
 5. Change one material variable at a time. Minimize input, setup, action sequence, dependent services, and elapsed time while preserving the observed failure and valid oracle. Do not modify product code or tests unless the user asked for a diagnostic patch.
-6. Probe nearby boundaries, negative controls, and a known-good comparison when they improve causal discrimination. Keep destructive, external, sensitive, load, fault-injection, and production actions behind explicit authorization.
+6. Probe nearby boundaries, negative controls, and a known-good comparison when they improve causal discrimination. Keep destructive, external, sensitive, load, fault-injection, and production actions behind explicit authorization. A bounded concurrency probe confined to a disposable temporary directory is a local check, not load or fault injection.
 7. Classify honestly:
    - `confirmed`: controlled evidence repeatedly or otherwise sufficiently supports a product-contract violation.
    - `not-reproduced`: valid attempts did not reproduce it; retain the original observation and limits.

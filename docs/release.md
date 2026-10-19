@@ -51,6 +51,10 @@ computed version into `pyproject.toml`, `.codex-plugin/plugin.json` and
 `CHANGELOG.md` into that version's entry. It runs only inside preflight and
 commits nothing; the tag records what a version means.
 
+Because nothing is committed back, the first change after a release promotes
+the released section in the committed `CHANGELOG.md` with that release's date,
+so `## [Unreleased]` holds only unreleased work.
+
 The Claude Code manifests declare no version, on purpose. Claude Code installs
 from the repository rather than the release assets and versions an undeclared
 plugin by commit, so `claude plugin update` keeps delivering new skills.

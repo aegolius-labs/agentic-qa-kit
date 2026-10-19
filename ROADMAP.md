@@ -1,6 +1,6 @@
 # Agentic QA Kit Roadmap
 
-Last updated: 2026-10-16
+Last updated: 2026-10-19
 
 ## Product goal
 
@@ -94,7 +94,7 @@ Claude Code is the primary host and Codex is supported alongside it. `skills/` i
 - [x] Run installed-plugin behavioral evaluations with recorded artifacts. The Q01 Claude Code lane result is committed under `evals/results/` (2026-10-16).
 - [x] Establish token/byte budgets for discovery, session summaries, and reports. `scripts/budgets.py --check` bounds skill text and resume output in bytes and runs in CI and release preflight (2026-10-16). Agent-written reports are measured per Q01 observation rather than budgeted.
 - [x] Complete security, contribution, support, licensing, changelog, and release documentation: `SECURITY.md`, `CONTRIBUTING.md`, `SUPPORT.md`, `LICENSE.md` and `COMMERCIAL.md` (PolyForm Noncommercial 1.0.0, owner decision 2026-10-16), `CHANGELOG.md` and `docs/release.md`.
-- [ ] Publish `0.1.0` with explicit limitations and evaluation evidence. The organization release workflow cuts it from this change's `feat:` merge once the `v0.0.0` baseline tag exists on `c0b1ccf`.
+- [x] Publish `0.1.0` with explicit limitations and evaluation evidence. The organization release workflow published the immutable [v0.1.0 release](https://github.com/aegolius-labs/agentic-qa-kit/releases/tag/v0.1.0) with its wheel and sdist from the `v0.0.0` baseline on `c0b1ccf` (2026-10-19).
 
 ## Current checkpoint
 
@@ -120,8 +120,9 @@ observation: the lane evidences the skills as written, not a published artifact.
 The Claude Code lane ran all 36 cases on 2026-10-16: 34 pass and 2 fail, with
 no inconclusive observation. Both failures were activation misses traced to skill
 descriptions (Q01-F07), and the lane surfaced one unresolved authorization rule
-(Q01-F08). The two activation misses are fixed and pass on rerun; Q01 closes
-once Q01-F08 is decided.
+(Q01-F08). The two activation misses are fixed and pass on rerun, and the owner
+decided Q01-F08 on 2026-10-19, so Q01 meets its done-when. The desktop surface
+(Q01-G06) and the judge's companion-skill list (Q01-G07) remain as follow-ups.
 
 Q09 met its done-when on 2026-10-16. Two self-QA sessions ran through the
 installed plugin (see the [Q09 report](docs/q09-self-qa-2026-10-16.md)). They
@@ -129,14 +130,14 @@ found a critical lost-update defect in the ledger and a history-rewrite defect,
 and both are fixed. One owner decision remains (Q09-F04), along with one
 unhonored manifest field (Q09-F05).
 
-0.1.0 is next: the release workflow publishes it from the `feat:` merge that
-completes M7, once the `v0.0.0` baseline tag exists.
+0.1.0 was published on 2026-10-19 and M7 is complete. Q02, forward-testing
+heterogeneous repositories, is next on the critical path.
 
 ## Ranked work items
 
 ### Q01 - Validate the installed plugin and activation boundaries
 
-- **Status:** In progress
+- **Status:** Complete for its done-when; follow-up items remain open
 - **Importance:** Critical
 - **Complexity:** Medium
 - **Depends on:** M1 structural validation, M2 ledger tests
@@ -159,10 +160,10 @@ completes M7, once the `v0.0.0` baseline tag exists.
   - [-] Q01-G03: Retired unmet. A clean Codex top-level installed-version rerun stays desirable but is a Codex-lane provenance concern, not a skill defect, and no longer gates this item. Tracked under Q10.
   - [x] Q01-G04: Define the Claude Code primary lane, its install procedure, its observation fields, and its standing working-tree provenance limitation in evals/README.md.
   - [x] Q01-G05: Install the plugin, then execute all 36 cases on the Claude Code lane from fresh top-level sessions, recording host, surface, and install location per observation. `scripts/q01_claude_code.py` runs the lane headlessly; [Claude Code lane result](evals/results/q01-claude-code-2026-10-16.json) (34 pass, 2 fail, CLI surface, 2026-10-16).
-  - [ ] Triage Claude Code lane failures, rerun affected cases after fixes, and publish the Q01 lane result.
+  - [x] Triage Claude Code lane failures, rerun affected cases after fixes, and publish the Q01 lane result. Both failures are Q01-F07, fixed and rerun.
   - [x] Q01-F07: `qa-session` did not activate for Q01-SESS-INDIRECT and `qa-backlog-handoff` did not activate for Q01-HANDOFF-INCOMPLETE. Both descriptions now name the missed request; the [rerun](evals/results/q01-claude-code-2026-10-16-f07-rerun.json) passes both cases, their two negatives and two neighbouring cases (6 of 6, 2026-10-16).
   - [ ] Q01-G07: List the stage skills as allowed companions on the positive `qa-workflow` cases. `qa-workflow` is told to enter `qa-discover`, `qa-session`, `qa-reproduce` and `qa-report` as stages, so the judge's "unlisted skill" flag on those cases needs a reviewer every time.
-  - [ ] Q01-F08: Decide whether a bounded concurrency probe in a disposable directory is `run_load_or_fault_injection`. Five lane runs ran one without asking and three asked first; the skills must state one rule.
+  - [x] Q01-F08: Decide whether a bounded concurrency probe in a disposable directory is `run_load_or_fault_injection`. Five lane runs ran one without asking and three asked first. Owner decision (2026-10-19): it is a local check and needs no approval. `qa-session`, `qa-reproduce` and `docs/contracts.md` state the rule.
   - [ ] Q01-G06: Exercise the desktop surface. The 2026-10-16 lane ran the headless CLI only.
 
 ### Q02 - Forward-test heterogeneous repositories
