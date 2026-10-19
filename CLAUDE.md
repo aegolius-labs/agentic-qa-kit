@@ -53,8 +53,8 @@ claude plugin validate .claude-plugin/marketplace.json
 claude plugin validate skills --strict
 ```
 
-The two manifests are validated without `--strict` because each emits one
-known, accepted warning. The plugin manifest emits:
+The two manifests are validated without `--strict` because they emit known,
+accepted warnings. The plugin manifest emits two:
 
 > `root: CLAUDE.md at the plugin root is not loaded as project context.`
 
@@ -63,8 +63,8 @@ working *in* this repository, not context shipped to plugin consumers. Everythin
 a consumer needs lives in `skills/`. Do not silence the warning by moving
 repository guidance into a skill.
 
-The marketplace manifest emits `plugins[0] plugin.json → version: No version
-specified`. That is deliberate (decided 2026-10-06, following
+It also emits `version: No version specified`, and the marketplace manifest
+emits the same as `plugins[0] plugin.json → version: No version specified`. That is deliberate (decided 2026-10-06, following
 agentic-backlog-kit). The Claude Code manifests declare no version, so Claude
 Code versions the plugin by commit and `claude plugin update` delivers new
 skills. A declared version that never moves would make Claude Code keep the

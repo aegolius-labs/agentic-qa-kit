@@ -92,9 +92,9 @@ Claude Code is the primary host and Codex is supported alongside it. `skills/` i
 - [x] Add clean-checkout Windows and Linux CI. CI runs on Linux, Windows and macOS with Python 3.11-3.14 (2026-10-14).
 - [x] Run plugin and skill structural validation in CI. `scripts/validate_plugin.py` runs Claude Code's bundled validator and fails on any warning not documented in `CLAUDE.md` (2026-10-14).
 - [x] Run installed-plugin behavioral evaluations with recorded artifacts. The Q01 Claude Code lane result is committed under `evals/results/` (2026-10-16).
-- [ ] Establish token/byte budgets for discovery, session summaries, and reports.
-- [ ] Complete security, contribution, support, licensing, changelog, and release documentation.
-- [ ] Publish `0.1.0` with explicit limitations and evaluation evidence.
+- [x] Establish token/byte budgets for discovery, session summaries, and reports. `scripts/budgets.py --check` bounds skill text and resume output in bytes and runs in CI and release preflight (2026-10-16). Agent-written reports are measured per Q01 observation rather than budgeted.
+- [x] Complete security, contribution, support, licensing, changelog, and release documentation: `SECURITY.md`, `CONTRIBUTING.md`, `SUPPORT.md`, `LICENSE.md` and `COMMERCIAL.md` (PolyForm Noncommercial 1.0.0, owner decision 2026-10-16), `CHANGELOG.md` and `docs/release.md`.
+- [ ] Publish `0.1.0` with explicit limitations and evaluation evidence. The organization release workflow cuts it from this change's `feat:` merge once the `v0.0.0` baseline tag exists on `c0b1ccf`.
 
 ## Current checkpoint
 
@@ -123,11 +123,14 @@ descriptions (Q01-F07), and the lane surfaced one unresolved authorization rule
 (Q01-F08). The two activation misses are fixed and pass on rerun; Q01 closes
 once Q01-F08 is decided.
 
-Q09 is now the active item. The repository declares itself a QA target
-(`.agentic-qa/manifest.json` is tracked; generated session evidence stays
-ignored), which is the precondition for dogfooding. No self-QA session has been
-run yet, so the kit has produced no evidence about itself. That run is the next
-proof required.
+Q09 met its done-when on 2026-10-16. Two self-QA sessions ran through the
+installed plugin (see the [Q09 report](docs/q09-self-qa-2026-10-16.md)). They
+found a critical lost-update defect in the ledger and a history-rewrite defect,
+and both are fixed. One owner decision remains (Q09-F04), along with one
+unhonored manifest field (Q09-F05).
+
+0.1.0 is next: the release workflow publishes it from the `feat:` merge that
+completes M7, once the `v0.0.0` baseline tag exists.
 
 ## Ranked work items
 
@@ -227,7 +230,7 @@ proof required.
 
 ### Q09 - Dogfood the kit on itself under Claude Code
 
-- **Status:** In progress
+- **Status:** Complete for its done-when; follow-up items remain open
 - **Importance:** Critical
 - **Complexity:** Medium
 - **Depends on:** M1 Claude Code host support, M2 ledger
@@ -251,12 +254,18 @@ proof required.
   - [x] Track a self-targeting `.agentic-qa/manifest.json` and narrow `.gitignore` so generated evidence stays untracked.
   - [x] Declare the quality profile Q09 evaluates against: functional suitability, data integrity, security, compatibility, and maintainability.
   - [x] Add regression coverage so the self-target cannot be silently ignored or drift out of contract.
-  - [ ] Run `qa-discover` against this repository through the installed plugin and retain the profile and charters.
-  - [ ] Execute at least one bounded session with real attempts and record them with `attempt-add`.
-  - [ ] Produce an evidence package and a disposition, and record the limitations the session could not close.
-  - [ ] Feed anything confirmed back into this roadmap as tracked work rather than an inline fix.
+  - [x] Run `qa-discover` against this repository through the installed plugin and retain the profile and charters (Q01-DISC-DIRECT and both self-QA sessions, 2026-10-16).
+  - [x] Execute at least one bounded session with real attempts and record them with `attempt-add`: `qa-self-20261015-wf` (15 attempts) and `qa-q09-rc-010` (17 attempts) on the release candidate.
+  - [x] Produce an evidence package and a disposition, and record the limitations the session could not close: [Q09 self-QA report](docs/q09-self-qa-2026-10-16.md) (hold on both, scoped to what was tested).
+  - [x] Feed anything confirmed back into this roadmap as tracked work (Q09-F01 to Q09-F07 below).
   - [x] Q09-F01: Concurrent writers to one session silently lost records; 16 parallel `attempt-add` calls all exited 0 and left 1 record. Every session write now holds an OS file lock, with a 12-writer regression test (2026-10-16).
   - [x] Q09-F02: `finding-update` could rewrite a confirmed finding's `actual`, `expected` and `recorded_at` and erase a candidate's evidence. History fields are now append-only and observation fields are fixed once a finding leaves `candidate` (2026-10-16).
+  - [x] Q09-F03: Five of the new finding-history rules had no test that fails when their guard is removed (found by `qa-q09-rc-010`). Every settled and append-only field now has one, and each guard removal fails the suite (2026-10-16).
+  - [ ] Q09-F04: A confirmed finding's reproduction, severity and acceptance criteria can still change without trace. `docs/contracts.md` allows it and the manifest's data-integrity claim arguably forbids it; the owner decides which governs.
+  - [ ] Q09-F05: `.agentic-qa/manifest.json` `defaults.evidence_root` is validated but never used. Either honor it or drop it from the contract.
+  - [x] Q09-F06: `CLAUDE.md` under-stated the plugin manifest's accepted validator warnings (2026-10-16).
+  - [x] Q09-F07: The roadmap's date and its links to uncommitted Q01 results had gone stale (2026-10-16).
+  - [ ] Q09-G01: Probe concurrent writes on Windows and macOS, and interrupted writes with authorization; the 2026-10-16 sessions covered Linux and Python 3.13 only.
 
 ### Q10 - Restore the Codex secondary lane
 

@@ -164,6 +164,41 @@ class StoreTests(unittest.TestCase):
             with self.subTest(field=field), self.assertRaisesRegex(ValidationError, f"finding.{field} is append-only"):
                 self.store.update_finding("qa-example", "finding-rounding", {field: []})
 
+    def test_every_settled_field_is_fixed_once_confirmed(self) -> None:
+        self.store.add_attempt("qa-example", attempt_input())
+        self.store.add_finding("qa-example", confirmed_finding())
+        for field in ("title", "summary", "expected", "actual", "oracle"):
+            with self.subTest(field=field), self.assertRaisesRegex(ValidationError, f"finding.{field} is fixed"):
+                self.store.update_finding("qa-example", "finding-rounding", {field: "Rewritten."})
+
+    def test_every_history_field_rejects_removal_and_rewrite(self) -> None:
+        self.store.add_attempt("qa-example", attempt_input())
+        other = attempt_input()
+        other["id"] = "attempt-other"
+        self.store.add_attempt("qa-example", other)
+        self.store.add_finding("qa-example", candidate_finding())
+        finding = candidate_finding()
+        no_attempts = dict(finding["reproduction"], attempts=0)
+        changes = {
+            "attempt_ids": (
+                {"attempt_ids": [], "reproduction": no_attempts},
+                {"attempt_ids": ["attempt-other"]},
+            ),
+            "evidence": (
+                {"evidence": []},
+                {"evidence": [{"kind": "log", "location": ".agentic-qa/sessions/qa-example/evidence/other.log"}]},
+            ),
+            "limitations": ({"limitations": []}, {"limitations": ["A different limitation"]}),
+        }
+        for field, (removal, rewrite) in changes.items():
+            for label, payload in (("removal", removal), ("rewrite", rewrite)):
+                with self.subTest(field=field, change=label):
+                    with self.assertRaisesRegex(ValidationError, f"finding.{field} is append-only"):
+                        self.store.update_finding("qa-example", "finding-rounding", payload)
+        stored = self.store.load_session("qa-example")["findings"][0]
+        for field in changes:
+            self.assertEqual(stored[field], finding[field])
+
     def test_update_may_append_evidence_and_limitations(self) -> None:
         self.store.add_attempt("qa-example", attempt_input())
         self.store.add_finding("qa-example", confirmed_finding())
