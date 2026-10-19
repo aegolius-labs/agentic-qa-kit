@@ -12,6 +12,12 @@
 
 It contains no credentials, live environment identifiers, or production data.
 
+A bounded concurrency probe that runs the target's own local commands inside a
+disposable temporary directory, touching nothing outside it, belongs to
+`run_existing_local_checks`, not `run_load_or_fault_injection` (owner decision,
+2026-10-19). A probe that reaches shared state, external services or resource
+exhaustion is still load or fault injection.
+
 ## Session
 
 A session binds:
