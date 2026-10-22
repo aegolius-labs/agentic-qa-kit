@@ -41,7 +41,7 @@ planned -> running -> completed
                   \-> blocked
 ```
 
-`completed` and `blocked` are terminal in schema version 1. Reopening is forbidden. Further evidence uses a new session whose optional `continuation_of` object names the terminal source session and, when applicable, its finding; creation and full-ledger validation reject missing or non-terminal sources, and a continuation cannot contain a replacement finding with the linked source finding ID. When a session closes, only charters with recorded attempts may become `completed`; unexecuted charters become `blocked`.
+`completed` and `blocked` are terminal in schema versions 1 and 2. Reopening is forbidden. Further evidence uses a new session whose optional `continuation_of` object names the terminal source session and, when applicable, its finding; creation and full-ledger validation reject missing or non-terminal sources, and a continuation cannot contain a replacement finding with the linked source finding ID. When a session closes, only charters with recorded attempts may become `completed`; unexecuted charters become `blocked`.
 
 Finding states are `candidate`, `confirmed`, `not-reproduced`, and `dismissed`. Only `candidate -> confirmed|not-reproduced|dismissed` is allowed. A confirmed finding may be handed off; other states remain evidence but not backlog defects.
 

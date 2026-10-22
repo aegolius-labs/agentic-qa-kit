@@ -53,7 +53,7 @@ Claude Code is the primary host and Codex is supported alongside it. `skills/` i
 - [x] Implement dependency-free initialization, validation, append, summary, show, close, and export commands.
 - [x] Reject duplicate identities, invalid transitions, unconfirmed exports, missing evidence, and incomplete planning inputs.
 - [x] Add unit tests for validation, lifecycle behavior, and safe handoff generation.
-- [ ] Add content digests and optional append-only receipt chaining for consequential evidence.
+- [x] Add content digests and optional append-only receipt chaining for consequential evidence. Every session write is sealed in a SHA-256 receipt chain (Q03, 2026-10-22); chaining is optional in that schema-version-1 sessions stay valid until migrated. Digests of evidence files themselves are tracked as Q03-G01.
 
 ### M3 - Autonomous core QA workflow
 
@@ -191,12 +191,20 @@ ledger-chaining hazard (Q02-F01) and a measured payload-discovery cost for Q07
 
 ### Q03 - Add chained evidence receipts
 
-- **Status:** Not started
+- **Status:** Complete for its done-when; follow-up items remain open
 - **Importance:** High
 - **Complexity:** Medium
 - **Depends on:** Stable M2 contract
 - **Approach:** Canonicalize records, hash each accepted mutation, and retain prior/current digests without claiming that hashes prove source truth.
 - **Done when:** Tampering and missing links are detected, ordinary summaries remain compact, and migration from schema version 1 is tested.
+- **Progress:**
+  - [x] Canonical JSON digests, and one linked receipt per accepted write in schema-version-2 sessions (`src/agentic_qa_kit/receipts.py`).
+  - [x] Detect an edit made outside the ledger, an altered, removed or reordered receipt, and a dropped last write. A broken session refuses further writes and fails `validate` (`tests/test_receipts.py`).
+  - [x] Keep summaries compact. `summary` adds one `integrity` field, and `show` replaces the chain with its status and count. Byte budgets are unchanged and pass.
+  - [x] Migrate from schema version 1. Version-1 sessions stay valid and `unchained`, and `aqk migrate` seals one without changing its content. Tested, including on a terminal session.
+  - [x] State the limits in `docs/contracts.md`. The chain does not authenticate a writer. It is no defense against someone who rewrites every receipt, or rolls the session back to an earlier sealed state; a test pins that last limit.
+  - [ ] Q03-G01: Digest the evidence files that attempts and findings reference, so a changed or replaced evidence file is detected. Evidence references already accept an optional `digest`; nothing computes or checks it yet.
+  - [ ] Q03-G02: Exercise receipts through the installed plugin (a Q01 or Q09 rerun) so the skills' use of `summary`, `show` and `validate` is observed with the new fields.
 
 ### Q04 - Add model-based functional design pack
 

@@ -8,6 +8,22 @@ computed version and promotes that section when it publishes.
 
 ## [Unreleased]
 
+### Added
+
+- Chained evidence receipts (Q03). New sessions use schema version 2 and seal
+  every accepted write in a SHA-256 receipt that links to the one before it.
+  `validate` fails on a session changed outside the ledger, an altered,
+  removed or reordered receipt, or a dropped last write. A broken session
+  takes no further writes. `summary` and `show` report `integrity`.
+- `aqk migrate <session>` seals a schema-version-1 session as version 2.
+  Version-1 sessions stay valid and are reported as `unchained`.
+
+### Changed
+
+- `show` leaves a session's receipt chain out and reports its integrity
+  status and receipt count instead.
+- `qa-report` treats a broken integrity check as evidence contamination.
+
 ## [0.1.3] - 2026-10-22
 
 ### Fixed

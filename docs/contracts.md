@@ -65,6 +65,38 @@ A finding update keeps its history:
 - `attempt_ids`, `evidence` and `limitations` only grow, and existing entries are never removed or rewritten; and
 - once a finding leaves `candidate`, its `title`, `summary`, `expected`, `actual`, `oracle`, `severity`, `acceptance_criteria` and reproduction `preconditions`, `steps` and `reproducibility` are fixed (owner decision on Q09-F04, 2026-10-22). `reproduction.attempts` still counts the linked attempts as they grow. A later observation is a new attempt, or a continuation when the session is closed.
 
+## Receipts
+
+A schema-version-2 session carries `receipts`, one per accepted write:
+`session-create`, `attempt-add`, `finding-add`, `finding-update`,
+`session-close` and `migrate`. Each receipt records its sequence number,
+operation, subject ID, time, the digest of the receipt before it, and the
+SHA-256 digest of the whole session except its receipts, as it stood after the
+write. The receipt's own digest covers all of those fields. Digests are taken
+over canonical JSON: sorted keys, no insignificant whitespace, UTF-8.
+
+`validate` recomputes every chain and fails when a session disagrees with it.
+That covers an edit made outside the ledger, an altered, removed or reordered
+receipt, and a dropped last receipt. A session that fails takes no further
+writes, because a new receipt would seal over the change. `summary` and `show`
+report `integrity` as `chained`, `broken` or `unchained`, and `show` leaves
+the chain itself out.
+
+What a chain does not prove:
+
+- that any recorded observation is true;
+- that nobody rewrote the session together with every receipt after the
+  change, because the chain carries no secret;
+- that a session was not rolled back to an earlier sealed state, receipts
+  included.
+
+It makes an unforged change visible. It does not authenticate the writer.
+
+Sessions created before schema version 2 stay valid and `unchained`. Writes to
+them still work and add no receipts. `migrate <session>` seals one as version
+2 with a single `migrate` receipt. Everything before that receipt is
+unverified, and the operation name records that.
+
 ## Concurrent writers
 
 Every change to a session holds an exclusive operating-system lock on `.session.lock` beside `session.json` for the whole read-modify-write, so parallel writers are serialized and none loses another's record. The lock is released when its holder exits, including after a crash. It covers processes on one machine sharing a local filesystem; network filesystems may not honor it.
