@@ -8,7 +8,7 @@
 - Methods and oracles.
 - Attempt counts by outcome; retry and flake semantics.
 - Findings by status and severity with direct evidence links.
-- Coverage against declared charters or obligation ledgers, not a universal quality percentage.
+- Coverage against declared charters or obligation ledgers, not a universal quality percentage. Obligation coverage measures the design model only; name what stayed unexercised.
 - Evidence gaps, uncertainty, data completeness, and method limitations.
 - Open defects, exceptions, compensating controls, owners, and expiry when known.
 - Recommended disposition and next evidence action.

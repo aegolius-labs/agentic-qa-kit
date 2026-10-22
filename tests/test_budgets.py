@@ -28,6 +28,18 @@ class BudgetTests(unittest.TestCase):
             failures = budgets.check(root)["failures"]
         self.assertTrue(any(f.startswith("qa-report body_bytes") for f in failures), failures)
 
+    def test_activation_counts_the_body_and_one_reference(self) -> None:
+        # A skill may carry several technique packs; one activation reads one.
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            shutil.copytree(budgets.PLUGIN_ROOT / "skills", root / "skills")
+            references = root / "skills" / "qa-session" / "references"
+            (references / "extra-pack.md").write_text("x" * 1_000, encoding="utf-8")
+            row = next(r for r in budgets.skill_measurements(root) if r["skill"] == "qa-session")
+            largest = max(ref.stat().st_size for ref in references.glob("*.md"))
+            body = (root / "skills" / "qa-session" / "SKILL.md").stat().st_size
+        self.assertEqual(row["activation_bytes"], body + largest)
+
 
 if __name__ == "__main__":
     unittest.main()

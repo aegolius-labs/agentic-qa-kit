@@ -7,7 +7,7 @@ from pathlib import Path
 from typing import Any
 
 from .backlog import build_backlog_item
-from .model import ValidationError, read_json
+from .model import ValidationError, obligation_coverage, read_json
 from .receipts import integrity
 from .store import KitStore, atomic_write_json
 
@@ -94,6 +94,7 @@ def _session_summary(session: dict[str, Any]) -> dict[str, Any]:
         "attempts": len(session["attempts"]),
         "findings": counts,
         "gaps": len(session["gaps"]),
+        "obligations": obligation_coverage(session),
         "integrity": integrity(session),
     }
 

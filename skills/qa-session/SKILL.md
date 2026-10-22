@@ -14,4 +14,4 @@ description: Plan and execute a bounded QA session against a codebase, recording
 7. Route suspected product defects to `$qa-reproduce`. Stop on the charter budget, an authorization boundary, evidence contamination, target drift, a critical invariant breach, or an environment state that invalidates the method.
 8. Return scope/revision, charter status, attempts and outcomes, evidence paths, candidate findings, gaps, consumed budget, and recommended next action. Do not implement repairs unless asked.
 
-Read [references/session-design.md](references/session-design.md) when creating a charter, selecting retries, or running a non-functional or risky technique.
+Read [references/session-design.md](references/session-design.md) when creating a charter, selecting retries, or running a non-functional or risky technique. Read [references/functional-design.md](references/functional-design.md) when a charter checks specified rules, ranges, states or flows.

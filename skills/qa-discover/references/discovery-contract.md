@@ -15,7 +15,7 @@ Return a compact profile with:
 
 ## Technique-routing questions
 
-- Rules/ranges/states uncertain: use partitions, boundaries, decision tables, scenarios, or state models.
+- Rules/ranges/states uncertain: use partitions, boundaries, decision tables, scenarios, or state models, recorded as charter obligations (qa-session's functional-design reference).
 - API/schema/provider-consumer risk: inspect contracts and negative/compatibility behavior.
 - Broad input space: consider properties, metamorphic relations, fuzzing, or constrained combinations.
 - Weak suite sensitivity: consider mutation or differential evidence, not coverage alone.

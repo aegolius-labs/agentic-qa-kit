@@ -52,6 +52,21 @@ An attempt records the action actually performed, not a proposed command:
 
 Retries never replace the first result.
 
+An attempt may name `obligation_ids`: obligations of its own charter that it
+exercised.
+
+## Obligations
+
+A charter may declare `obligations`, the test obligations its design derived
+from the specification. Each has a unique `id`, a `technique` (`partition`,
+`boundary`, `decision-table`, `state-transition`, `scenario`, `combinatorial`,
+`property` or `other`), the `source` it was derived from, a `statement` of the
+case, and an independent `oracle`. `summary` counts them per session:
+`exercised` when a linked attempt passed or failed, `inconclusive` when linked
+attempts were only inconclusive or errors, and `unexercised` otherwise. That is
+coverage of the design model. It is not code coverage and not evidence that
+defects are absent.
+
 ## Finding
 
 A finding records title, quality attribute, severity, confidence, status, summary, expected and actual behavior, controlled reproduction, evidence, limitations, and acceptance criteria. Severity describes consequence; it is not backlog priority. Root cause remains `unknown` until independently supported.
