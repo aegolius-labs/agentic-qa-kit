@@ -8,6 +8,7 @@ from typing import Any
 
 from .backlog import build_backlog_item
 from .model import ValidationError, read_json
+from .receipts import integrity
 from .store import KitStore, atomic_write_json
 
 
@@ -60,6 +61,10 @@ def _parser() -> argparse.ArgumentParser:
     show.add_argument("session_id")
     show.add_argument("--finding", help="Show only one finding ID")
 
+    migrate = subparsers.add_parser("migrate", help="Seal a schema-version-1 session with a receipt chain")
+    with_root(migrate)
+    migrate.add_argument("session_id")
+
     export = subparsers.add_parser("backlog-export", help="Export a confirmed finding as a backlog Bug payload")
     with_root(export)
     export.add_argument("session_id")
@@ -89,6 +94,7 @@ def _session_summary(session: dict[str, Any]) -> dict[str, Any]:
         "attempts": len(session["attempts"]),
         "findings": counts,
         "gaps": len(session["gaps"]),
+        "integrity": integrity(session),
     }
 
 
@@ -118,7 +124,13 @@ def run(args: argparse.Namespace) -> Any:
             if finding is None:
                 raise ValidationError(f"unknown finding ID: {args.finding}")
             return finding
-        return session
+        # Receipts grow with every write; resume needs only their verdict.
+        shown = {key: value for key, value in session.items() if key != "receipts"}
+        shown["integrity"] = {"status": integrity(session), "receipts": len(session.get("receipts") or [])}
+        return shown
+    if args.command == "migrate":
+        session = store.migrate_session(args.session_id)
+        return {"session": session["id"], "schema_version": session["schema_version"], "integrity": integrity(session)}
     if args.command == "backlog-export":
         session = store.load_session(args.session_id)
         finding = next((item for item in session["findings"] if item["id"] == args.finding_id), None)

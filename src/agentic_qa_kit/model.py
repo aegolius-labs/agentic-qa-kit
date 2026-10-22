@@ -25,6 +25,10 @@ SESSION_MODES = {
 }
 SESSION_STATUSES = {"planned", "running", "completed", "blocked"}
 TERMINAL_SESSION_STATUSES = {"completed", "blocked"}
+# Version 2 adds the receipt chain (Q03). Version 1 sessions stay readable,
+# unchained, until `migrate` seals them.
+SESSION_SCHEMA_VERSION = 2
+SESSION_SCHEMA_VERSIONS = {1, 2}
 CHARTER_STATUSES = {"planned", "running", "completed", "blocked"}
 ATTEMPT_OUTCOMES = {"pass", "fail", "inconclusive", "error"}
 FINDING_STATUSES = {"candidate", "confirmed", "not-reproduced", "dismissed"}
@@ -389,11 +393,21 @@ def validate_session(payload: dict[str, Any]) -> None:
             "findings",
             "gaps",
             "decision",
+            "receipts",
         },
         "session",
     )
-    if payload.get("schema_version") != 1:
-        raise ValidationError("session.schema_version must be 1")
+    version = payload.get("schema_version")
+    if version not in SESSION_SCHEMA_VERSIONS:
+        raise ValidationError("session.schema_version must be 1 or 2")
+    if version == 1 and "receipts" in payload:
+        raise ValidationError("a schema-version-1 session has no receipts; migrate it to version 2")
+    if version == 2:
+        from .receipts import validate_receipt_shape
+
+        receipts = _expect_list(payload.get("receipts"), "session.receipts")
+        for index, receipt in enumerate(receipts):
+            validate_receipt_shape(receipt, f"session.receipts[{index}]")
     _expect_id(payload.get("id"), "session.id")
     _expect_string(payload.get("objective"), "session.objective")
     _expect_enum(payload.get("mode"), SESSION_MODES, "session.mode")
@@ -498,7 +512,9 @@ def validate_session(payload: dict[str, Any]) -> None:
 
 def normalize_session(payload: dict[str, Any]) -> dict[str, Any]:
     result = deepcopy(payload)
-    result.setdefault("schema_version", 1)
+    result.setdefault("schema_version", SESSION_SCHEMA_VERSION)
+    if result["schema_version"] == SESSION_SCHEMA_VERSION:
+        result.setdefault("receipts", [])
     result.setdefault("created_at", utc_now())
     result.setdefault("status", "planned")
     result.setdefault("closed_at", None)

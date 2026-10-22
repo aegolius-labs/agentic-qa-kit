@@ -11,7 +11,8 @@ from tests.helpers import confirmed_finding, session_input
 class ModelTests(unittest.TestCase):
     def test_normalizes_session_defaults(self) -> None:
         payload = normalize_session(session_input())
-        self.assertEqual(payload["schema_version"], 1)
+        self.assertEqual(payload["schema_version"], 2)
+        self.assertEqual(payload["receipts"], [])
         self.assertEqual(payload["status"], "planned")
         self.assertEqual(payload["attempts"], [])
         self.assertIsNone(payload["decision"])

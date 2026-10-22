@@ -9,6 +9,7 @@ from typing import Any, Iterator
 
 from .model import (
     FINDING_STATUSES,
+    SESSION_SCHEMA_VERSION,
     TERMINAL_SESSION_STATUSES,
     ValidationError,
     normalize_attempt,
@@ -19,6 +20,7 @@ from .model import (
     validate_manifest,
     validate_session,
 )
+from .receipts import append_receipt, chain_problems, integrity
 
 
 FINDING_TRANSITIONS = {
@@ -173,13 +175,15 @@ class KitStore:
 
     def create_session(self, input_payload: dict[str, Any]) -> dict[str, Any]:
         self.load_manifest()
-        session = normalize_session(input_payload)
+        # New sessions are always chained, whatever version the input names.
+        payload = {**input_payload, "schema_version": SESSION_SCHEMA_VERSION, "receipts": []}
+        session = normalize_session(payload)
         path = self.session_path(session["id"])
         with self.session_lock(session["id"]):
             if path.exists():
                 raise ValidationError(f"session already exists: {session['id']}")
             self._validate_continuation(session)
-            atomic_write_json(path, session)
+            self._commit(session, "session-create", None)
         return session
 
     def _validate_continuation(
@@ -214,12 +218,49 @@ class KitStore:
         validate_session(payload)
         atomic_write_json(self.session_path(payload["id"]), payload)
 
+    def _load_for_write(self, session_id: str) -> dict[str, Any]:
+        """Load a session to change it, refusing one whose chain is broken.
+
+        Sealing a new receipt over a tampered session would hide the tamper,
+        so a broken session takes no further writes.
+        """
+
+        session = self.load_session(session_id)
+        if session["schema_version"] == SESSION_SCHEMA_VERSION:
+            problems = chain_problems(session)
+            if problems:
+                raise ValidationError(
+                    f"session {session_id} failed its integrity check, so it takes no writes: {problems[0]}"
+                )
+        return session
+
+    def _commit(self, session: dict[str, Any], op: str, subject: str | None) -> None:
+        if session["schema_version"] == SESSION_SCHEMA_VERSION:
+            append_receipt(session, op, subject, utc_now())
+        self.save_session(session)
+
+    def migrate_session(self, session_id: str) -> dict[str, Any]:
+        """Seal a schema-version-1 session as version 2 with a `migrate` receipt.
+
+        The receipt vouches only for the session as it stands now; nothing
+        before it was chained, and the migration says so by its operation.
+        """
+
+        with self.session_lock(session_id):
+            session = self.load_session(session_id)
+            if session["schema_version"] != 1:
+                raise ValidationError(f"session {session_id} is already at schema version {session['schema_version']}")
+            session["schema_version"] = SESSION_SCHEMA_VERSION
+            session["receipts"] = []
+            self._commit(session, "migrate", None)
+        return session
+
     def add_attempt(self, session_id: str, input_payload: dict[str, Any]) -> dict[str, Any]:
         with self.session_lock(session_id):
             return self._add_attempt(session_id, input_payload)
 
     def _add_attempt(self, session_id: str, input_payload: dict[str, Any]) -> dict[str, Any]:
-        session = self.load_session(session_id)
+        session = self._load_for_write(session_id)
         if session["status"] in TERMINAL_SESSION_STATUSES:
             raise ValidationError("cannot add an attempt to a terminal session")
         attempt = normalize_attempt(input_payload)
@@ -234,7 +275,7 @@ class KitStore:
         for charter in session["charters"]:
             if charter["id"] == attempt["charter_id"] and charter["status"] == "planned":
                 charter["status"] = "running"
-        self.save_session(session)
+        self._commit(session, "attempt-add", attempt["id"])
         return attempt
 
     def add_finding(self, session_id: str, input_payload: dict[str, Any]) -> dict[str, Any]:
@@ -242,7 +283,7 @@ class KitStore:
             return self._add_finding(session_id, input_payload)
 
     def _add_finding(self, session_id: str, input_payload: dict[str, Any]) -> dict[str, Any]:
-        session = self.load_session(session_id)
+        session = self._load_for_write(session_id)
         if session["status"] in TERMINAL_SESSION_STATUSES:
             raise ValidationError("cannot add a finding to a terminal session")
         finding = normalize_finding(input_payload)
@@ -252,7 +293,7 @@ class KitStore:
         if unknown_attempts:
             raise ValidationError(f"finding references unknown attempts: {', '.join(unknown_attempts)}")
         session["findings"].append(finding)
-        self.save_session(session)
+        self._commit(session, "finding-add", finding["id"])
         return finding
 
     def update_finding(self, session_id: str, finding_id: str, input_payload: dict[str, Any]) -> dict[str, Any]:
@@ -260,7 +301,7 @@ class KitStore:
             return self._update_finding(session_id, finding_id, input_payload)
 
     def _update_finding(self, session_id: str, finding_id: str, input_payload: dict[str, Any]) -> dict[str, Any]:
-        session = self.load_session(session_id)
+        session = self._load_for_write(session_id)
         if session["status"] in TERMINAL_SESSION_STATUSES:
             raise ValidationError("cannot update a finding in a terminal session")
         finding_index = next(
@@ -280,7 +321,7 @@ class KitStore:
         if unknown_attempts:
             raise ValidationError(f"finding references unknown attempts: {', '.join(unknown_attempts)}")
         session["findings"][finding_index] = updated
-        self.save_session(session)
+        self._commit(session, "finding-update", finding_id)
         return updated
 
     def close_session(self, session_id: str, status: str, decision: dict[str, Any]) -> dict[str, Any]:
@@ -288,7 +329,7 @@ class KitStore:
             return self._close_session(session_id, status, decision)
 
     def _close_session(self, session_id: str, status: str, decision: dict[str, Any]) -> dict[str, Any]:
-        session = self.load_session(session_id)
+        session = self._load_for_write(session_id)
         if session["status"] in TERMINAL_SESSION_STATUSES:
             raise ValidationError("session is already terminal")
         if status not in TERMINAL_SESSION_STATUSES:
@@ -303,7 +344,7 @@ class KitStore:
                     charter["status"] = "completed"
                 else:
                     charter["status"] = "blocked"
-        self.save_session(session)
+        self._commit(session, "session-close", None)
         return session
 
     def list_sessions(self) -> list[dict[str, Any]]:
@@ -323,8 +364,18 @@ class KitStore:
         sessions_by_id = {session["id"]: session for session in sessions}
         for session in sessions:
             self._validate_continuation(session, sessions_by_id)
+        broken = {
+            session["id"]: chain_problems(session)
+            for session in sessions
+            if integrity(session) == "broken"
+        }
+        if broken:
+            details = "; ".join(f"{sid}: {problems[0]}" for sid, problems in sorted(broken.items()))
+            raise ValidationError(f"integrity check failed for {len(broken)} session(s): {details}")
         return {
             "sessions": len(sessions),
+            "chained": sum(1 for item in sessions if integrity(item) == "chained"),
+            "unchained": sum(1 for item in sessions if integrity(item) == "unchained"),
             "attempts": sum(len(item["attempts"]) for item in sessions),
             "findings": sum(len(item["findings"]) for item in sessions),
         }
