@@ -112,6 +112,9 @@ def atomic_write_json(path: Path, payload: dict[str, Any]) -> None:
             temporary_path.unlink()
 
 
+DEFAULT_EVIDENCE_ROOT = ".agentic-qa/sessions"
+
+
 class KitStore:
     def __init__(self, root: Path | str):
         self.root = Path(root).resolve()
@@ -124,7 +127,7 @@ class KitStore:
             "project": {"name": self.root.name, "repository_root": "."},
             "defaults": {
                 "risk_tier": "medium",
-                "evidence_root": ".agentic-qa/sessions",
+                "evidence_root": DEFAULT_EVIDENCE_ROOT,
                 "max_session_minutes": 60,
                 "max_reproduction_attempts": 3,
             },
@@ -164,9 +167,26 @@ class KitStore:
             raise ValidationError(f"invalid session ID: {session_id}")
         return session_id
 
+    @property
+    def sessions_root(self) -> Path:
+        """Where sessions live: the manifest's `defaults.evidence_root`.
+
+        Before a manifest exists the default applies, so a read of an empty
+        ledger still works. A root that resolves outside the repository, for
+        example through a symlink, is refused.
+        """
+
+        relative = DEFAULT_EVIDENCE_ROOT
+        if self.manifest_path.exists():
+            relative = self.load_manifest()["defaults"]["evidence_root"]
+        resolved = (self.root / relative).resolve()
+        if resolved != self.root and self.root not in resolved.parents:
+            raise ValidationError("manifest.defaults.evidence_root must stay inside the target repository")
+        return resolved
+
     def session_path(self, session_id: str) -> Path:
         session_id = self._session_id(session_id)
-        return self.control_root / "sessions" / session_id / "session.json"
+        return self.sessions_root / session_id / "session.json"
 
     def session_lock(self, session_id: str):
         """Serialize writers to one session; every read-modify-write holds it."""
@@ -348,7 +368,7 @@ class KitStore:
         return session
 
     def list_sessions(self) -> list[dict[str, Any]]:
-        sessions_root = self.control_root / "sessions"
+        sessions_root = self.sessions_root
         if not sessions_root.exists():
             return []
         sessions: list[dict[str, Any]] = []

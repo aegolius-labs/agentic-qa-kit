@@ -30,7 +30,7 @@ A tool, test runner, scanner, model judge, or dashboard is not its own risk owne
 1. Six focused skills route full and partial workflows.
 2. `scripts/qa.py` exposes compact, deterministic commands over a dependency-free Python package.
 3. A target repository's `.agentic-qa/manifest.json` declares quality defaults, evidence location, authorization boundaries, and backlog mode.
-4. Each `.agentic-qa/sessions/<id>/session.json` binds target identity, scope, charters, attempts, findings, gaps, and disposition.
+4. Each `<evidence_root>/<id>/session.json` (by default `.agentic-qa/sessions/`) binds target identity, scope, charters, attempts, findings, gaps, and disposition.
 5. Append commands validate identities and lifecycle invariants before atomic replacement of the session record.
 6. Backlog export accepts only confirmed findings with evidence and explicit planning inputs.
 

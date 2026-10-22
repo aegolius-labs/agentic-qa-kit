@@ -271,5 +271,43 @@ class StoreTests(unittest.TestCase):
         self.assertEqual(stored, {f"attempt-parallel-{index:02d}" for index in range(writers)})
 
 
+class EvidenceRootTests(unittest.TestCase):
+    def setUp(self) -> None:
+        self.temporary = tempfile.TemporaryDirectory()
+        self.addCleanup(self.temporary.cleanup)
+        self.root = Path(self.temporary.name).resolve()
+        self.store = KitStore(self.root)
+        self.store.initialize()
+
+    def _set_evidence_root(self, value: str) -> None:
+        manifest = json.loads(self.store.manifest_path.read_text(encoding="utf-8"))
+        manifest["defaults"]["evidence_root"] = value
+        self.store.manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+
+    def test_default_root_keeps_sessions_under_the_control_directory(self) -> None:
+        self.store.create_session(session_input())
+        self.assertTrue((self.root / ".agentic-qa" / "sessions" / "qa-example" / "session.json").is_file())
+
+    def test_sessions_follow_the_manifest_evidence_root(self) -> None:
+        self._set_evidence_root("qa-evidence/sessions")
+        self.store.create_session(session_input())
+        self.store.add_attempt("qa-example", attempt_input())
+        self.assertTrue((self.root / "qa-evidence" / "sessions" / "qa-example" / "session.json").is_file())
+        self.assertFalse((self.root / ".agentic-qa" / "sessions").exists())
+        self.assertEqual([s["id"] for s in self.store.list_sessions()], ["qa-example"])
+        self.assertEqual(self.store.validate_all()["attempts"], 1)
+
+    def test_root_that_escapes_through_a_symlink_is_refused(self) -> None:
+        outside = tempfile.TemporaryDirectory()
+        self.addCleanup(outside.cleanup)
+        try:
+            (self.root / "escape").symlink_to(outside.name, target_is_directory=True)
+        except OSError:
+            self.skipTest("this host cannot create symlinks")
+        self._set_evidence_root("escape")
+        with self.assertRaisesRegex(ValidationError, "inside the target repository"):
+            self.store.create_session(session_input())
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -8,6 +8,13 @@ computed version and promotes that section when it publishes.
 
 ## [Unreleased]
 
+### Fixed
+
+- The ledger now stores sessions under the manifest's `defaults.evidence_root`
+  instead of always using `.agentic-qa/sessions` (Q09-F05). A root that
+  resolves outside the repository, for example through a symlink, is refused.
+  Sessions already written under an earlier root are not moved.
+
 ## [0.2.0] - 2026-10-22
 
 ### Added

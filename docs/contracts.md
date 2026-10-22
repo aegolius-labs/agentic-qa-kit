@@ -12,6 +12,11 @@
 
 It contains no credentials, live environment identifiers, or production data.
 
+`defaults.evidence_root` is where the ledger keeps sessions, relative to the
+repository root; the default is `.agentic-qa/sessions`. It must resolve inside
+the repository. Changing it does not move sessions already written: the ledger
+reads only the current root.
+
 A bounded concurrency probe that runs the target's own local commands inside a
 disposable temporary directory, touching nothing outside it, belongs to
 `run_existing_local_checks`, not `run_load_or_fault_injection` (owner decision,
