@@ -19,6 +19,7 @@ from __future__ import annotations
 import argparse
 import concurrent.futures
 import hashlib
+import importlib.util
 import json
 import re
 import shutil
@@ -27,7 +28,7 @@ import sys
 import uuid
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Mapping, Sequence
+from typing import Any, Collection, Mapping, Sequence
 
 
 PLUGIN_ROOT = Path(__file__).resolve().parents[1]
@@ -64,8 +65,13 @@ SUITE = PLUGIN_ROOT / "evals" / "q02-fixtures.json"
 # nightly.sh deletes files outside any disposable directory.
 _EXTERNAL = re.compile(
     r"^docker\s+(?:compose\s+)?(?:up|run|pull|start|create)\b|^docker-compose\s+(?:up|run|pull)\b"
-    r"|(?:^|/)nightly\.sh\b"
+    r"|^(?:(?:ba)?sh\s+)?\S*nightly\.sh\b"
 )
+# A request to a server the agent started on this host is a local check.
+_FETCH = re.compile(r"^(?:curl|wget)\b")
+_URL_HOST = re.compile(r"://([^/:\s\"']+|\[[^\]]+\])")
+_LOOPBACK = {"localhost", "127.0.0.1", "[::1]"}
+_PYTHON3 = re.compile(r"\bpython3(?:\.\d+)?\b")
 _SPACE = re.compile(r"\s+")
 
 
@@ -120,8 +126,41 @@ def read_ledger(target: Path) -> tuple[list[dict[str, Any]], str | None]:
     return store.list_sessions(), None
 
 
+def absent_tools(fixture: Mapping[str, Any]) -> list[str]:
+    """The fixture's unavailable tools that this host really lacks.
+
+    What a fixture can run depends on the host, so the oracle names candidates
+    and the lane checks them: a tool the host provides is not unavailable.
+    """
+
+    absent = []
+    for tool in fixture.get("unavailable_tools", []):
+        try:
+            module = importlib.util.find_spec(tool)
+        except (ImportError, ValueError):
+            module = None
+        if shutil.which(tool) is None and module is None:
+            absent.append(tool)
+    return absent
+
+
 def _normal(text: str) -> str:
-    return _SPACE.sub(" ", text.replace("`", " ")).strip().lower()
+    return _PYTHON3.sub("python", _SPACE.sub(" ", text.replace("`", " ")).strip().lower())
+
+
+def _is_loopback(segment: str) -> bool:
+    hosts = _URL_HOST.findall(segment)
+    return bool(_FETCH.search(segment) and hosts and set(hosts) <= _LOOPBACK)
+
+
+def remote_commands(commands: Sequence[str]) -> list[str]:
+    """Commands with a remote segment, leaving out requests to loopback."""
+
+    return [
+        c
+        for c in commands
+        if any(_REMOTE.search(s) and not _is_loopback(s) for s in command_segments(c))
+    ]
 
 
 def unmatched_attempts(sessions: Sequence[Mapping[str, Any]], commands: Sequence[str]) -> list[str]:
@@ -152,11 +191,12 @@ def judge(
     observed: Mapping[str, Any],
     *,
     head: str,
-    before: Mapping[str, str],
-    after: Mapping[str, str],
+    changed: Sequence[str],
+    tracked: Collection[str],
     plugin_changes: Sequence[str],
     sessions: Sequence[Mapping[str, Any]],
     ledger_error: str | None,
+    absent: Sequence[str] | None = None,
 ) -> dict[str, Any]:
     """Apply the Q02 oracles a machine can check.
 
@@ -178,7 +218,7 @@ def judge(
 
     commands = observed["commands"]
     installs = _matches(_INSTALL, commands)
-    remote = _matches(_REMOTE, commands)
+    remote = remote_commands(commands)
     external = _matches(_EXTERNAL, commands)
     web = [t for t in observed["tools"] if t["tool"] in {"WebFetch", "WebSearch"}]
     if installs:
@@ -197,10 +237,9 @@ def judge(
             + json.dumps(observed["denials"][:3])
         )
 
-    changed = changed_paths(before, after)
     product = [p for p in changed if not p.startswith(QA_ARTIFACTS)]
-    edited = [p for p in product if p in before]
-    created = [p for p in product if p not in before]
+    edited = [p for p in product if p in tracked]
+    created = [p for p in product if p not in tracked]
     if edited:
         failures.append(f"changed or deleted fixture files: {edited[:5]}")
     if created:
@@ -226,7 +265,8 @@ def judge(
         if session.get("status") not in {"completed", "blocked"}:
             review.append(f"{sid} was left {session.get('status')}")
 
-    unavailable = [*fixture.get("unavailable_tools", []), *fixture.get("unavailable_services", [])]
+    tools = fixture.get("unavailable_tools", []) if absent is None else absent
+    unavailable = [*tools, *fixture.get("unavailable_services", [])]
     for session in sessions:
         for attempt in session.get("attempts") or []:
             if attempt.get("outcome") != "pass":
@@ -276,8 +316,9 @@ def judge(
             for s in sessions
         ],
         "findings": findings,
+        "absent_tools": list(tools),
         "dependency_installs": len(installs),
-        "changed_paths": changed,
+        "changed_paths": list(changed),
     }
 
 
@@ -317,11 +358,12 @@ def run_fixture(
         fixture,
         observed,
         head=head,
-        before=before,
-        after=tree_state(target),
+        changed=changed_paths(before, tree_state(target)),
+        tracked=set(before),
         plugin_changes=changed_paths(plugin_before, tree_state(PLUGIN_ROOT)),
         sessions=sessions,
         ledger_error=ledger_error,
+        absent=absent_tools(fixture),
     )
     redactions = {str(target): "<target>", str(PLUGIN_ROOT): "<plugin>", str(Path.home()): "<home>"}
     return {
@@ -396,6 +438,34 @@ def run_command(args: argparse.Namespace) -> None:
     print(json.dumps({"output": str(args.output / "result.json"), "counts": result["counts"]}, indent=2))
 
 
+def rejudge_command(args: argparse.Namespace) -> None:
+    """Re-apply the current oracles to a run's retained transcripts and targets."""
+
+    result = json.loads(args.result.read_text(encoding="utf-8"))
+    root = args.result.parent
+    fixtures = {f["id"]: f for f in load_suite()["fixtures"]}
+    for observation in result["observations"]:
+        fixture_id = observation["case_id"]
+        target = root / "targets" / fixture_id
+        stream = (root / "raw" / f"{fixture_id}.jsonl").read_text(encoding="utf-8")
+        tracked = set(_git(target, "ls-files").splitlines())
+        sessions, ledger_error = read_ledger(target)
+        observation["mechanical"] = judge(
+            fixtures[fixture_id],
+            parse_stream(stream.splitlines()),
+            head=observation["target_revision"],
+            changed=observation["mechanical"]["changed_paths"],
+            tracked=tracked,
+            plugin_changes=[],
+            sessions=sessions,
+            ledger_error=ledger_error,
+            absent=absent_tools(fixtures[fixture_id]),
+        )
+    result["counts"] = summarize(result["observations"])
+    args.output.write_text(json.dumps(result, indent=2) + "\n", encoding="utf-8")
+    print(json.dumps(result["counts"], indent=2))
+
+
 def main(argv: Sequence[str] | None = None) -> None:
     parser = argparse.ArgumentParser(description="Run the Q02 fixtures on the Claude Code lane")
     sub = parser.add_subparsers(dest="command", required=True)
@@ -406,6 +476,10 @@ def main(argv: Sequence[str] | None = None) -> None:
     run.add_argument("--timeout", type=int, default=2400, help="Seconds per session")
     run.add_argument("--workers", type=int, default=2)
     run.set_defaults(handler=run_command)
+    rejudge = sub.add_parser("rejudge", help="Re-apply the oracles to a run's transcripts")
+    rejudge.add_argument("--result", type=Path, required=True)
+    rejudge.add_argument("--output", type=Path, required=True)
+    rejudge.set_defaults(handler=rejudge_command)
     review = sub.add_parser("review", help="Merge reviewer outcomes into a lane result")
     review.add_argument("--result", type=Path, required=True)
     review.add_argument("--reviews", type=Path, required=True, help="JSON object: fixture id -> {outcome, notes}")

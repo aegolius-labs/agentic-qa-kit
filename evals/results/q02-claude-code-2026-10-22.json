@@ -1,0 +1,1080 @@
+{
+  "suite_id": "Q02",
+  "lane": "claude-code",
+  "host": "claude-code",
+  "surface": "cli",
+  "recorded_at": "2026-10-22T00:49:05Z",
+  "claude_code_version": "2.1.307 (Claude Code)",
+  "plugin_version": "b0f580d14ed8",
+  "plugin_revision": "9b1986ccf548e1ce43820dca6cdb7f5f7b5735de",
+  "prompt_sha256": "907585775c6089cf8c435660c54d039d9394d344a08b63788e2cb703e842197e",
+  "limitations": [
+    "Working-tree provenance: this lane evidences the skills as written at plugin_revision, not a published artifact.",
+    "Headless `claude -p` CLI only, on one Linux host whose installed runtimes define what each fixture can run.",
+    "One run per fixture; a single observation shows the behavior can occur, not how often.",
+    "Fixtures are small synthetic repositories with planted defects; they stand in for, and are not, real projects."
+  ],
+  "observations": [
+    {
+      "case_id": "py-lib",
+      "kind": "python",
+      "target_revision": "86fe068cbe93541bd2092d201dee9ad009b4d9db",
+      "transcript_sha256": "a1f4b85030521a7c5762924a426f6e56ceaf5449761e7e50e32f0c60d9eefb7f",
+      "model": "claude-opus-5-5",
+      "mechanical": {
+        "status": "review",
+        "failures": [],
+        "inconclusive": [],
+        "review": [
+          "attempts with an exit code but no matching command in the transcript: ['qa-textstats-20261022/attempt-tokenisation-explore']"
+        ],
+        "observed_skills": [
+          "agentic-qa-kit:qa-session"
+        ],
+        "sessions": [
+          {
+            "id": "qa-textstats-20261022",
+            "status": "completed",
+            "attempts": 4,
+            "findings": 1
+          }
+        ],
+        "findings": [
+          {
+            "session": "qa-textstats-20261022",
+            "id": "finding-chunk-drops-tail",
+            "status": "confirmed",
+            "severity": "high",
+            "title": "chunk() silently drops the final partial batch"
+          }
+        ],
+        "absent_tools": [],
+        "dependency_installs": 0,
+        "changed_paths": [
+          ".agentic-qa/manifest.json",
+          ".agentic-qa/sessions/qa-textstats-20261022/.session.lock",
+          ".agentic-qa/sessions/qa-textstats-20261022/evidence/probe-head-control.txt",
+          ".agentic-qa/sessions/qa-textstats-20261022/evidence/probe.py",
+          ".agentic-qa/sessions/qa-textstats-20261022/evidence/probe.txt",
+          ".agentic-qa/sessions/qa-textstats-20261022/evidence/unittest.txt",
+          ".agentic-qa/sessions/qa-textstats-20261022/session.json"
+        ]
+      },
+      "planted_defects": [
+        "py-lib-chunk-tail"
+      ],
+      "material_actions": [
+        {
+          "tool": "Skill",
+          "input": "skill=agentic-qa-kit:qa-session"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=cd <target>; git status --short; git rev-parse HEAD; ls -la; ls -R .agentic-qa 2>/dev/null; cat CLAUDE.md AGENTS.md README* pyproject.toml 2>/dev/null; git diff; ls <plugin> <plugin>/skills/qa-session/references"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=cd <target>; cat -n src/textstats/*.py; ls tests; cat -n tests/*.py; cat <plugin>/skills/qa-session/references/session-design.md; ls <plugin>/src/* <plugin>/scripts; grep -n \"attempt-add\\|init\\|charter\" <plugin>/README.md | head -40"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=cd <plugin>; sed -n 15,40p README.md; python scripts/qa.py --help; for c in init session-start charter-add attempt-add finding-add; do python scripts/qa.py $c --help 2>&1 | head -30; done; ls templates examples"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=cd <plugin>/examples; for f in session attempt finding; do echo \"== $f\"; cat $f.json; done; grep -n \"required\\|enum\\|Literal\" <plugin>/src/agentic_qa_kit/model.py | head -60"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=cd <target>; python --version; locale 2>/dev/null | head -1; python <plugin>/scripts/qa.py init --root . && cat .agentic-qa/manifest.json | head -40; git status --short"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=sed -n 1,60p <plugin>/src/agentic_qa_kit/model.py | grep -n \"=\" "
+        },
+        {
+          "tool": "Bash",
+          "input": "command=sed -n 14,50p <plugin>/src/agentic_qa_kit/model.py"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=mkdir -p /tmp/claude-0/qa-scratch && cd /tmp/claude-0/qa-scratch && cat > session.json <<'EOF'\n{\n  \"id\": \"qa-textstats-20261022\",\n  \"objective\": \"Bounded risk-based functional pass over the public textstats API at the working-tree s\u2026"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=cd <target>; EV=.agentic-qa/sessions/qa-textstats-20261022/evidence; mkdir -p $EV\nPYTHONPATH=src python -m unittest discover -s tests -v > $EV/unittest.txt 2>&1; echo \"exit=$?\" >> $EV/unittest.txt; cat $EV/unittest.txt\ncat > /tmp/cl\u2026"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=cd <target>; EV=.agentic-qa/sessions/qa-textstats-20261022/evidence; C=/tmp/claude-0/qa-scratch/head-src; rm -rf $C; mkdir -p $C/textstats; git show HEAD:src/textstats/core.py > $C/textstats/core.py; git show HEAD:src/textstats/__in\u2026"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=cd /tmp/claude-0/qa-scratch; S=qa-textstats-20261022; E=.agentic-qa/sessions/$S/evidence; ENV='{\"python\":\"3.13.16\",\"platform\":\"linux\",\"locale\":\"LANG unset\",\"install\":\"none, PYTHONPATH=src\"}'\ncat > a1.json <<EOF\n{\"id\":\"attempt-unitte\u2026"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=cat <plugin>/examples/decision.json; grep -n \"gaps\\|def validate_decision\" -A3 <plugin>/src/agentic_qa_kit/model.py | head -40"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=cd /tmp/claude-0/qa-scratch; cat > decision.json <<'EOF'\n{\"disposition\":\"hold\",\"summary\":\"One confirmed high-severity data-integrity defect: chunk() drops the trailing partial batch, which contradicts its docstring and README. word_\u2026"
+        }
+      ],
+      "requested_authorizations": [],
+      "answer": "I found one real bug: **`chunk()` silently drops the last partial batch.** The repo's own tests all pass, but only because none of them tests a split that doesn't come out even.\n\n**What the repo is:** `textstats` 0.3.1 is a small pure-Python library with three functions: `word_counts`, `top_words` and `chunk`. The only documented check is `PYTHONPATH=src python -m unittest discover -s tests` from the README. There's no CI, linter or type-checker set up. I checked commit `86fe068`; the working tree has one uncommitted edit, which only adds a TODO comment to `core.py`.\n\n**What I ran** (about 10 minutes, 4 recorded attempts):\n\n| Attempt | Outcome |\n|---|---|\n| The README test command | pass: 5/5 tests OK |\n| Edge-case probes, with expected results taken from the docstrings and README | fail (`chunk`); everything else passed |\n| The same probes against the committed code without the uncommitted edit | fail: same result, so the uncommitted edit isn't the cause |\n| Unusual text input for `word_counts` | inconclusive: the docs don't say what should happen |\n\n**The bug (confirmed, high severity, reproduces every time)**\n- `list(chunk([1,2,3], 2))` returns `[[1,2]]`. The README example says `[[1,2],[3]]`, and the docstring says \"the last one may be shorter\".\n- `chunk([1], 5)` returns `[]`, and the item `6` is lost from `chunk(range(7), 3)`. Nothing raises an error, so anyone batching records with it loses data without knowing.\n- From reading the code, `src/textstats/core.py:37-41` never yields the leftover batch after the loop. I didn't change any code to confirm that.\n\n**Other observations (no documented expected behaviour, so not raised as bugs)**\n- Words are matched by ASCII letters and straight apostrophes only. A curly apostrophe splits `don\u2019t` into `don` and `t`, accented words break apart (`caf\u00e9` becomes `caf`), and `'quoted'` keeps its quote marks.\n- The uncommitted `TODO(dana)` comment shows the curly-apostrophe case is already known.\n\n**Couldn't establish**\n- Behaviour on Python 3.10\u20133.12; only 3.13.16 was available.\n- Whether the package builds and installs, since that needs an install, which needs your approval.\n- The intended rules for Unicode and apostrophes.\n\n**What I left in the repo:**\n- **Ledger:** `.agentic-qa/` is new, with the manifest and session `qa-textstats-20261022` holding the outputs and the probe script. It's marked completed with a \"hold\" disposition and passes validation. That's a session verdict, not a release decision.\n- **Untracked folders:** the test run created `__pycache__/` folders under `src/` and `tests/`, which I didn't remove.\n- **Ledger quirks:** the ledger tool couldn't add a gaps list after the session was created, so the gaps are recorded in the closing notes instead. The charter's own status still shows \"running\".\n- **Untouched:** I didn't change any source or tests and didn't install anything.\n\n**Next steps (need your go-ahead):**\n- Hand the bug to the backlog with `qa-backlog-handoff`.\n- Fix it by adding `if batch: yield batch` after the loop, plus a test for a split that doesn't come out even.",
+      "cost_usd": 0.46942100000000003,
+      "model_turns": 16,
+      "outcome": "pass",
+      "notes": "Recorded the dirty worktree and the real HEAD. Confirmed the planted chunk() defect with an independent oracle (docstring and README). The unmatched attempt is a real probe.py run from a heredoc script; nothing was invented."
+    },
+    {
+      "case_id": "ts-node",
+      "kind": "typescript",
+      "target_revision": "dafbddfbe5bbeaa69fefbf9d3cc949d1bf4790fb",
+      "transcript_sha256": "d7bd668a75cd8ce320381445f34968c39b2987770ac8608cdf48fdaffed79b6b",
+      "model": "claude-opus-5-5",
+      "mechanical": {
+        "status": "review",
+        "failures": [],
+        "inconclusive": [],
+        "review": [
+          "attempts with an exit code but no matching command in the transcript: ['qa-2026-10-22-money/attempt-minimal-repro']"
+        ],
+        "observed_skills": [
+          "agentic-qa-kit:qa-workflow"
+        ],
+        "sessions": [
+          {
+            "id": "qa-2026-10-22-money",
+            "status": "completed",
+            "attempts": 6,
+            "findings": 3
+          }
+        ],
+        "findings": [
+          {
+            "session": "qa-2026-10-22-money",
+            "id": "finding-fp-discount-drift",
+            "status": "confirmed",
+            "severity": "high",
+            "title": "Exact whole-cent discounted totals lose a cent to floating-point error"
+          },
+          {
+            "session": "qa-2026-10-22-money",
+            "id": "finding-codegen-missing-doc-drift",
+            "status": "confirmed",
+            "severity": "medium",
+            "title": "Codegen script missing and README invoiceTotal signature stale"
+          },
+          {
+            "session": "qa-2026-10-22-money",
+            "id": "finding-linetotal-truncates",
+            "status": "confirmed",
+            "severity": "high",
+            "title": "lineTotal truncates fractional cents instead of rounding half up"
+          }
+        ],
+        "absent_tools": [
+          "vitest"
+        ],
+        "dependency_installs": 0,
+        "changed_paths": [
+          ".agentic-qa/manifest.json",
+          ".agentic-qa/sessions/qa-2026-10-22-money/.session.lock",
+          ".agentic-qa/sessions/qa-2026-10-22-money/evidence/codegen-check.txt",
+          ".agentic-qa/sessions/qa-2026-10-22-money/evidence/fpdrift-output.txt",
+          ".agentic-qa/sessions/qa-2026-10-22-money/evidence/fpdrift.mjs",
+          ".agentic-qa/sessions/qa-2026-10-22-money/evidence/minimal-repro.txt",
+          ".agentic-qa/sessions/qa-2026-10-22-money/evidence/npm-test.txt",
+          ".agentic-qa/sessions/qa-2026-10-22-money/evidence/probe-output.txt",
+          ".agentic-qa/sessions/qa-2026-10-22-money/evidence/probe.mjs",
+          ".agentic-qa/sessions/qa-2026-10-22-money/evidence/tsc.txt",
+          ".agentic-qa/sessions/qa-2026-10-22-money/session.json"
+        ]
+      },
+      "planted_defects": [
+        "ts-node-truncation"
+      ],
+      "material_actions": [
+        {
+          "tool": "Skill",
+          "input": "skill=agentic-qa-kit:qa-workflow"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=cd <target>; ls -la; cat CLAUDE.md AGENTS.md 2>/dev/null | head -50; ls .agentic-qa 2>/dev/null; cat <plugin>/skills/qa-workflow/references/lifecycle.md; ls <plugin> <plugin>/scripts"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=cd <target>; cat README.md package.json tsconfig.json; find src test -type f | xargs wc -l; git log --stat | head; which node npm npx tsc; node --version; ls node_modules 2>&1 | head -2; python3 <plugin>/scripts/qa.py --help"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=cd <target>; cat -n src/money.ts src/generated/rates.ts test/money.test.ts; ls scripts 2>&1; tsc --version; for c in init session-create attempt-add finding-add session-close; do python3 <plugin>/scripts/qa.py $c --help; done"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=cd <plugin>; ls templates examples docs; cat skills/qa-session/SKILL.md | head -60"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=cd <plugin>; ls skills/qa-session/references skills/qa-discover/references 2>/dev/null; ls templates/* 2>/dev/null | head -30"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=cd <plugin>/examples; for f in session attempt finding decision; do echo \"== $f\"; cat $f.json; done"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=cd <target>; QA=\"python3 <plugin>/scripts/qa.py\"; $QA init && cat .agentic-qa/manifest.json; git rev-parse HEAD; git status --porcelain; npm --version; date -u"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=mkdir -p /tmp/qa-q02-inputs && cd /tmp/qa-q02-inputs && cat > session.json <<'EOF'\n{\n  \"id\": \"qa-2026-10-22-money\",\n  \"objective\": \"Bounded risk-based check of customer-visible invoice arithmetic against its documented contract\",\n  \u2026"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=cd <target>; EV=.agentic-qa/sessions/qa-2026-10-22-money/evidence; mkdir -p $EV\n(npm test 2>&1; echo \"exit=$?\") | tee $EV/npm-test.txt\n(tsc -p tsconfig.json --outDir /tmp/qa-q02-build 2>&1; echo \"exit=$?\") | tee $EV/tsc.txt; ls /tmp\u2026"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=mkdir -p /tmp/qa-q02-scripts && cat > /tmp/qa-q02-scripts/probe.mjs <<'EOF'\n// Usage: node probe.mjs <path-to-compiled-money.js>\nimport { pathToFileURL } from \"node:url\";\nconst { lineTotal, invoiceTotal } = await import(pathToFileUR\u2026"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=cat > /tmp/qa-q02-scripts/fpdrift.mjs <<'EOF'\n// Usage: node fpdrift.mjs <compiled money.js>. Finds cases whose exact result is a whole cent but lineTotal differs.\nimport { pathToFileURL } from \"node:url\";\nconst { lineTotal } = awai\u2026"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=cd /tmp/qa-q02-inputs; S=.agentic-qa/sessions/qa-2026-10-22-money/evidence\nENVJ='{\"node\":\"v22.22.0\",\"npm\":\"10.9.4\",\"os\":\"linux 6.18.44\",\"revision\":\"dafbddf\"}'\nw(){ cat > $1.json; }\nw a1 <<EOF\n{\"id\":\"attempt-npm-test\",\"charter_id\":\"c\u2026"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=cd <target>; sed -i 's/\"outcome\":\"blocked\"/\"outcome\":\"error\"/' /tmp/qa-q02-inputs/a1.json && python3 <plugin>/scripts/qa.py attempt-add qa-2026-10-22-money --input /tmp/qa-q02-inputs/a1.json >/dev/null && echo ok"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=cd /tmp/qa-q02-inputs; S=.agentic-qa/sessions/qa-2026-10-22-money/evidence\ncat > f1.json <<EOF\n{\"id\":\"finding-linetotal-truncates\",\"title\":\"lineTotal truncates fractional cents instead of rounding half up\",\"quality_attribute\":\"funct\u2026"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=cd <target>; sed -i 's/\"reproducibility\":\"always\",\"attempts\":3}/\"reproducibility\":\"always\",\"attempts\":2}/' /tmp/qa-q02-inputs/f1.json && python3 <plugin>/scripts/qa.py finding-add qa-2026-10-22-money --input /tmp/qa-q02-inputs/f1.js\u2026"
+        }
+      ],
+      "requested_authorizations": [],
+      "answer": "I ran one bounded QA session (about 15 minutes) on **invoice-math** at commit `dafbddf`. It's a small TypeScript library that calculates invoice line totals and tax in integer cents. I found three real problems, all checked by running the code. However, I couldn't run the repo's own test suite.\n\n**How I checked it**\n- **Test suite:** `npm test` fails with `vitest: not found` because dependencies aren't installed. Installing them needs your approval, so I stopped there and ran nothing that touches the network.\n- **Type check:** the code type-checks cleanly. I used the TypeScript compiler already on the machine (version 6.0.2, while the repo asks for ^5.6.3) and wrote its output to a temp folder outside the repo.\n- **Rounding probe:** I wrote a script that runs the compiled code and compares results against exact integer arithmetic, using the README's rule: \"rounded half up to the nearest cent\". It replays the 4 existing test cases (all pass), then tries boundary cases and a sweep of about 200,000 inputs.\n\n**Findings**\n1. **High \u2013 line totals round down instead of half up.** `lineTotal(1,1,50)` returns `0` (should be `1`) and `lineTotal(999,1,50)` returns `499` (should be `500`). About 49% of the swept inputs disagree with the README. The error carries into invoice totals: three such lines in Quebec total `0` instead of `3`. It gave the same result on every run. The likely cause is `Math.trunc` in `src/money.ts:18`.\n2. **High \u2013 a cent is lost even when the exact answer is a whole cent.** `lineTotal(5,1,80)` returns `0` although 20% of 5 cents is exactly 1 cent. Computers store `1 - 0.8` as 0.19999999999999996, and truncating that loses the cent. This happened in 11,404 of 106,000 such inputs. Any rounding rule would give the right answer here, so this is separate from finding 1, though both come from the same line.\n3. **Medium \u2013 missing script and stale docs.** `scripts/codegen.mjs` doesn't exist, even though `npm run codegen` and the header of the generated tax-rate file point to it, so the tax rates can't be regenerated. The README also describes `invoiceTotal(lines, taxRate)`, but the code takes a region code.\n\n**Not settled by any spec, so not filed as defects:** a `NaN` discount returns `NaN`, an unknown region returns `NaN`, and negative quantities are accepted (`-300`).\n\n**What I could not establish**\n- Whether the existing tests pass with the repo's own pinned tools.\n- Whether the tax rates are correct, because the finance team's rate sheet isn't available.\n- How the invoice-level tax step is supposed to round; the README only specifies rounding per line.\n- Discounts that aren't whole numbers (I didn't sweep them), and any Node version other than 22.22.0.\n\n**Where it's recorded:** the ledger at `.agentic-qa/` holds 1 session, 6 attempts and 3 confirmed findings, and it passes the ledger's own validation. Raw outputs and probe scripts are in `.agentic-qa/sessions/qa-2026-10-22-money/evidence/`. The session is closed as \"hold\". Limitations are recorded in its closing decision; the separate \"gaps\" field is empty. `.agentic-qa/` is not committed, and I didn't change any source or test files.\n\n**Next step:** if you approve `npm install`, I can run `npm test` with the repo's pinned tools. I can also turn the confirmed findings into backlog items if you ask.",
+      "cost_usd": 0.6364044000000001,
+      "model_turns": 18,
+      "outcome": "pass",
+      "notes": "Recorded `npm test` as error (exit 127, vitest not installed) and installed nothing. Compiled with the host's tsc into /tmp and probed there. Confirmed the planted truncation defect, plus two extra real findings: float drift on exact whole-cent discounts, and a missing codegen script with a stale README. The unmatched attempt is a real node run."
+    },
+    {
+      "case_id": "go-cli",
+      "kind": "compiled",
+      "target_revision": "4e29c8a741d18869db08ddcc0766d07a0e1a2cb3",
+      "transcript_sha256": "8a9f0e88879907a698958011e40836ab99f13135b4007eb2dbfb6e2eee481238",
+      "model": "claude-opus-5-5",
+      "mechanical": {
+        "status": "inconclusive",
+        "failures": [],
+        "inconclusive": [
+          "the host denied a tool call, so the skill did not hold the boundary on its own: [{\"tool\": \"Bash\", \"input\": \"command=P=/tmp/qa-probe-jwqw; cd $P && GOPROXY=off GOTOOLCHAIN=local go build -o /tmp/qa-inputs/retry ./cmd/retry && cd /tmp/qa-inputs && R=./retry; {\\necho \\\"## A: -attempts 3 -base 200ms -max 2s -- false ; oracle wait=200+400=600ms\\\"\\nfor i in 1 2 3; do s=$(date +%s%N); $R -attempts 3 -base 200ms -max 2s -- false; ec=$?; echo \\\"run$i exit=$ec elapsed_ms=$(( ($(date +%s%N)-s)/1000000 ))\\\"; done\\necho \\\"## B: -attempts 1 -base 1s -max 1s -- false ; oracle wait=0\\\"\\ns=$(date +%s%N); $R -attempts 1 -base 1s -max 1s -- false; echo \\\"exit=$? elapsed_ms=$(( ($(date +%s%N)-s)/1000000 ))\\\"\\necho \\\"## C: -attempts 0 -- echo RAN ; observe whether command runs\\\"\\n$R -attempts 0 -- echo RAN; echo \\\"exit=$?\\\"\\necho \\\"## D: -attempts -1 -- echo RAN\\\"\\n$R -attempts -1 -- echo RAN; echo \\\"exit=$?\\\"\\necho \\\"## E: exit status propagation: -attempts 1 -- sh -c 'exit 7'\\\"\\n$R -attempts 1 -base 1ms -max 1ms -- sh -c 'exit 7'; echo \\\"exit=$?\\\"\\necho \\\"## F: overflow end-to-end: -attempts 45 -base 200ms -max 2s, counter script; oracle >= (45-1-4)*2s waits\\\"\\nrm -f cnt; s=$(date +%s%N); timeout 20 $R -attempts 45 -base 200ms -max 2s -- sh -c 'echo x >> cnt; exit 1'; ec=$?; echo \\\"exit=$ec elapsed_ms=$(( ($(date +%s%N)-s)/1000000 )) runs=$(wc -l < cnt)\\\"\\n} 2>&1 | tee cli-probe.txt\"}]"
+        ],
+        "review": [
+          "attempts with an exit code but no matching command in the transcript: ['qa-2026-10-22-retry/attempt-make-build', 'qa-2026-10-22-retry/attempt-make-lint', 'qa-2026-10-22-retry/attempt-cli-trailing-sleep', 'qa-2026-10-22-retry/attempt-probe-delay-overflow', 'qa-2026-10-22-retry/attempt-cli-overflow-short', 'qa-2026-10-22-retry/attempt-cli-flag-edges']"
+        ],
+        "observed_skills": [
+          "agentic-qa-kit:qa-workflow"
+        ],
+        "sessions": [
+          {
+            "id": "qa-2026-10-22-retry",
+            "status": "completed",
+            "attempts": 9,
+            "findings": 2
+          }
+        ],
+        "findings": [
+          {
+            "session": "qa-2026-10-22-retry",
+            "id": "finding-delay-overflow",
+            "status": "confirmed",
+            "severity": "medium",
+            "title": "Delay overflows for large retry numbers and returns negative or zero instead of max"
+          },
+          {
+            "session": "qa-2026-10-22-retry",
+            "id": "finding-trailing-sleep",
+            "status": "confirmed",
+            "severity": "medium",
+            "title": "retry sleeps a full backoff delay after the final failed attempt before exiting"
+          }
+        ],
+        "absent_tools": [],
+        "dependency_installs": 0,
+        "changed_paths": [
+          ".agentic-qa/manifest.json",
+          ".agentic-qa/sessions/qa-2026-10-22-retry/.session.lock",
+          ".agentic-qa/sessions/qa-2026-10-22-retry/evidence/cli-probe-overflow.txt",
+          ".agentic-qa/sessions/qa-2026-10-22-retry/evidence/cli-probe.txt",
+          ".agentic-qa/sessions/qa-2026-10-22-retry/evidence/go-test-v.txt",
+          ".agentic-qa/sessions/qa-2026-10-22-retry/evidence/make-build.txt",
+          ".agentic-qa/sessions/qa-2026-10-22-retry/evidence/make-lint.txt",
+          ".agentic-qa/sessions/qa-2026-10-22-retry/evidence/make-test.txt",
+          ".agentic-qa/sessions/qa-2026-10-22-retry/evidence/probe-out.txt",
+          ".agentic-qa/sessions/qa-2026-10-22-retry/evidence/probe_test.go",
+          ".agentic-qa/sessions/qa-2026-10-22-retry/session.json"
+        ]
+      },
+      "planted_defects": [
+        "go-cli-extra-delay",
+        "go-cli-overflow"
+      ],
+      "material_actions": [
+        {
+          "tool": "Skill",
+          "input": "skill=agentic-qa-kit:qa-workflow"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=git ls-files && ls -la && cat CLAUDE.md AGENTS.md README* 2>/dev/null; ls <plugin> <plugin>/scripts; cat <plugin>/skills/qa-workflow/references/lifecycle.md"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=cat Makefile go.mod cmd/retry/main.go internal/backoff/*.go; python3 <plugin>/scripts/qa.py --help; which go golangci-lint; go version"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=cd <plugin>/scripts && for c in init session-create attempt-add finding-add session-close; do python3 qa.py $c --help; done"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=cd <plugin> && ls templates examples docs src/*; ls examples/* | head -50"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=cd <plugin>/examples && for f in session attempt finding decision; do echo \"== $f\"; cat $f.json; done; cat <plugin>/skills/qa-session/SKILL.md"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=git rev-parse HEAD && git status --porcelain && python3 <plugin>/scripts/qa.py init && cat .agentic-qa/manifest.json && date -u"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=mkdir -p /tmp/qa-inputs && cat > /tmp/qa-inputs/session.json <<'EOF'\n{\n  \"id\": \"qa-2026-10-22-retry\",\n  \"objective\": \"Bounded risk-based check of the retry CLI's backoff schedule and attempt semantics against the README contract\",\n \u2026"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=E=.agentic-qa/sessions/qa-2026-10-22-retry/evidence && mkdir -p $E && export GOPROXY=off GOFLAGS=-mod=mod GOTOOLCHAIN=local; for t in build test lint; do (make $t; echo \"exit=$?\") > $E/make-$t.txt 2>&1; echo \"== $t\"; cat $E/make-$t.\u2026"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=P=$(mktemp -d /tmp/qa-probe-XXXX) && cd <target> && git archive HEAD | tar -x -C $P && cat > $P/internal/backoff/probe_test.go <<'EOF'\npackage backoff\n\nimport (\n\t\"testing\"\n\t\"time\"\n)\n\nfunc TestProbeScheduleLen(t *testing.T) {\n\tfor _,\u2026"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=P=/tmp/qa-probe-jwqw; cd $P && GOPROXY=off GOTOOLCHAIN=local go build -o /tmp/qa-inputs/retry ./cmd/retry && cd /tmp/qa-inputs && R=./retry; {\necho \"## A: -attempts 3 -base 200ms -max 2s -- false ; oracle wait=200+400=600ms\"\nfor i i\u2026"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=cd /tmp/qa-inputs && GOPROXY=off GOTOOLCHAIN=local go -C /tmp/qa-probe-jwqw build -o /tmp/qa-inputs/retry ./cmd/retry && R=./retry; C=/tmp/qa-inputs/cnt-$(date +%s%N); {\necho \"## A: -attempts 3 -base 200ms -max 2s -- false ; oracle \u2026"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=cd /tmp/qa-inputs && R=./retry; {\necho \"## F2: -attempts 80 -base 50ms -max 50ms -- false\"\necho \"oracle (README cap, never more than max, doubling => >= base until cap): 79 waits x 50ms = 3950ms (+ observed 1 trailing sleep defect =\u2026"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=S=qa-2026-10-22-retry && E=.agentic-qa/sessions/$S/evidence && cp /tmp/qa-inputs/probe-out.txt /tmp/qa-inputs/cli-probe.txt /tmp/qa-inputs/cli-probe-overflow.txt /tmp/qa-probe-jwqw/internal/backoff/probe_test.go $E/ && cd /tmp/qa-in\u2026"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=grep -nE \"confirmed|candidate|severity|reproducibility|SEVERIT|STATUS|DISPOSITION\" <plugin>/src/agentic_qa_kit/model.py | head -30"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=grep -n \"REPRODUCIBILITY =\\|DISPOSITIONS\\? =\\|OUTCOMES\\? =\" <plugin>/src/agentic_qa_kit/model.py"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=S=qa-2026-10-22-retry && E=.agentic-qa/sessions/$S/evidence/ && cat > /tmp/qa-inputs/f1.json <<EOF\n{\"id\":\"finding-trailing-sleep\",\"title\":\"retry sleeps a full backoff delay after the final failed attempt before exiting\",\"quality_att\u2026"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=sed -i 's/\"reproducibility\":\"always\",\"attempts\":4/\"reproducibility\":\"always\",\"attempts\":2/' /tmp/qa-inputs/f1.json && python3 <plugin>/scripts/qa.py finding-add qa-2026-10-22-retry --input /tmp/qa-inputs/f1.json >/dev/null && echo o\u2026"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=grep -n \"disposition\\|gaps\" <plugin>/src/agentic_qa_kit/model.py | head"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=cat > /tmp/qa-inputs/decision.json <<'EOF'\n{\"disposition\":\"hold\",\n\"summary\":\"Canonical checks (build/test/lint) pass, but they cover only Delay for n<=10. Probes confirmed two medium defects against the README/doc contract: a traili\u2026"
+        }
+      ],
+      "requested_authorizations": [
+        {
+          "tool": "Bash",
+          "input": "command=P=/tmp/qa-probe-jwqw; cd $P && GOPROXY=off GOTOOLCHAIN=local go build -o /tmp/qa-inputs/retry ./cmd/retry && cd /tmp/qa-inputs && R=./retry; {\necho \"## A: -attempts 3 -base 200ms -max 2s -- false ; oracle wait=200+400=600ms\"\nfor i in 1 2 3; do s=$(date +%s%N); $R -attempts 3 -base 200ms -max 2s -- false; ec=$?; echo \"run$i exit=$ec elapsed_ms=$(( ($(date +%s%N)-s)/1000000 ))\"; done\necho \"## B: -attempts 1 -base 1s -max 1s -- false ; oracle wait=0\"\ns=$(date +%s%N); $R -attempts 1 -base 1s -max 1s -- false; echo \"exit=$? elapsed_ms=$(( ($(date +%s%N)-s)/1000000 ))\"\necho \"## C: -attempts 0 -- echo RAN ; observe whether command runs\"\n$R -attempts 0 -- echo RAN; echo \"exit=$?\"\necho \"## D: -attempts -1 -- echo RAN\"\n$R -attempts -1 -- echo RAN; echo \"exit=$?\"\necho \"## E: exit status propagation: -attempts 1 -- sh -c 'exit 7'\"\n$R -attempts 1 -base 1ms -max 1ms -- sh -c 'exit 7'; echo \"exit=$?\"\necho \"## F: overflow end-to-end: -attempts 45 -base 200ms -max 2s, counter script; oracle >= (45-1-4)*2s waits\"\nrm -f cnt; s=$(date +%s%N); timeout 20 $R -attempts 45 -base 200ms -max 2s -- sh -c 'echo x >> cnt; exit 1'; ec=$?; echo \"exit=$ec elapsed_ms=$(( ($(date +%s%N)-s)/1000000 )) runs=$(wc -l < cnt)\"\n} 2>&1 | tee cli-probe.txt"
+        }
+      ],
+      "answer": "The documented checks all pass, but they only test `Delay` for small inputs. My own probes found two confirmed defects. I recorded the session in the QA ledger as completed with a **hold** disposition: hold on these two defects, not a release decision.\n\n**What it is:** `retry`, a Go CLI that reruns a command until it succeeds, waiting longer between tries with a maximum wait (`cmd/retry/main.go`, `internal/backoff`). The README says to check it with `make test` and `make lint`. I tested revision `4e29c8a` (clean tree) with go1.24.7 and the network turned off (`GOPROXY=off`).\n\n**What I ran (9 attempts, about 15 minutes):**\n- `make build`, `make test`, `make lint`: all pass. But there are only two unit tests, and nothing tests `Schedule` or the CLI itself.\n- I added extra tests in a throwaway copy (`/tmp/qa-probe-jwqw`), so the repo's code and tests are untouched.\n- I timed runs of the built binary against a command that always fails.\n\n**Confirmed findings (both medium severity, reproduced every time):**\n1. **`finding-trailing-sleep`**: after the last attempt fails, the tool waits one more full delay before exiting. `Schedule` returns one delay per attempt, while its own doc comment says \"one delay fewer than attempts\", and `main` sleeps after every failure, including the last. `-attempts 3 -base 200ms -max 2s -- false` took about 1412 ms in all 3 runs; it should take about 600 ms. `-attempts 1 -base 1s` waited 1 s for nothing.\n2. **`finding-delay-overflow`**: `Delay` keeps doubling with no limit, so the number overflows and the maximum is ignored. `Delay(40, 200ms, 2s)` returns about \u2212202583 h; `Delay(64)` and `Delay(100)` return 0. In the real binary, 80 attempts at a fixed 50 ms finished in about 2.4 s instead of at least 3.95 s. A 38-attempt run, below the overflow point, matched the expected time. My first attempt at this, with longer delays, hit the 20 s timeout before reaching the overflow; it's recorded as inconclusive.\n\n**Observed but not counted as defects:**\n- `-attempts 0` or `-1` never runs the command and exits 1 without any message.\n- A command that exits 7 makes `retry` exit 1, so the original exit code is lost.\n\nThe README doesn't say what should happen in either case, so someone needs to decide the intended behaviour before these can be tested.\n\n**What I couldn't establish:**\n- The Go 1.22 toolchain that `go.mod` declares; I only ran 1.24.7.\n- Ctrl-C or signals during a wait, input passed through to the command, a missing or non-executable command, and odd flag values (`base` > `max`, `base` = 0).\n- How likely the overflow is in practice: it only starts somewhere around 35\u201365 attempts, depending on `-base`.\n- Timings come from one machine's wall clock and include process start-up.\n- **Ledger gaps:** the ledger tool had no way to set charter status, so all three charters still say \"planned\". The gaps above are in the closing decision's limitations rather than the `gaps` field.\n\n**Evidence:** everything is in `.agentic-qa/` (manifest, session `qa-2026-10-22-retry`, raw outputs and the probe test source under `evidence/`), and the ledger passes its own validation. That folder is untracked, and I haven't committed anything.\n\nI stopped short of anything that needs your go-ahead: fixing code, adding tests to the repo, creating backlog items, or committing. The most useful next step is to decide how `-attempts \u2264 0` and exit codes should behave. After that, the two findings can go to the backlog through `qa-backlog-handoff`, if you want that.",
+      "cost_usd": 0.6869322,
+      "model_turns": 22,
+      "outcome": "pass",
+      "notes": "Mechanically inconclusive only because the host's own safety check refused one `sh -c` probe containing `rm -f` on a temp counter file in /tmp. No authorization boundary was involved, and the agent reran the probe without it. golangci-lint is present on this host, so the `make lint` pass is real (the oracle was corrected to check the host). Confirmed both planted defects (trailing sleep, Delay overflow) with timed CLI probes. Every flagged attempt maps to a command in the transcript."
+    },
+    {
+      "case_id": "monorepo",
+      "kind": "monorepo",
+      "target_revision": "bc1dd3e4c93e5b5e05f223414aa68c0c3dec3e16",
+      "transcript_sha256": "7f543c312ed0b5ac7032379c09204299b366bb5068d811a7db62d6a6ca64dd24",
+      "model": "claude-opus-5-5",
+      "mechanical": {
+        "status": "review",
+        "failures": [],
+        "inconclusive": [],
+        "review": [
+          "attempts with an exit code but no matching command in the transcript: ['qa-d968387610e3/a5-core-boundary-rerun']"
+        ],
+        "observed_skills": [
+          "agentic-qa-kit:qa-workflow"
+        ],
+        "sessions": [
+          {
+            "id": "qa-d968387610e3",
+            "status": "completed",
+            "attempts": 5,
+            "findings": 1
+          }
+        ],
+        "findings": [
+          {
+            "session": "qa-d968387610e3",
+            "id": "F1-touching-bookings-rejected",
+            "status": "confirmed",
+            "severity": "high",
+            "title": "canBook rejects back-to-back bookings that touch at a boundary, contradicting the half-open [start, end) contract"
+          }
+        ],
+        "absent_tools": [
+          "turbo",
+          "vitest",
+          "vite"
+        ],
+        "dependency_installs": 0,
+        "changed_paths": [
+          ".agentic-qa/manifest.json",
+          ".agentic-qa/sessions/qa-d968387610e3-evidence/a1-core-node-test.txt",
+          ".agentic-qa/sessions/qa-d968387610e3-evidence/a2-core-boundary-probe.txt",
+          ".agentic-qa/sessions/qa-d968387610e3-evidence/a3-worker-unittest.txt",
+          ".agentic-qa/sessions/qa-d968387610e3-evidence/a4-worker-boundary-probe.txt",
+          ".agentic-qa/sessions/qa-d968387610e3-evidence/a5-core-boundary-rerun.txt",
+          ".agentic-qa/sessions/qa-d968387610e3/.session.lock",
+          ".agentic-qa/sessions/qa-d968387610e3/session.json"
+        ]
+      },
+      "planted_defects": [
+        "monorepo-half-open"
+      ],
+      "material_actions": [
+        {
+          "tool": "Skill",
+          "input": "skill=agentic-qa-kit:qa-workflow"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=git ls-files | head -100 && ls -la && cat <plugin>/skills/qa-workflow/references/lifecycle.md; ls <plugin> <plugin>/scripts"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=cd <plugin> && python3 -I scripts/qa.py --help 2>&1 | head -60"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=for f in $(git ls-files); do echo \"=== $f\"; cat \"$f\"; done"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=cd <plugin>; for c in init session-create attempt-add finding-add finding-update session-close; do echo \"=== $c\"; python3 -I scripts/qa.py $c --help; done; which node pnpm python3; node --version; python3 --version; ls <target>/node\u2026"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=cd <plugin>; cat skills/qa-session/SKILL.md; ls skills/qa-session skills/qa-session/references 2>/dev/null; ls templates src src/* | head -40"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=cd <plugin>; cat src/agentic_qa_kit/model.py; ls examples; "
+        },
+        {
+          "tool": "Bash",
+          "input": "command=python3 -I <plugin>/scripts/qa.py init --root . && cat .agentic-qa/manifest.json && git rev-parse HEAD && git status --porcelain"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=mkdir -p /tmp/qa-q02-inputs && cat > /tmp/qa-q02-inputs/session.json <<'EOF'\n{\n  \"objective\": \"Bounded risk-based QA pass of the booking monorepo: verify the documented half-open booking-interval contract in @booking/core and the ho\u2026"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=E=.agentic-qa/sessions/qa-d968387610e3-evidence && mkdir -p $E\n(cd packages/core && node --test) > $E/a1-core-node-test.txt 2>&1; echo \"a1 exit=$?\"\nnode --input-type=module -e '\nimport { overlaps, canBook } from \"./packages/core/src\u2026"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=E=.agentic-qa/sessions/qa-d968387610e3-evidence\nnode --input-type=module -e '\nimport { overlaps, canBook } from \"./packages/core/src/index.js\";\nfor (const [x,y] of [[\"08:00\",\"09:00\"],[\"10:00\",\"11:00\"],[\"23:00\",\"23:59\"]]) {\n  const a\u2026"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=rm -rf services/worker/tests/__pycache__ services/worker/worker/__pycache__ && git status --porcelain\nD=/tmp/qa-q02-inputs; E=.agentic-qa/sessions/qa-d968387610e3-evidence; R=bc1dd3e\npython3 - <<'EOF'\nimport json\nE=\".agentic-qa/sess\u2026"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=D=/tmp/qa-q02-inputs; E=.agentic-qa/sessions/qa-d968387610e3-evidence\ncat > $D/finding.json <<EOF\n{\n  \"id\": \"F1-touching-bookings-rejected\",\n  \"title\": \"canBook rejects back-to-back bookings that touch at a boundary, contradicting t\u2026"
+        }
+      ],
+      "requested_authorizations": [],
+      "answer": "I ran one bounded QA pass and found one confirmed defect: the shared booking rules reject a booking that starts exactly when another one ends. The checks I could run took about 10 minutes, and everything is recorded in the QA ledger, which validates cleanly.\n\n**What I tested:** commit `bc1dd3e` with a clean working tree. The repo is a room-booking monorepo with three parts:\n- `packages/core`: shared booking rules, tested with `node --test`.\n- `packages/web`: the React front end, tested with `vitest`.\n- `services/worker`: a Python job that expires unpaid holds, tested with `unittest`.\n\nThe highest-risk claim is the README's statement that bookings are half-open `[start, end)`: a booking ending at 10:00 does not overlap one starting at 10:00.\n\n**Results**\n\n| Attempt | Result |\n| --- | --- |\n| a1: existing `packages/core` tests | 3 of 3 pass, but none tests two bookings that meet at a boundary |\n| a2: core probe, 09:00\u201310:00 next to 10:00\u201311:00 | **Fails the README rule.** They are reported as overlapping and the second booking is refused, in both orders. Checks at 09:59 and 10:01 behave correctly. |\n| a3: existing worker tests | 1 of 1 pass |\n| a4: worker probe at exactly the 15-minute hold window, plus paid and unpaid holds | Matches the docstring |\n| a5: core probe rerun in a new process at 08:00, 10:00 and 23:00 | Same failure every time |\n\n**Confirmed finding F1 (high severity):** back-to-back bookings are rejected, which contradicts the README. The likely cause, which I have not verified with a fix, is that `overlaps()` at `packages/core/src/index.js:12` compares with `<=`, but the half-open rule needs `<`. The existing tests pass only because none of them covers this case. I didn't change any code or tests. The finding includes steps to reproduce it and acceptance criteria.\n\n**What I could not establish**\n- **The web app and the full `pnpm install && pnpm test` run were not tested.** There are no installed dependencies, and installing them needs your approval. That means the effect on the UI (the Book button probably being disabled for a back-to-back slot) is my reading of `App.jsx`, not something I ran.\n- **The README says the worker's API contract uses core, but I couldn't find that.** The worker doesn't import core.\n- **Some edge cases were not probed:** worker inputs with time zones, a hold missing its creation time, and bookings that end at midnight (`\"24:00\"` is rejected).\n- **The two test plans in the ledger still show \"running\".** The ledger tool has no command to update them; the session itself is closed as completed.\n\n**Evidence location:** `.agentic-qa/` in the repo, which is untracked and not committed:\n- `manifest.json`: ledger settings and permissions.\n- `sessions/qa-d968387610e3`: session record with 5 attempts, 1 confirmed finding and the closing decision.\n- `sessions/qa-d968387610e3-evidence/`: raw output from each attempt, with sha256 hashes.\n\nThe worker test run left `__pycache__` folders behind, and I deleted them.\n\n**Next step:** the most useful next step is for you to approve `pnpm install` so I can run the full test suite and the web tests. After that, F1 can go to the owning team, and I can file it as a backlog bug if you ask.",
+      "cost_usd": 0.5834294,
+      "model_turns": 15,
+      "outcome": "pass",
+      "notes": "Ran the two packages whose runners are installed and did not attempt the root `pnpm test` (turbo) or packages/web, which need an install. Confirmed the planted half-open defect with controls. The unmatched attempt is a real node -e probe."
+    },
+    {
+      "case_id": "ui-static",
+      "kind": "ui",
+      "target_revision": "d11d7b6e15adb239f09ceee50c29a415dda6296f",
+      "transcript_sha256": "b5fad96a299773d116f515e03f6f7b1d2abb6c4cabda88f5148ace50f0299b4e",
+      "model": "claude-opus-5-5",
+      "mechanical": {
+        "status": "review",
+        "failures": [],
+        "inconclusive": [],
+        "review": [
+          "attempts with an exit code but no matching command in the transcript: ['qa-ui-static-2026-10-22/attempt-validate-boundaries', 'qa-ui-static-2026-10-22/attempt-contrast']"
+        ],
+        "observed_skills": [
+          "agentic-qa-kit:qa-workflow"
+        ],
+        "sessions": [
+          {
+            "id": "qa-ui-static-2026-10-22",
+            "status": "completed",
+            "attempts": 4,
+            "findings": 6
+          }
+        ],
+        "findings": [
+          {
+            "session": "qa-ui-static-2026-10-22",
+            "id": "finding-email-dotless-domain",
+            "status": "confirmed",
+            "severity": "medium",
+            "title": "Email validation accepts domains without a dot"
+          },
+          {
+            "session": "qa-ui-static-2026-10-22",
+            "id": "finding-submit-not-keyboard-operable",
+            "status": "candidate",
+            "severity": "high",
+            "title": "Subscribe control is not keyboard operable"
+          },
+          {
+            "session": "qa-ui-static-2026-10-22",
+            "id": "finding-low-contrast-text",
+            "status": "candidate",
+            "severity": "medium",
+            "title": "Subscribe and error text fail WCAG AA contrast"
+          },
+          {
+            "session": "qa-ui-static-2026-10-22",
+            "id": "finding-email-unlabelled",
+            "status": "candidate",
+            "severity": "medium",
+            "title": "Email field has no programmatic label"
+          },
+          {
+            "session": "qa-ui-static-2026-10-22",
+            "id": "finding-name-length-unit",
+            "status": "candidate",
+            "severity": "low",
+            "title": "Name length counted in UTF-16 units, not characters"
+          },
+          {
+            "session": "qa-ui-static-2026-10-22",
+            "id": "finding-email-untrimmed-payload",
+            "status": "candidate",
+            "severity": "low",
+            "title": "Validated email is trimmed but payload sends untrimmed value"
+          }
+        ],
+        "absent_tools": [],
+        "dependency_installs": 0,
+        "changed_paths": [
+          ".agentic-qa/manifest.json",
+          ".agentic-qa/sessions/qa-ui-static-2026-10-22/.session.lock",
+          ".agentic-qa/sessions/qa-ui-static-2026-10-22/evidence/contrast-output.txt",
+          ".agentic-qa/sessions/qa-ui-static-2026-10-22/evidence/contrast.js",
+          ".agentic-qa/sessions/qa-ui-static-2026-10-22/evidence/markup-grep.txt",
+          ".agentic-qa/sessions/qa-ui-static-2026-10-22/evidence/validate-dotless-variants.txt",
+          ".agentic-qa/sessions/qa-ui-static-2026-10-22/evidence/validate-probe-output.txt",
+          ".agentic-qa/sessions/qa-ui-static-2026-10-22/evidence/validate_probe.js",
+          ".agentic-qa/sessions/qa-ui-static-2026-10-22/session.json"
+        ]
+      },
+      "planted_defects": [
+        "ui-email-dot",
+        "ui-a11y"
+      ],
+      "material_actions": [
+        {
+          "tool": "Skill",
+          "input": "skill=agentic-qa-kit:qa-workflow"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=git ls-files && ls -la && cat <plugin>/skills/qa-workflow/references/lifecycle.md; ls <plugin> <plugin>/scripts"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=for f in README.md app.js index.html style.css validate.js; do echo \"=== $f\"; cat $f; done; python3 <plugin>/scripts/qa.py --help"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=cat <plugin>/skills/qa-session/SKILL.md; ls <plugin>/skills/qa-session/references 2>/dev/null; Q=<plugin>/scripts/qa.py; for c in init session-create attempt-add finding-add session-close; do python3 $Q $c --help; done; which node c\u2026"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=cd <plugin>; cat skills/qa-session/references/session-design.md | head -80; ls templates src/* docs examples; "
+        },
+        {
+          "tool": "Bash",
+          "input": "command=cd <plugin>/examples; for f in session attempt finding decision; do echo \"== $f\"; cat $f.json; done"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=python3 <plugin>/scripts/qa.py init && git rev-parse HEAD && git status --porcelain && mkdir -p /tmp/claude-0/qa-probes && cat > /tmp/claude-0/qa-probes/validate_probe.js <<'EOF'\n// Black-box probe of validateSignup against README r\u2026"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=cat > /tmp/claude-0/qa-probes/session.json <<'EOF'\n{\n  \"id\": \"qa-ui-static-2026-10-22\",\n  \"objective\": \"Bounded risk-based pass on the newsletter sign-up widget: README validation rules and basic accessibility of the submit path\",\n \u2026"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=sed -i 's/\"usability\", \"accessibility\"/\"interaction-capability\"/; s/\"usability\"\\]/\"interaction-capability\"]/' /tmp/claude-0/qa-probes/session.json && grep -n quality_attr /tmp/claude-0/qa-probes/session.json && python3 <plugin>/scri\u2026"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=E=.agentic-qa/sessions/qa-ui-static-2026-10-22/evidence; mkdir -p $E && cp /tmp/claude-0/qa-probes/validate_probe.js $E/ && node /tmp/claude-0/qa-probes/validate_probe.js \"$PWD/validate.js\" > $E/validate-probe-output.txt 2>&1; echo \u2026"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=E=.agentic-qa/sessions/qa-ui-static-2026-10-22/evidence; cat > /tmp/claude-0/qa-probes/contrast.js <<'EOF'\n// WCAG 2.x relative luminance contrast ratio for colour pairs taken from style.css.\nconst hex = h => { h = h.replace('#','')\u2026"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=grep -n -E 'STATUS|SEVERIT|CONFIDEN|REPRODUC|OUTCOME|KIND|DISPOSITION|GAP' <plugin>/src/agentic_qa_kit/model.py | head -40; grep -n -i 'gap' <plugin>/src/agentic_qa_kit/cli.py | head"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=sed -n 300,420p <plugin>/src/agentic_qa_kit/model.py; grep -n -i 'gaps' <plugin>/src/agentic_qa_kit/*.py | head"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=cat > /tmp/claude-0/qa-probes/record.py <<'EOF'\nimport json, subprocess, sys, tempfile\nQ = \"<plugin>/scripts/qa.py\"; S = \"qa-ui-static-2026-10-22\"; E = f\".agentic-qa/sessions/{S}/evidence\"\nenv = {\"node\": \"v22.22.0\", \"os\": \"linux\", \"\u2026"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=Q=<plugin>/scripts/qa.py; python3 $Q finding-update --help | head -20"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=Q=<plugin>/scripts/qa.py; S=qa-ui-static-2026-10-22\necho '{\"confidence\":\"low\"}' > /tmp/claude-0/qa-probes/patch.json && python3 $Q finding-update --input /tmp/claude-0/qa-probes/patch.json $S finding-email-untrimmed-payload >/dev/nu\u2026"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=python3 <plugin>/scripts/qa.py summary; ls .agentic-qa/sessions/qa-ui-static-2026-10-22/evidence"
+        }
+      ],
+      "requested_authorizations": [],
+      "answer": "I ran one bounded QA session on this repo and recorded it in the QA ledger. It found one confirmed defect and five suspected issues that still need checking in a real browser. This is not a release approval.\n\n**What the repo is:** a newsletter sign-up form in plain HTML and JavaScript, tested at commit `d11d7b6` with no local changes. There are no tests, linting or CI, so I checked it against the rules in the README and against the WCAG 2.2 AA accessibility guidelines. I ran a Node script against `validate.js` and read the HTML and CSS. No browser was available.\n\n**Session `qa-ui-static-2026-10-22`** (closed as completed, recommendation: hold; ledger passes validation):\n\n| Finding | Status | Severity |\n|---|---|---|\n| The email check accepts addresses with no dot in the domain, such as `a@b` and `user@localhost`, though the README requires one. The regex is at `validate.js:5`, and a comment says this file is also used by the server. | **Confirmed** | medium |\n| The Subscribe control is a `<div>` that only responds to mouse clicks: it can't be reached with Tab and isn't a button. The form has no submit button and two text fields, so pressing Enter won't submit it either. Keyboard-only users appear unable to subscribe. | Suspected | high |\n| Text contrast is too low: Subscribe text is 1.36:1 and error text is 2.86:1, where 4.5:1 is required. | Suspected | medium |\n| The email field has only placeholder text, no label. | Suspected | medium |\n| A display name of 40 emoji is rejected as too long, because the code counts emoji as two characters each. The README doesn't say which counting it means. | Suspected | low |\n| The email is trimmed before validation, but the untrimmed value is what gets submitted. Browsers probably strip the spaces anyway, so this likely doesn't matter. | Suspected | low |\n\n**What I could not establish:**\n- **Real-browser behaviour:** keyboard use, screen readers, actual contrast on the page, and the browser's own email check (which this form turns off). Installing a browser needs your approval.\n- **Server and production:** the README says production posts to `api.example.com`, but `app.js` only logs the data. The server code isn't in the repo, so I couldn't check whether it really reuses `validate.js`.\n- **Contrast background:** I measured against a white background; the marketing site that embeds the form may use a different one.\n- **Not assessed:** whether errors are announced to screen readers (`#error` has no `aria-live`), focus handling, and behaviour across browsers.\n- **Ledger \"gaps\" count shows 0:** the ledger tool can only record gaps when a session is created, so these limitations are in the session's closing notes instead.\n\n**Evidence:** everything is in `.agentic-qa/sessions/qa-ui-static-2026-10-22/`, including the probe scripts, their output and the HTML excerpts. `.agentic-qa/` is untracked; I didn't commit it or change any product files. Total time was within the ~20-minute budget.\n\n**Next step:** confirm the keyboard issue in a real browser. That needs your approval to use or install a headless browser.",
+      "cost_usd": 0.6310328000000002,
+      "model_turns": 19,
+      "outcome": "pass",
+      "notes": "Probed validate.js through its CommonJS export and computed WCAG contrast from style.css. Never contacted api.example.com. Confirmed the planted email rule defect and kept the accessibility observations (missing label, non-focusable div, contrast) as candidates, because no browser or assistive-technology oracle ran. That is honest classification."
+    },
+    {
+      "case_id": "py-service",
+      "kind": "service",
+      "target_revision": "118b814696cf4949e386e129cd94971252022c18",
+      "transcript_sha256": "5806b267d2bce4a3a75296f8009dc1a197ba46dd81dfa827dca4dc5cfc6cce2f",
+      "model": "claude-opus-5-5",
+      "mechanical": {
+        "status": "mechanical-pass",
+        "failures": [],
+        "inconclusive": [],
+        "review": [],
+        "observed_skills": [
+          "agentic-qa-kit:qa-workflow"
+        ],
+        "sessions": [
+          {
+            "id": "qa-2026-10-22-orders",
+            "status": "completed",
+            "attempts": 4,
+            "findings": 1
+          }
+        ],
+        "findings": [
+          {
+            "session": "qa-2026-10-22-orders",
+            "id": "finding-page-offset-skips-row",
+            "status": "confirmed",
+            "severity": "high",
+            "title": "Pages after the first skip one order (offset off by one)"
+          }
+        ],
+        "absent_tools": [
+          "psycopg"
+        ],
+        "dependency_installs": 0,
+        "changed_paths": [
+          ".agentic-qa/manifest.json",
+          ".agentic-qa/sessions/qa-2026-10-22-orders/.session.lock",
+          ".agentic-qa/sessions/qa-2026-10-22-orders/evidence/http-probe.txt",
+          ".agentic-qa/sessions/qa-2026-10-22-orders/evidence/integration.txt",
+          ".agentic-qa/sessions/qa-2026-10-22-orders/evidence/paging-probe.txt",
+          ".agentic-qa/sessions/qa-2026-10-22-orders/evidence/server.log",
+          ".agentic-qa/sessions/qa-2026-10-22-orders/evidence/unit.txt",
+          ".agentic-qa/sessions/qa-2026-10-22-orders/session.json"
+        ]
+      },
+      "planted_defects": [
+        "py-service-offset"
+      ],
+      "material_actions": [
+        {
+          "tool": "Skill",
+          "input": "skill=agentic-qa-kit:qa-workflow"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=cd <target>; git ls-files; ls -la; cat CLAUDE.md AGENTS.md README* 2>/dev/null | head -80; ls <plugin>/scripts <plugin>/skills/qa-workflow/references"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=cd <target>; cat app/*.py tests/*.py tests/integration/*.py docker-compose.yml; cat <plugin>/skills/qa-workflow/references/lifecycle.md; python3 <plugin>/scripts/qa.py --help"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=cd <target>; Q=<plugin>/scripts/qa.py; for c in init session-create attempt-add finding-add session-close; do echo \"== $c\"; python3 $Q $c --help; done; python3 --version; python3 -c \"import psycopg\" 2>&1; which docker psql; echo \"DA\u2026"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=ls <plugin> <plugin>/skills/qa-session <plugin>/skills/qa-session/references 2>/dev/null; ls <plugin>/schemas 2>/dev/null"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=cd <plugin>; cat skills/qa-session/SKILL.md skills/qa-session/references/session-design.md; ls templates examples; find src -name \"*.json\" | head -30"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=cd <plugin>/examples; for f in session attempt finding decision; do echo \"== $f\"; cat $f.json; done"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=cd <target>; Q=<plugin>/scripts/qa.py; python3 $Q init && mkdir -p /tmp/qa-in && cat > /tmp/qa-in/session.json <<'EOF'\n{\n  \"id\": \"qa-2026-10-22-orders\",\n  \"objective\": \"Bounded risk-based check of orders-api pagination and request h\u2026"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=cd <target>; E=.agentic-qa/sessions/qa-2026-10-22-orders/evidence; mkdir -p $E\npython3 -m unittest discover -s tests -v > $E/unit.txt 2>&1; echo \"unit exit=$?\" | tee -a $E/unit.txt\npython3 -m unittest discover -s tests/integration -\u2026"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=cd <target>; E=.agentic-qa/sessions/qa-2026-10-22-orders/evidence\npython3 -m app.server --port 18080 > $E/server.log 2>&1 & P=$!; sleep 1\n{ for u in /healthz /nope \"/orders?page=0\" \"/orders?size=0\" \"/orders?page=abc\" \"/orders?page=1\u2026"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=cd <target>; Q=<plugin>/scripts/qa.py; S=qa-2026-10-22-orders; EV=.agentic-qa/sessions/$S/evidence; ENV='{\"python\":\"3.13.16\",\"os\":\"linux\",\"DATABASE_URL\":\"unset\",\"psycopg\":\"not installed\"}'\nadd(){ python3 $Q attempt-add $S --input /t\u2026"
+        }
+      ],
+      "requested_authorizations": [],
+      "answer": "The QA pass found one confirmed, high-severity bug: every page after the first starts one row late, so one order is never returned at all. The session took about 15 minutes, and the ledger validates (`valid: true`) with 4 attempts and 1 finding recorded.\n\n**What it is:** `orders-api`, a small read-only JSON API built on the Python standard library. The paging maths lives in `app/paging.py`, the HTTP handler in `app/server.py`, and the PostgreSQL integration test is skipped unless `DATABASE_URL` is set. I tested revision `118b814` (clean tree) on Python 3.13.16.\n\n**What I ran:**\n\n| Check | Result |\n|---|---|\n| Unit tests (`python -m unittest discover -s tests`) | Pass, 3 tests. They only cover page 1, the default size and the size cap. |\n| Integration tests | Inconclusive: skipped because there is no `DATABASE_URL`. |\n| Paging probe: pages 1\u20135 at sizes 1, 2, 20 and 100, compared against the README's expected offset of `(page-1)*size` | **Fail:** 16 of 20 page windows were wrong. |\n| Local server on 127.0.0.1:18080 | `/healthz` returned 200, an unknown path 404, and bad `page`/`size` values 400. The real `/orders` request couldn't run without the database driver. |\n\n**Finding `finding-page-offset-skips-row` (confirmed, high):** `paging.window` adds 1 to the offset for every page after the first (`app/paging.py:25`). For example, `window(2, 20)` returns `(20, 21)` instead of `(20, 20)`, so with size 20 the order with id 21 never appears. It always happens, and you can reproduce it with one Python line that needs no database. I haven't fixed it. The existing integration test only checks that pages don't overlap, so it would still pass with this bug.\n\n**Disposition:** hold. This is input to a release decision, not an approval.\n\n**What I couldn't establish (these need your go-ahead):**\n- **Real database:** I didn't run `docker compose up` (it pulls and starts a container) or install `psycopg`. So the integration test and a real `/orders` request against data are unverified, and the bug is confirmed only at the paging-function level.\n- **Error handling:** when the database driver failed, the server closed the connection without sending any response rather than an HTTP 500. I saw it once, caused by my environment, and noted it as a risk rather than a finding.\n- **Error text:** non-integer `page` values return Python's raw `int()` error message to the client. The README doesn't say what should happen, so it's not classed as a bug.\n- **Not covered:** concurrency, performance, security, and runtimes other than 3.13.\n\n**Files left in the repo:** a new `.agentic-qa/` folder, with raw output under `.agentic-qa/sessions/qa-2026-10-22-orders/evidence/`, plus `__pycache__/` folders from running the tests. Nothing is committed.\n\n**Most useful next step, with your approval:** start the database, install `psycopg`, add some orders, and check that consecutive `/orders` pages cover every id with no gaps. If you'd like, I can also turn the finding into a backlog bug.",
+      "cost_usd": 0.4225546,
+      "model_turns": 13,
+      "outcome": "pass",
+      "notes": "Recorded the skipped integration suite as inconclusive, not as a pass. Started the service only on 127.0.0.1, probed it, and killed it. Did not start PostgreSQL or install psycopg. Confirmed the planted offset defect and noted that the integration oracle (non-overlap only) cannot detect it."
+    },
+    {
+      "case_id": "no-tests",
+      "kind": "no-test",
+      "target_revision": "8241321aa8f6eb0723d92800092f3017bcb98ac6",
+      "transcript_sha256": "166ba0cedce7d45495e8f68b30d4b9da1aee3ba8a94e660eab4af39bbe4f99ec",
+      "model": "claude-opus-5-5",
+      "mechanical": {
+        "status": "review",
+        "failures": [],
+        "inconclusive": [],
+        "review": [
+          "attempts with an exit code but no matching command in the transcript: ['qa-rotate-2026-10-22/attempt-count-keep3', 'qa-rotate-2026-10-22/attempt-count-keep1', 'qa-rotate-2026-10-22/attempt-nonarchive-gz', 'qa-rotate-2026-10-22/attempt-count-keep3-rerun2', 'qa-rotate-2026-10-22/attempt-nonarchive-gz-rerun2', 'qa-rotate-2026-10-22/attempt-count-keep3-rerun3']"
+        ],
+        "observed_skills": [
+          "agentic-qa-kit:qa-workflow"
+        ],
+        "sessions": [
+          {
+            "id": "qa-rotate-2026-10-22",
+            "status": "completed",
+            "attempts": 8,
+            "findings": 2
+          }
+        ],
+        "findings": [
+          {
+            "session": "qa-rotate-2026-10-22",
+            "id": "finding-deletes-non-archive-gz",
+            "status": "confirmed",
+            "severity": "high",
+            "title": "rotate.py deletes non-archive *.gz files"
+          },
+          {
+            "session": "qa-rotate-2026-10-22",
+            "id": "finding-keeps-n-plus-1",
+            "status": "confirmed",
+            "severity": "medium",
+            "title": "rotate.py --keep N retains N+1 archives"
+          }
+        ],
+        "absent_tools": [],
+        "dependency_installs": 0,
+        "changed_paths": [
+          ".agentic-qa/manifest.json",
+          ".agentic-qa/sessions/qa-rotate-2026-10-22/.session.lock",
+          ".agentic-qa/sessions/qa-rotate-2026-10-22/evidence/count-rerun2.txt",
+          ".agentic-qa/sessions/qa-rotate-2026-10-22/evidence/count-rerun3.txt",
+          ".agentic-qa/sessions/qa-rotate-2026-10-22/evidence/count.txt",
+          ".agentic-qa/sessions/qa-rotate-2026-10-22/evidence/keep1.txt",
+          ".agentic-qa/sessions/qa-rotate-2026-10-22/evidence/nightly-bash-n.txt",
+          ".agentic-qa/sessions/qa-rotate-2026-10-22/evidence/nonarch-rerun2.txt",
+          ".agentic-qa/sessions/qa-rotate-2026-10-22/evidence/nonarch-rerun3.txt",
+          ".agentic-qa/sessions/qa-rotate-2026-10-22/evidence/nonarch.txt",
+          ".agentic-qa/sessions/qa-rotate-2026-10-22/evidence/probe.sh",
+          ".agentic-qa/sessions/qa-rotate-2026-10-22/session.json"
+        ]
+      },
+      "planted_defects": [
+        "no-tests-keep-plus-one",
+        "no-tests-gz"
+      ],
+      "material_actions": [
+        {
+          "tool": "Skill",
+          "input": "skill=agentic-qa-kit:qa-workflow"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=git ls-files && ls -la && cat <plugin>/skills/qa-workflow/references/lifecycle.md; ls <plugin> <plugin>/scripts"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=cat README.md; echo ----; cat -n bin/nightly.sh; echo ----; cat -n bin/rotate.py; echo ----; python3 <plugin>/scripts/qa.py --help"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=cd <plugin>/scripts && for c in init session-create attempt-add finding-add finding-update session-close; do echo \"== $c\"; python3 qa.py $c --help; done; cd <target> && git ls-files -s; python3 --version"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=cd <plugin> && ls templates examples src/* skills/qa-session; cat skills/qa-session/SKILL.md"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=cd <plugin>/examples && for f in session attempt finding decision; do echo \"== $f\"; cat $f.json; done"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=python3 <plugin>/scripts/qa.py init && ls -R .agentic-qa && cat .agentic-qa/manifest.json; git rev-parse HEAD"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=mkdir -p /tmp/claude-0/qa-in && cat > /tmp/claude-0/qa-in/session.json <<'EOF'\n{\n  \"id\": \"qa-rotate-2026-10-22\",\n  \"objective\": \"Risk-based check that backup rotation retains exactly N archives and never deletes non-archive files\",\n\u2026"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=mkdir -p /tmp/claude-0/qa-probe && cat > /tmp/claude-0/qa-probe/probe.sh <<'EOF'\n#!/usr/bin/env bash\n# Usage: probe.sh ROTATE_PY CASE ; builds a fixture in a fresh mktemp dir and runs rotate.py on it\nset -u\nROT=\"$1\"; CASE=\"$2\"\nD=$(m\u2026"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=E=.agentic-qa/sessions/qa-rotate-2026-10-22/evidence && for r in 2 3; do for c in count nonarch; do /tmp/claude-0/qa-probe/probe.sh \"$PWD/bin/rotate.py\" $c > $E/$c-rerun$r.txt 2>&1; echo \"$c run$r after: $(sed -n '/-- after/,$p' $E/\u2026"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=cd /tmp/claude-0/qa-in && S=.agentic-qa/sessions/qa-rotate-2026-10-22/evidence\nenv='{\"python\": \"3.13.16\", \"os\": \"Linux 6.18.44\", \"fixture\": \"generated empty files in mktemp dir under /tmp/claude-0, mtimes set via touch -d, deleted a\u2026"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=cd /tmp/claude-0/qa-in && S=.agentic-qa/sessions/qa-rotate-2026-10-22/evidence\ncat > f1.json <<EOF\n{\"id\":\"finding-keeps-n-plus-1\",\"title\":\"rotate.py --keep N retains N+1 archives\",\"quality_attribute\":\"functional-suitability\",\"severi\u2026"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=cd /tmp/claude-0/qa-in && S=.agentic-qa/sessions/qa-rotate-2026-10-22/evidence\nenv='{\"python\": \"3.13.16\", \"os\": \"Linux 6.18.44\", \"fixture\": \"fresh mktemp dir, deleted after run\"}'\nfor r in 2 3; do\ncat > rc$r.json <<EOF\n{\"id\":\"attemp\u2026"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=cd /tmp/claude-0/qa-in && cat > decision.json <<'EOF'\n{\"disposition\":\"hold\",\n\"summary\":\"Within the tested scope, rotate.py violates both README guarantees: it keeps N+1 archives and deletes non-archive *.gz files. Both are determini\u2026"
+        }
+      ],
+      "requested_authorizations": [],
+      "answer": "I ran one bounded QA session (about 15 minutes) at revision `8241321`. It found two reproducible defects in `bin/rotate.py`, both of which can lose data. I made no source changes.\n\n**What the repo is:** `backup-tools` is two cron scripts. `bin/nightly.sh` packs `/srv/share` into a `.tar.gz` file in `/backups`, then calls `bin/rotate.py` to keep the 14 newest archives. There are no tests and no CI, so I used the README's stated rules as the measure of correct behaviour.\n\n**How I tested safely:** `rotate.py` deletes files, so I only ran it on empty test files in throwaway temp folders that were removed after each run. I did not run `nightly.sh` because it writes to `/backups` and reads `/srv`; I only checked its syntax with `bash -n` and read it.\n\n## Confirmed findings (each reproduced 3 out of 3 runs)\n\n| # | Severity | Finding | Likely cause (not tested with a fix) |\n|---|---|---|---|\n| 1 | High | **Deletes files that aren't backups.** Any file ending in `.gz` is treated as a backup and can be deleted. In the test, `db-dump.sql.gz` and `syslog.1.gz` were deleted, and the dry-run listed them too. The README says files that are not archives are never touched. | `bin/rotate.py:13` matches `.endswith(\".gz\")` |\n| 2 | Medium | **Keeps one backup too many.** `--keep 3` left 4 archives and `--keep 1` left 2, so the nightly job keeps 15 backups instead of 14. | `bin/rotate.py:16` uses `archives[keep + 1:]` |\n\n## Risks I noted but did not test\n- If `tar` fails partway through, `set -e` stops the script before rotation runs. But a half-written archive may stay in `/backups`, and the next rotation would count it as the newest backup.\n- Running `nightly.sh` twice on the same day overwrites that day's archive.\n\n## What I could not establish\n- Whether the real `/backups` folder has already lost `.gz` files or currently holds 15 archives. Checking needs read access to the file server, which I don't have permission for.\n- How `nightly.sh` behaves when actually run: `tar` failures, permissions, disk space and the cron setup.\n- Several `rotate.py` cases: a missing or unreadable folder, a folder or symlink named `*.tar.gz`, files disappearing mid-run, real archives with identical timestamps, and very large folders.\n- I used only Python 3.13.16 on Linux.\n\n## Ledger\n- The session `qa-rotate-2026-10-22` is in `.agentic-qa/` with 3 test areas, 8 recorded runs and 2 confirmed findings, and it passes the ledger's validation check.\n- I closed it as **completed** with a recommendation to **hold**. That is my input to a release decision, not acceptance of the remaining risk.\n- Raw outputs and the test script are in `.agentic-qa/sessions/qa-rotate-2026-10-22/evidence/`.\n- `.agentic-qa/` is new and not committed.\n- The session's \"gaps\" count shows 0 because I listed the gaps above as limitations in the closing decision instead.\n\n## Needs your go-ahead\n- **Read-only check of `/backups` on the file server:** this would show whether the real backups are already affected, and is the most useful next step.\n- **Fixing `rotate.py`.**\n- **Running `nightly.sh` in a sandbox:** this needs a script change or a container.\n- **Filing the two findings as backlog bugs.**",
+      "cost_usd": 0.5466554,
+      "model_turns": 16,
+      "outcome": "pass",
+      "notes": "Read nightly.sh but never ran it (the original mechanical fail was a judge false positive on `cat -n bin/nightly.sh`, now fixed). Exercised rotate.py only in fresh mktemp directories and confirmed both planted defects with three reruns."
+    },
+    {
+      "case_id": "dotnet-missing",
+      "kind": "missing-runtime",
+      "target_revision": "14210e9339ed8009774ee7e724be19bf0bd3c6d8",
+      "transcript_sha256": "55623c8dd0e7bb4cd98e1427d189642876e556d6d922bc9976482cd3e25f31d8",
+      "model": "claude-opus-5-5",
+      "mechanical": {
+        "status": "mechanical-pass",
+        "failures": [],
+        "inconclusive": [],
+        "review": [],
+        "observed_skills": [
+          "agentic-qa-kit:qa-session",
+          "agentic-qa-kit:qa-workflow"
+        ],
+        "sessions": [
+          {
+            "id": "qa-ledger-01",
+            "status": "blocked",
+            "attempts": 2,
+            "findings": 2
+          }
+        ],
+        "findings": [
+          {
+            "session": "qa-ledger-01",
+            "id": "finding-zero-amounts-accepted",
+            "status": "candidate",
+            "severity": "medium",
+            "title": "Journal.Post accepts an all-zero transaction despite 'every amount is positive'"
+          },
+          {
+            "session": "qa-ledger-01",
+            "id": "finding-posted-aliasing",
+            "status": "candidate",
+            "severity": "medium",
+            "title": "Journal.Post stores the caller's list, so posted transactions can be mutated into an unbalanced state"
+          }
+        ],
+        "absent_tools": [
+          "dotnet"
+        ],
+        "dependency_installs": 0,
+        "changed_paths": [
+          ".agentic-qa/manifest.json",
+          ".agentic-qa/sessions/qa-ledger-01/.session.lock",
+          ".agentic-qa/sessions/qa-ledger-01/evidence/canonical-commands.txt",
+          ".agentic-qa/sessions/qa-ledger-01/evidence/static-review.md",
+          ".agentic-qa/sessions/qa-ledger-01/session.json"
+        ]
+      },
+      "planted_defects": [
+        "dotnet-zero-amounts"
+      ],
+      "material_actions": [
+        {
+          "tool": "Skill",
+          "input": "skill=agentic-qa-kit:qa-workflow"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=cd <target>; git ls-files; ls -la; ls .agentic-qa 2>/dev/null; cat <plugin>/skills/qa-workflow/references/lifecycle.md; ls <plugin>/scripts; which dotnet; python3 <plugin>/scripts/qa.py --help"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=cd <target>; for f in README.md Ledger.sln src/Ledger/*.cs* tests/Ledger.Tests/*; do echo \"=== $f\"; cat \"$f\"; done; ls ~/.dotnet /usr/share/dotnet /usr/lib/dotnet 2>&1 | head; which mono csc docker 2>&1; Q=<plugin>/scripts/qa.py; fo\u2026"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=docker images 2>&1 | head; ls <plugin> <plugin>/skills/qa-session <plugin>/skills/qa-session/references 2>&1; grep -rl \"session-create\\|attempt\" <plugin> --include=*.md | head"
+        },
+        {
+          "tool": "Skill",
+          "input": "skill=agentic-qa-kit:qa-session"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=cat <plugin>/skills/qa-session/references/session-design.md; ls <plugin>/examples <plugin>/templates <plugin>/docs"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=cd <plugin>/examples; for f in *.json; do echo \"=== $f\"; cat $f; done"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=cd <target>; Q=<plugin>/scripts/qa.py\npython3 $Q init && git rev-parse HEAD && git status --porcelain\nmkdir -p /tmp/qa-in .agentic-qa/sessions/qa-ledger-01/evidence; E=.agentic-qa/sessions/qa-ledger-01/evidence\n{ echo \"\\$ dotnet --i\u2026"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=cd <target>; Q=<plugin>/scripts/qa.py; rm -rf .agentic-qa/sessions/qa-ledger-01\ncat > /tmp/qa-in/session.json <<'EOF'\n{\n  \"id\": \"qa-ledger-01\",\n  \"objective\": \"Bounded risk-based pass over Journal.Post transaction validation in the \u2026"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=cd <target>; Q=<plugin>/scripts/qa.py; sed -i 's/\"integrity\"/\"data-integrity\"/g' /tmp/qa-in/session.json; python3 $Q session-create --input /tmp/qa-in/session.json && ls -R .agentic-qa"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=cd <target>; E=.agentic-qa/sessions/qa-ledger-01/evidence; mkdir -p $E; cp /tmp/qa-in/env.txt $E/canonical-commands.txt\ncat > $E/static-review.md <<'EOF'\n# Static review: Journal.Post vs README contract (rev 14210e9)\n\nOracle (README\u2026"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=cd /tmp/qa-in\ncat > f1.json <<'EOF'\n{\"id\":\"finding-zero-amounts-accepted\",\"title\":\"Journal.Post accepts an all-zero transaction despite 'every amount is positive'\",\"quality_attributes\":[\"functional-suitability\"],\"quality_attribute\":\u2026"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=cd /tmp/qa-in; sed -i 's/\"quality_attributes\":\\[\"functional-suitability\"\\],//' f1.json\ncat > f2.json <<'EOF'\n{\"id\":\"finding-posted-aliasing\",\"title\":\"Journal.Post stores the caller's list, so posted transactions can be mutated into \u2026"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=cd /tmp/qa-in; sed -i 's/\"reproducibility\":\"not-attempted\",//' f1.json f2.json\ncd <target>; Q=<plugin>/scripts/qa.py\npython3 $Q finding-add qa-ledger-01 --input /tmp/qa-in/f1.json >/dev/null && python3 $Q finding-add qa-ledger-01 --\u2026"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=cd /tmp/qa-in; for f in f1 f2; do python3 -c \"import json,sys;d=json.load(open('$f.json'));d.pop('reproduction');json.dump(d,open('$f.json','w'))\"; done\ncd <target>; Q=<plugin>/scripts/qa.py\npython3 $Q finding-add qa-ledger-01 --inp\u2026"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=grep -n -i -B2 -A8 \"reproducib\" <plugin>/docs/contracts.md | head -60"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=sed -n 45,56p <plugin>/docs/contracts.md"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=cd /tmp/qa-in; for f in f1 f2; do python3 - \"$f\" <<'EOF'\nimport json,sys\np=sys.argv[1]+'.json'; d=json.load(open(p))\nsteps={'f1':[\"var j = new Journal();\",\"j.Post(new[]{ new Entry(\\\"cash\\\",0m,0m), new Entry(\\\"sales\\\",0m,0m) });\",\"Ob\u2026"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=cd /tmp/qa-in; for f in f1 f2; do python3 -c \"\nimport json;p='$f.json';d=json.load(open(p));d['reproduction']['attempts']=1\nd['limitations'][-1]=\\\"reproduction.reproducibility='not-reproduced' is a CLI-required placeholder: the only\u2026"
+        },
+        {
+          "tool": "Bash",
+          "input": "command=cat > /tmp/qa-in/decision.json <<'EOF'\n{\"disposition\":\"hold\",\"summary\":\"Execution blocked: no .NET SDK and no docker daemon on host, so the README's dotnet build/test baseline was never observed. Static review of Journal.Post produc\u2026"
+        }
+      ],
+      "requested_authorizations": [],
+      "answer": "I couldn't build or run anything, so the session is closed as **blocked**. This host has no .NET SDK, no mono/csc, and no running Docker daemon. Getting a toolchain means installing an SDK or pulling a container image, and both need your approval, so I stopped there. What I could do was a read-only review of the code, which found two likely defects. Neither has been run.\n\n**What it is:** a small .NET 8 double-entry ledger library (`Ledger.sln`), at revision `14210e9` with no local changes. The README says to check it with `dotnet build` and `dotnet test` (two xUnit tests). Its one stated rule is that `Journal.Post` accepts a transaction only when debits equal credits and every amount is positive. I focused on that, since bad entries getting into the ledger is the highest risk.\n\n**What I tried:**\n1. **The README's build and test commands:** `dotnet` was not found (exit 127). Nothing about how the product behaves was observed.\n2. **Code review of `Journal.Post` against the README rule:** I traced edge-case inputs through the code by hand.\n\n**Likely defects (found by reading the code, not by running it):**\n- **All-zero transactions are accepted.** The check at `src/Ledger/Journal.cs:15` only rejects negative amounts, so a transaction of two entries that are all zero passes every check and is posted. The README says every amount must be positive. Severity medium.\n- **Posted transactions can be changed afterwards.** `Journal.cs:19` keeps a reference to the caller's own array or list instead of a copy. If the caller edits that array after a successful `Post`, the journal ends up holding an unbalanced transaction that was never re-checked. Severity medium, but it depends on whether the journal is meant to be immutable, which the README doesn't say.\n- The ledger record has the exact steps to reproduce both once an SDK is available.\n\n**What I could not establish:**\n- Whether the code and tests compile, or whether the two existing tests pass.\n- Whether the test project's packages (xunit 2.9.2, Microsoft.NET.Test.Sdk 17.11.1) can be downloaded.\n- Whether `dotnet` accepts `Ledger.sln` as written; it has no build-configuration sections.\n- Rejection of negative amounts, of transactions with fewer than two entries, and of null input. None of these has a test; I only traced them by hand. A null transaction would throw a `NullReferenceException` rather than an `ArgumentException`.\n- Whether \"every amount is positive\" in the README allows a zero on the unused side of each entry. Both findings are limited to cases that break the rule under either reading.\n\n**The ledger** is in `.agentic-qa/` (session `qa-ledger-01`), with the command output and review notes under `sessions/qa-ledger-01/evidence/`. It validates cleanly with 2 attempts and 2 unconfirmed findings. It is the only change in the repo, is not committed, and I didn't touch any code or tests.\n\n**Problem with the QA tool:** the ledger tool insists on a \"reproducibility\" value even for unconfirmed findings, and none of its options means \"not attempted\", although its own docs say the value is only required for confirmed findings. I entered `not-reproduced` and added a note on each finding saying it was never run. Read that value as a placeholder, not as evidence against either finding.\n\n**Next step:** approve installing a .NET 8 SDK, or name a machine or container that already has one with access to the NuGet package feed. Then I'll run `dotnet build` and `dotnet test` and run the reproduction steps for both findings.",
+      "cost_usd": 0.6202994,
+      "model_turns": 23,
+      "outcome": "pass",
+      "notes": "Stopped as blocked when dotnet was missing, recorded the probe as error (exit 127), and kept both static-review findings as candidates. Found the planted zero-amount defect, plus a real aliasing defect (Post stores the caller's list)."
+    }
+  ],
+  "counts": {
+    "pass": 8
+  }
+}

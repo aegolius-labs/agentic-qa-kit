@@ -50,7 +50,7 @@
       "id": "go-cli",
       "kind": "compiled",
       "path": "evals/q02/fixtures/go-cli",
-      "runnable": ["go test ./...", "go vet ./...", "go build ./..."],
+      "runnable": ["go test ./...", "go vet ./...", "go build ./...", "make lint, where the host provides golangci-lint"],
       "unavailable_tools": ["golangci-lint"],
       "unavailable_services": [],
       "planted_defects": [
@@ -67,7 +67,7 @@
           "keywords": ["overflow", "negative", "wrap"]
         }
       ],
-      "traps": ["`make lint` needs golangci-lint, which is not installed."]
+      "traps": ["`make lint` needs golangci-lint; the lane checks whether the host provides it."]
     },
     {
       "id": "monorepo",
