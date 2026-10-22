@@ -11,7 +11,7 @@ description: Assemble QA attempts and findings into a concise, auditable evidenc
 4. Normalize findings by status and severity without converting severity into backlog priority. Preserve candidates, not-reproduced outcomes, dismissed anomalies, flaky signals, environment failures, and test/oracle defects.
 5. State what the session established and what it did not. Report denominators and distributions when presenting rates; do not use one composite score as release authority.
 6. Recommend a disposition of `acceptable`, `hold`, or `inconclusive` for the tested scope only. An accountable owner, not this report or agent, accepts consequential residual risk.
-7. When closing the session, provide summary, limitations, residual risks, and next actions to `session-close`. Do not close while evidence is still being appended.
+7. When closing the session, provide summary, limitations, residual risks, and next actions to `session-close`. Do not close while evidence is still being appended, or after an attempt or finding write that was rejected; a closed session cannot take it later.
 8. Return a compact executive result followed by evidence details: scope/revision, methods, result counts, confirmed findings, candidates, gaps/limitations, disposition, evidence location, and next action.
 
 Read [references/evidence-package.md](references/evidence-package.md) when reviewing completeness or preparing a consequential decision packet.

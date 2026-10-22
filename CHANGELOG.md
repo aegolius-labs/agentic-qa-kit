@@ -8,6 +8,14 @@ computed version and promotes that section when it publishes.
 
 ## [Unreleased]
 
+### Fixed
+
+- `qa-session` tells the agent to check each ledger write's exit status before
+  the next one and never to chain ledger writes with `;`. `qa-report` does not
+  close a session after a rejected attempt or finding write. A Q02 run had
+  closed a session without the findings whose write had been rejected
+  (Q02-F01).
+
 ## [0.1.2] - 2026-10-22
 
 ### Fixed
