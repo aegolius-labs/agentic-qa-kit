@@ -1,0 +1,5 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ledger", "src\Ledger\Ledger.csproj", "{6A1F7E21-1C3B-4E7B-9E3F-1A2B3C4D5E61}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ledger.Tests", "tests\Ledger.Tests\Ledger.Tests.csproj", "{6A1F7E21-1C3B-4E7B-9E3F-1A2B3C4D5E62}"
+EndProject
