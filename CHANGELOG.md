@@ -8,6 +8,15 @@ computed version and promotes that section when it publishes.
 
 ## [Unreleased]
 
+### Fixed
+
+- Once a finding leaves `candidate`, the ledger rejects changes to its
+  severity, acceptance criteria and reproduction preconditions, steps and
+  reproducibility (Q09-F04, owner decision 2026-10-22). Linking a new attempt
+  still updates `reproduction.attempts`.
+
+## [0.1.1] - 2026-10-19
+
 ### Changed
 
 - `qa-session` and `qa-reproduce` state that a bounded concurrency probe

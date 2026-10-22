@@ -167,9 +167,43 @@ class StoreTests(unittest.TestCase):
     def test_every_settled_field_is_fixed_once_confirmed(self) -> None:
         self.store.add_attempt("qa-example", attempt_input())
         self.store.add_finding("qa-example", confirmed_finding())
-        for field in ("title", "summary", "expected", "actual", "oracle"):
+        rewrites = {field: "Rewritten." for field in ("title", "summary", "expected", "actual", "oracle")}
+        rewrites["severity"] = "low"
+        rewrites["acceptance_criteria"] = ["Any total is accepted"]
+        for field, value in rewrites.items():
             with self.subTest(field=field), self.assertRaisesRegex(ValidationError, f"finding.{field} is fixed"):
-                self.store.update_finding("qa-example", "finding-rounding", {field: "Rewritten."})
+                self.store.update_finding("qa-example", "finding-rounding", {field: value})
+        reproduction = confirmed_finding()["reproduction"]
+        for field, value in (
+            ("preconditions", ["A different configuration"]),
+            ("steps", ["Calculate a total of 10.005"]),
+            ("reproducibility", "always"),
+        ):
+            with self.subTest(field=f"reproduction.{field}"):
+                with self.assertRaisesRegex(ValidationError, f"finding.reproduction.{field} is fixed"):
+                    self.store.update_finding(
+                        "qa-example", "finding-rounding", {"reproduction": dict(reproduction, **{field: value})}
+                    )
+        stored = self.store.load_session("qa-example")["findings"][0]
+        self.assertEqual(stored["severity"], "high")
+        self.assertEqual(stored["reproduction"], reproduction)
+
+    def test_confirmed_finding_still_links_new_attempts(self) -> None:
+        self.store.add_attempt("qa-example", attempt_input())
+        self.store.add_finding("qa-example", confirmed_finding())
+        later = attempt_input()
+        later["id"] = "attempt-later"
+        self.store.add_attempt("qa-example", later)
+        finding = confirmed_finding()
+        updated = self.store.update_finding(
+            "qa-example",
+            "finding-rounding",
+            {
+                "attempt_ids": finding["attempt_ids"] + ["attempt-later"],
+                "reproduction": dict(finding["reproduction"], attempts=2),
+            },
+        )
+        self.assertEqual(updated["reproduction"]["attempts"], 2)
 
     def test_every_history_field_rejects_removal_and_rewrite(self) -> None:
         self.store.add_attempt("qa-example", attempt_input())
