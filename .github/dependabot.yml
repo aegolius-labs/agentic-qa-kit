@@ -1,0 +1,12 @@
+# The kit has no runtime dependencies. The npm manifests under
+# evals/q02/fixtures/ are synthetic evaluation targets that are never
+# installed, so Dependabot must not raise alerts or open updates for them.
+version: 2
+updates:
+  - package-ecosystem: "npm"
+    directory: "/"
+    exclude-paths:
+      - "evals/q02/fixtures/**"
+    schedule:
+      interval: "monthly"
+    open-pull-requests-limit: 0
