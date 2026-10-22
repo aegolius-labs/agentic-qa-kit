@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+from pathlib import Path
 from typing import Any
 
 from .model import ValidationError
@@ -40,6 +41,16 @@ def canonical(payload: Any) -> bytes:
 
 def digest(payload: Any) -> str:
     return "sha256:" + hashlib.sha256(canonical(payload)).hexdigest()
+
+
+def file_digest(path: Path) -> str:
+    """SHA-256 of a file's bytes, in the same `sha256:<hex>` form."""
+
+    hasher = hashlib.sha256()
+    with open(path, "rb") as stream:
+        for block in iter(lambda: stream.read(1 << 16), b""):
+            hasher.update(block)
+    return "sha256:" + hasher.hexdigest()
 
 
 def state_digest(session: dict[str, Any]) -> str:

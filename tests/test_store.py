@@ -144,7 +144,10 @@ class StoreTests(unittest.TestCase):
     def test_validate_all_reports_counts(self) -> None:
         self.store.add_attempt("qa-example", attempt_input())
         self.store.add_finding("qa-example", candidate_finding())
-        self.assertEqual(self.store.validate_all(), {"sessions": 1, "chained": 1, "unchained": 0, "attempts": 1, "findings": 1})
+        self.assertEqual(
+            self.store.validate_all(),
+            {"sessions": 1, "chained": 1, "unchained": 0, "attempts": 1, "findings": 1, "evidence_verified": 0, "evidence_missing": 0},
+        )
 
 
     def test_update_cannot_rewrite_a_confirmed_observation(self) -> None:

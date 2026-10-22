@@ -48,7 +48,7 @@ An attempt records the action actually performed, not a proposed command:
 - outcome: `pass`, `fail`, `inconclusive`, or `error`;
 - exit code when applicable;
 - observation and oracle used; and
-- evidence references with kind, location, and optional digest.
+- evidence references with kind, location, and a digest that the ledger computes for repository files (see Evidence files).
 
 Retries never replace the first result.
 
@@ -101,6 +101,23 @@ Sessions created before schema version 2 stay valid and `unchained`. Writes to
 them still work and add no receipts. `migrate <session>` seals one as version
 2 with a single `migrate` receipt. Everything before that receipt is
 unverified, and the operation name records that.
+
+### Evidence files
+
+When an attempt or finding is written, each evidence reference whose
+`location` is a relative path to a file inside the repository gets a
+`sha256:<hex>` digest of that file, so the receipt seals the digest too. A
+digest the caller supplies in that form must match the file, or the write is
+refused; a digest in any other form is kept as declared and never checked. A
+URL, an absolute path, a path outside the repository or a file that does not
+exist yet gets no digest. A finding update digests only the evidence entries it
+adds; an earlier entry restated without its digest keeps the one it had.
+
+`validate` re-hashes every digested file that is still present and fails when
+one changed. It reports `evidence_verified` and `evidence_missing` counts. A
+missing file is counted, not failed, because evidence is often kept out of
+version control and a fresh clone lacks it; a missing file proves nothing
+either way.
 
 ## Concurrent writers
 
