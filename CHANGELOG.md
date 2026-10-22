@@ -8,6 +8,8 @@ computed version and promotes that section when it publishes.
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-10-22
+
 ### Added
 
 - Chained evidence receipts (Q03). New sessions use schema version 2 and seal
