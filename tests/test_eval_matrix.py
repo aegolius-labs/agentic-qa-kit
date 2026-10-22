@@ -90,6 +90,17 @@ class EvalMatrixTests(unittest.TestCase):
             self.assertTrue(setup["fresh_task"])
             self.assertEqual(case["target_skill"], setup["target_skill"])
 
+    def test_positive_workflow_cases_allow_their_stage_skills(self):
+        # qa-workflow enters these stages itself (Q01-G07); handoff stays
+        # unlisted because it needs a confirmed defect the cases never have.
+        stages = ["qa-discover", "qa-session", "qa-reproduce", "qa-report"]
+
+        for case in self.cases:
+            if case["target_skill"] != "qa-workflow":
+                continue
+            expected = stages if case["expected_activation"] else []
+            self.assertEqual(expected, case["expected_companions"], case["id"])
+
 
 if __name__ == "__main__":
     unittest.main()

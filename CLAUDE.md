@@ -72,6 +72,14 @@ first installed copy forever. `tests/test_host_manifest_parity.py` fails if a
 version is added back. Any other warning from either manifest is a failure, and
 `skills/` must keep passing `--strict`.
 
+Since Claude Code 2.1.307 the plugin manifest validation also runs a subset of
+the plugin directory's checks, which do not change the result. It reports
+`ICON_MISSING` and notes that this folder also holds a marketplace manifest.
+Both are accepted: the kit is not submitted to the plugin directory, the note
+is informational, and a listing icon can be set only once, at first
+submission, so choosing one is the owner's decision. CI pins Claude Code
+2.1.307.
+
 `python scripts/validate_plugin.py` runs all three validations and enforces
 exactly this: CI runs it on every pull request. If an accepted warning changes,
 update its allowlist and this section together.

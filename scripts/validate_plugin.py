@@ -24,6 +24,10 @@ CHECKS: tuple[tuple[str, bool, tuple[str, ...]], ...] = (
         (
             "version: No version specified",
             "root: CLAUDE.md at the plugin root is not loaded as project context",
+            # Plugin directory checks, which do not change the result. The kit
+            # is not submitted to the directory, and its icon is the owner's call.
+            ".claude-plugin/plugin.json icon: No icon (ICON_MISSING)",
+            "This folder also holds a marketplace manifest.",
         ),
     ),
     (

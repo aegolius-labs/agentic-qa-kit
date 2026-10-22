@@ -8,6 +8,8 @@ computed version and promotes that section when it publishes.
 
 ## [Unreleased]
 
+## [0.1.2] - 2026-10-22
+
 ### Fixed
 
 - Once a finding leaves `candidate`, the ledger rejects changes to its
