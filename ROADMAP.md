@@ -127,8 +127,7 @@ decided Q01-F08 on 2026-10-19, so Q01 meets its done-when. The desktop surface
 Q09 met its done-when on 2026-10-16. Two self-QA sessions ran through the
 installed plugin (see the [Q09 report](docs/q09-self-qa-2026-10-16.md)). They
 found a critical lost-update defect in the ledger and a history-rewrite defect,
-and both are fixed. The owner decided Q09-F04 on 2026-10-22 and it is fixed; one
-unhonored manifest field (Q09-F05) remains.
+and both are fixed. The owner decided Q09-F04 and Q09-F05 on 2026-10-22, and both are fixed.
 
 0.1.0 was published on 2026-10-19 and M7 is complete.
 
@@ -285,7 +284,7 @@ ledger-chaining hazard (Q02-F01) and a measured payload-discovery cost for Q07
   - [x] Q09-F02: `finding-update` could rewrite a confirmed finding's `actual`, `expected` and `recorded_at` and erase a candidate's evidence. History fields are now append-only and observation fields are fixed once a finding leaves `candidate` (2026-10-16).
   - [x] Q09-F03: Five of the new finding-history rules had no test that fails when their guard is removed (found by `qa-q09-rc-010`). Every settled and append-only field now has one, and each guard removal fails the suite (2026-10-16).
   - [x] Q09-F04: A confirmed finding's reproduction, severity and acceptance criteria could still change without trace. Owner decision (2026-10-22): lock them. Once a finding leaves `candidate`, the ledger rejects changes to its severity, acceptance criteria and reproduction preconditions, steps and reproducibility; `reproduction.attempts` still counts newly linked attempts.
-  - [ ] Q09-F05: `.agentic-qa/manifest.json` `defaults.evidence_root` is validated but never used. Either honor it or drop it from the contract.
+  - [x] Q09-F05: `.agentic-qa/manifest.json` `defaults.evidence_root` was validated but never used. Owner decision (2026-10-22): honor it. The ledger stores sessions under it and refuses a root that resolves outside the repository.
   - [x] Q09-F06: `CLAUDE.md` under-stated the plugin manifest's accepted validator warnings (2026-10-16).
   - [x] Q09-F07: The roadmap's date and its links to uncommitted Q01 results had gone stale (2026-10-16).
   - [ ] Q09-G01: Probe concurrent writes on Windows and macOS, and interrupted writes with authorization; the 2026-10-16 sessions covered Linux and Python 3.13 only.
