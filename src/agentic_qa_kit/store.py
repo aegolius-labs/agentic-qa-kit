@@ -31,9 +31,11 @@ FINDING_TRANSITIONS = {
 # History a finding accumulates. Entries may be appended, never removed or
 # rewritten, so an update cannot erase evidence that was already recorded.
 APPEND_ONLY_FINDING_FIELDS = ("attempt_ids", "evidence", "limitations")
-# What was observed. Fixed once a finding leaves `candidate`; a later
-# observation belongs in a new attempt or a continuation, not in an edit.
-SETTLED_FINDING_FIELDS = ("title", "summary", "expected", "actual", "oracle")
+# What was observed and what it means. Fixed once a finding leaves `candidate`;
+# a later observation belongs in a new attempt or a continuation, not in an edit.
+SETTLED_FINDING_FIELDS = ("title", "summary", "expected", "actual", "oracle", "severity", "acceptance_criteria")
+# `reproduction.attempts` stays out: it counts `attempt_ids`, which may grow.
+SETTLED_REPRODUCTION_FIELDS = ("preconditions", "steps", "reproducibility")
 
 
 @contextmanager
@@ -83,6 +85,12 @@ def _check_finding_history(current: dict[str, Any], updated: dict[str, Any]) -> 
             if updated.get(field) != current.get(field):
                 raise ValidationError(
                     f"finding.{field} is fixed once a finding is {current['status']}; record new observations as attempts"
+                )
+        for field in SETTLED_REPRODUCTION_FIELDS:
+            if updated["reproduction"].get(field) != current["reproduction"].get(field):
+                raise ValidationError(
+                    f"finding.reproduction.{field} is fixed once a finding is {current['status']}; "
+                    "record new observations as attempts"
                 )
 
 

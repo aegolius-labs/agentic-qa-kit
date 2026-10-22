@@ -63,7 +63,7 @@ A finding update keeps its history:
 
 - `recorded_at` never changes;
 - `attempt_ids`, `evidence` and `limitations` only grow, and existing entries are never removed or rewritten; and
-- once a finding leaves `candidate`, its `title`, `summary`, `expected`, `actual` and `oracle` are fixed. A later observation is a new attempt, or a continuation when the session is closed.
+- once a finding leaves `candidate`, its `title`, `summary`, `expected`, `actual`, `oracle`, `severity`, `acceptance_criteria` and reproduction `preconditions`, `steps` and `reproducibility` are fixed (owner decision on Q09-F04, 2026-10-22). `reproduction.attempts` still counts the linked attempts as they grow. A later observation is a new attempt, or a continuation when the session is closed.
 
 ## Concurrent writers
 
