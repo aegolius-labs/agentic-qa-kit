@@ -8,6 +8,8 @@ computed version and promotes that section when it publishes.
 
 ## [Unreleased]
 
+## [0.1.3] - 2026-10-22
+
 ### Fixed
 
 - `qa-session` tells the agent to check each ledger write's exit status before
