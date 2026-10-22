@@ -20,7 +20,7 @@ from .model import (
     validate_manifest,
     validate_session,
 )
-from .receipts import append_receipt, chain_problems, integrity
+from .receipts import append_receipt, chain_problems, file_digest, integrity
 
 
 FINDING_TRANSITIONS = {
@@ -254,6 +254,63 @@ class KitStore:
                 )
         return session
 
+    def evidence_file(self, location: str) -> Path | None:
+        """The repository file an evidence location names, or None.
+
+        Only a relative location that resolves to a regular file inside the
+        repository qualifies; a URL, an absolute path, a directory or a path
+        that escapes the repository is left alone.
+        """
+
+        if "://" in location or Path(location).is_absolute():
+            return None
+        resolved = (self.root / location).resolve()
+        if self.root not in resolved.parents or not resolved.is_file():
+            return None
+        return resolved
+
+    def _seal_evidence(self, entries: list[dict[str, Any]], where: str) -> None:
+        """Digest new evidence files, and check a digest the caller supplied.
+
+        A `sha256:` digest is compared with the file; a mismatch is refused,
+        because it records evidence that is not the file on disk. Any other
+        digest form is kept as declared and is not checked.
+        """
+
+        for index, entry in enumerate(entries):
+            path = self.evidence_file(entry["location"])
+            if path is None:
+                continue
+            actual = file_digest(path)
+            declared = entry.get("digest")
+            if declared is None:
+                entry["digest"] = actual
+            elif declared.startswith("sha256:") and declared != actual:
+                raise ValidationError(
+                    f"{where}[{index}].digest does not match the file at {entry['location']}"
+                )
+
+    def evidence_problems(self, session: dict[str, Any]) -> tuple[list[str], int, int]:
+        """Changed evidence files, and counts of verified and missing ones."""
+
+        problems: list[str] = []
+        verified = missing = 0
+        records = [("attempt", item) for item in session["attempts"]]
+        records += [("finding", item) for item in session["findings"]]
+        for kind, record in records:
+            for entry in record.get("evidence") or []:
+                declared = entry.get("digest")
+                if not declared or not declared.startswith("sha256:"):
+                    continue
+                path = self.evidence_file(entry["location"])
+                if path is None:
+                    missing += 1
+                elif file_digest(path) != declared:
+                    problems.append(f"{kind} {record['id']} evidence {entry['location']} changed after it was recorded")
+                else:
+                    verified += 1
+        return problems, verified, missing
+
     def _commit(self, session: dict[str, Any], op: str, subject: str | None) -> None:
         if session["schema_version"] == SESSION_SCHEMA_VERSION:
             append_receipt(session, op, subject, utc_now())
@@ -284,6 +341,7 @@ class KitStore:
         if session["status"] in TERMINAL_SESSION_STATUSES:
             raise ValidationError("cannot add an attempt to a terminal session")
         attempt = normalize_attempt(input_payload)
+        self._seal_evidence(attempt["evidence"], "attempt.evidence")
         charter_ids = {charter["id"] for charter in session["charters"]}
         if attempt["charter_id"] not in charter_ids:
             raise ValidationError(f"unknown charter ID: {attempt['charter_id']}")
@@ -307,6 +365,7 @@ class KitStore:
         if session["status"] in TERMINAL_SESSION_STATUSES:
             raise ValidationError("cannot add a finding to a terminal session")
         finding = normalize_finding(input_payload)
+        self._seal_evidence(finding["evidence"], "finding.evidence")
         if finding["id"] in {item["id"] for item in session["findings"]}:
             raise ValidationError(f"finding already exists: {finding['id']}")
         unknown_attempts = sorted(set(finding["attempt_ids"]) - {item["id"] for item in session["attempts"]})
@@ -334,6 +393,12 @@ class KitStore:
         merged.update(input_payload)
         merged["id"] = finding_id
         updated = normalize_finding(merged)
+        recorded = current.get("evidence") or []
+        for before, entry in zip(recorded, updated["evidence"]):
+            # A caller restating an earlier entry need not repeat its digest.
+            if "digest" in before and "digest" not in entry and {**entry, "digest": before["digest"]} == before:
+                entry["digest"] = before["digest"]
+        self._seal_evidence(updated["evidence"][len(recorded):], "finding.evidence")
         if updated["status"] not in FINDING_TRANSITIONS[current["status"]]:
             raise ValidationError(f"invalid finding transition: {current['status']} -> {updated['status']}")
         _check_finding_history(current, updated)
@@ -389,13 +454,24 @@ class KitStore:
             for session in sessions
             if integrity(session) == "broken"
         }
+        changed: list[str] = []
+        verified = missing = 0
+        for session in sessions:
+            problems, ok, absent = self.evidence_problems(session)
+            changed.extend(f"{session['id']}: {problem}" for problem in problems)
+            verified += ok
+            missing += absent
         if broken:
             details = "; ".join(f"{sid}: {problems[0]}" for sid, problems in sorted(broken.items()))
             raise ValidationError(f"integrity check failed for {len(broken)} session(s): {details}")
+        if changed:
+            raise ValidationError(f"{len(changed)} evidence file(s) changed after they were recorded: {changed[0]}")
         return {
             "sessions": len(sessions),
             "chained": sum(1 for item in sessions if integrity(item) == "chained"),
             "unchained": sum(1 for item in sessions if integrity(item) == "unchained"),
             "attempts": sum(len(item["attempts"]) for item in sessions),
             "findings": sum(len(item["findings"]) for item in sessions),
+            "evidence_verified": verified,
+            "evidence_missing": missing,
         }

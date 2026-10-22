@@ -8,6 +8,15 @@ computed version and promotes that section when it publishes.
 
 ## [Unreleased]
 
+### Added
+
+- Evidence-file digests (Q03-G01). Attempt and finding writes record a
+  SHA-256 digest of each evidence file inside the repository, and refuse a
+  supplied digest that does not match the file. `validate` fails when a
+  digested file changed and reports `evidence_verified` and `evidence_missing`.
+
+## [0.2.1] - 2026-10-22
+
 ### Fixed
 
 - The ledger now stores sessions under the manifest's `defaults.evidence_root`

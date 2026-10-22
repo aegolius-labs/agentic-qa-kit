@@ -21,7 +21,7 @@ class Q01FixtureTests(unittest.TestCase):
             self.assertEqual(result["finding_id"], "F-001")
             self.assertEqual(
                 KitStore(root).validate_all(),
-                {"sessions": 1, "chained": 1, "unchained": 0, "attempts": 1, "findings": 1},
+                {"sessions": 1, "chained": 1, "unchained": 0, "attempts": 1, "findings": 1, "evidence_verified": 2, "evidence_missing": 0},
             )
             session = KitStore(root).load_session("q01-fixture")
             self.assertEqual(session["status"], "completed")
