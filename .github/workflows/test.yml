@@ -51,7 +51,7 @@ jobs:
         with:
           python-version: "3.11"
       - name: Install Claude Code's bundled validator
-        run: npm install --global @anthropic-ai/claude-code@2.1.300
+        run: npm install --global @anthropic-ai/claude-code@2.1.307
       - name: Validate manifests and skills
         run: python scripts/validate_plugin.py
 
