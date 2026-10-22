@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Subscribe</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <form id="signup" novalidate>
+    <h1>Get the monthly digest</h1>
+    <input id="email" type="email" placeholder="Email address" autocomplete="email">
+    <label for="name">Display name (optional)</label>
+    <input id="name" type="text" maxlength="40">
+    <label><input id="consent" type="checkbox"> I agree to receive email</label>
+    <p id="error" class="error" hidden></p>
+    <div class="submit" onclick="document.getElementById('signup').requestSubmit()">Subscribe</div>
+  </form>
+  <script src="validate.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

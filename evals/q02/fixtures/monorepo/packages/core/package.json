@@ -1,0 +1,7 @@
+{
+  "name": "@booking/core",
+  "version": "0.9.0",
+  "type": "module",
+  "main": "src/index.js",
+  "scripts": { "test": "node --test", "build": "echo nothing to build" }
+}

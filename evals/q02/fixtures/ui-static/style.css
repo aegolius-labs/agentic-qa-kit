@@ -1,0 +1,4 @@
+body { font-family: system-ui, sans-serif; max-width: 28rem; margin: 3rem auto; }
+input[type=email], input[type=text] { display: block; width: 100%; margin: .25rem 0 1rem; padding: .5rem; }
+.error { color: #f66; }
+.submit { background: #ddd; color: #fff; padding: .6rem 1rem; display: inline-block; cursor: pointer; }

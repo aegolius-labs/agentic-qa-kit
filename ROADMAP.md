@@ -61,7 +61,7 @@ Claude Code is the primary host and Codex is supported alongside it. `skills/` i
 - [x] Define bounded session execution with attempt-level recording and explicit stop conditions.
 - [x] Define controlled reproduction and minimization with honest inconclusive outcomes.
 - [x] Define evidence/package and backlog handoff workflows.
-- [ ] Forward-test all six skills against representative Python, JavaScript/TypeScript, compiled, monorepo, and no-test codebases.
+- [ ] Forward-test all six skills against representative Python, JavaScript/TypeScript, compiled, monorepo, and no-test codebases. Q02 (2026-10-22) covered discovery and core sessions through `qa-workflow`. `qa-reproduce`, `qa-report` and `qa-backlog-handoff` were not each invoked on every fixture.
 - [ ] Add evaluation cases for dirty worktrees, missing runtimes, flaky tests, generated code, external services, and permission denial.
 
 ### M4 - Technique and quality-attribute packs
@@ -130,8 +130,15 @@ found a critical lost-update defect in the ledger and a history-rewrite defect,
 and both are fixed. The owner decided Q09-F04 on 2026-10-22 and it is fixed; one
 unhonored manifest field (Q09-F05) remains.
 
-0.1.0 was published on 2026-10-19 and M7 is complete. Q02, forward-testing
-heterogeneous repositories, is next on the critical path.
+0.1.0 was published on 2026-10-19 and M7 is complete.
+
+Q02 met its done-when on 2026-10-22 on the Claude Code CLI lane. Eight
+synthetic fixtures (Python, TypeScript, Go, monorepo, static UI,
+database-backed service, no tests, and a missing .NET runtime) each got one
+fresh session. All 8 completed or stopped honestly. Every planted defect was
+found, and no command, runtime or verdict was invented. The run surfaced one
+ledger-chaining hazard (Q02-F01) and a measured payload-discovery cost for Q07
+(Q02-O01). Q03, Q04 and Q05 are next on the critical path.
 
 ## Ranked work items
 
@@ -168,12 +175,19 @@ heterogeneous repositories, is next on the critical path.
 
 ### Q02 - Forward-test heterogeneous repositories
 
-- **Status:** Not started
+- **Status:** Complete for its done-when on the Claude Code CLI lane; follow-up items remain open
 - **Importance:** Critical
 - **Complexity:** Hard
 - **Depends on:** Q01 Claude Code lane
 - **Approach:** Use disposable fixtures representing Python, TypeScript, compiled, monorepo, UI, service, and no-test projects. Preserve raw session artifacts and compare behavior against evidence contracts.
 - **Done when:** Discovery and core sessions complete or stop honestly on every fixture, with no invented commands, runtimes, or verdicts.
+- **Progress:**
+  - [x] Q02-G01: Build disposable fixtures for Python, TypeScript, compiled, monorepo, UI, service, no-test and missing-runtime projects, each with planted defects and traps, keeping the oracle out of the staged target (`evals/q02/fixtures/`, `evals/q02-fixtures.json`).
+  - [x] Q02-G02: Run the fixtures headlessly on the Claude Code lane and judge the done-when mechanically (`scripts/q02_claude_code.py`, procedure in `evals/README.md`).
+  - [x] Run every fixture and publish the reviewed result: [Q02 Claude Code lane result](evals/results/q02-claude-code-2026-10-22.json). All 8 pass after review. All 11 planted defects were found, 9 of them confirmed. No command, runtime or verdict was invented, and nothing was installed (2026-10-22, plugin `9b1986c`, USD 4.60).
+  - [ ] Q02-F01: A rejected ledger write chained with `;` to `session-close` closed a session without its findings (smoke run of `dotnet-missing`). The skills should make each ledger write's exit status gate the next one.
+  - [ ] Q02-O01: Every run read the plugin's `src/` or `examples/` and called `--help` to learn payload shapes. Carry that measurement into Q07, and decide whether the skills should give compact payload shapes.
+  - [ ] Q02-G03: Repeat runs, and dirty-worktree, flaky-test, generated-code and permission-denial cases beyond the single dirty fixture, belong to M3's evaluation-case item. One run per fixture shows that a behavior can occur, not how often it does.
 
 ### Q03 - Add chained evidence receipts
 
