@@ -10,6 +10,21 @@ computed version and promotes that section when it publishes.
 
 ### Added
 
+- `scripts/q04_claude_code.py`, which runs the Q02 fixtures that carry written
+  rules through the installed plugin and reads the obligation ledger each
+  session left (Q04-G01), with its first recorded result.
+
+### Fixed
+
+- `examples/session.json` and `examples/attempt.json` now show charter
+  `obligations` and attempt `obligation_ids`. Agents copy these examples for
+  payload shapes, and without them two of three Q04-G01 sessions read the
+  design pack but recorded no obligation ledger (Q04-G01-F01).
+
+## [0.4.1] - 2026-10-27
+
+### Added
+
 - `scripts/q06_interop.py`, an offline check of the backlog handoff against a
   real Agentic Backlog Kit checkout (Q06), with its first recorded result.
 
