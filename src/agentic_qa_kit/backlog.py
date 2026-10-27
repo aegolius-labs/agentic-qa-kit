@@ -14,6 +14,10 @@ def _evidence_lines(finding: dict[str, Any]) -> list[str]:
     return lines
 
 
+def backlog_source(session: dict[str, Any], finding: dict[str, Any]) -> str:
+    return f"agentic-qa-kit:session={session['id']};finding={finding['id']}"
+
+
 def build_backlog_item(session: dict[str, Any], finding: dict[str, Any], fields: dict[str, Any]) -> dict[str, Any]:
     validate_backlog_fields(fields)
     if finding["status"] != "confirmed":
@@ -56,4 +60,7 @@ def build_backlog_item(session: dict[str, Any], finding: dict[str, Any], fields:
         "status": fields["status"],
         "maturity": fields["maturity"],
         "sprint": fields["sprint"],
+        # The receiving kit refuses a second item with the same source, so a
+        # repeated handoff of this finding cannot become a second Bug.
+        "source": backlog_source(session, finding),
     }

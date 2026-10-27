@@ -359,5 +359,8 @@ found and skips otherwise; CI has none.
 The 2026-10-27 run
 ([`results/q06-interop-2026-10-27.json`](results/q06-interop-2026-10-27.json))
 held six of seven checks. Q06-F01, a handoff example status the backlog kit's
-default workflow does not define, is fixed. Q06-F02 is open: ingesting the
-same finding twice creates a second Bug, and neither kit notices.
+default workflow does not define, is fixed. Q06-F02, a second ingest of the
+same finding creating a second Bug, is fixed by a unique item `source` in the
+backlog kit that the export now sets; the rerun
+([`results/q06-interop-2026-10-27-source.json`](results/q06-interop-2026-10-27-source.json))
+holds all seven.

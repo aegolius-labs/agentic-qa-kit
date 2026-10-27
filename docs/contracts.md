@@ -140,4 +140,4 @@ Every change to a session holds an exclusive operating-system lock on `.session.
 
 ## Backlog handoff
 
-The export is a single Agentic Backlog Kit `Bug` add payload. It requires explicit planning inputs and includes the QA session/finding IDs in the description. Export does not ingest or synchronize the item.
+The export is a single Agentic Backlog Kit `Bug` add payload. It requires explicit planning inputs and includes the QA session/finding IDs in the description. Its `source`, `agentic-qa-kit:session=<session>;finding=<finding>`, is unique in the receiving manifest, so the backlog kit refuses a second item for the same finding. Export does not ingest or synchronize the item.

@@ -44,6 +44,9 @@ ABK_ITEM_FIELDS = {
     "status",
     "maturity",
     "sprint",
+    # Optional on the receiving side; this kit always sets it, so a repeated
+    # handoff of one finding is refused instead of becoming a second Bug.
+    "source",
 }
 ABK_MATURITY = {"idea", "refined", "ready"}
 ABK_TYPES = {"Initiative", "Epic", "Feature", "Story", "Bug", "Task"}
@@ -60,6 +63,15 @@ class BacklogHandoffContractTests(unittest.TestCase):
 
     def test_export_never_assigns_a_backlog_id(self) -> None:
         self.assertNotIn("id", self.item)
+
+    def test_export_names_its_session_and_finding_as_the_source(self) -> None:
+        session = normalize_session(session_input())
+        finding = confirmed_finding()
+
+        self.assertEqual(
+            f"agentic-qa-kit:session={session['id']};finding={finding['id']}",
+            self.item["source"],
+        )
 
     def test_export_respects_the_receiving_enumerations(self) -> None:
         self.assertEqual("Bug", self.item["type"])

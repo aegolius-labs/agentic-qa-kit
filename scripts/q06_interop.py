@@ -41,7 +41,7 @@ SCRUBBED = ("GH_TOKEN", "GITHUB_TOKEN", "GH_ENTERPRISE_TOKEN", "GITHUB_ENTERPRIS
 def default_backlog_kit() -> Path | None:
     configured = os.environ.get("AGENTIC_BACKLOG_KIT")
     candidate = Path(configured) if configured else PLUGIN_ROOT.parent / "agentic-backlog-kit"
-    return candidate if (candidate / "scripts" / "backlog.py").is_file() else None
+    return candidate.resolve() if (candidate / "scripts" / "backlog.py").is_file() else None
 
 
 def _run(command: list[str], cwd: Path) -> dict[str, Any]:

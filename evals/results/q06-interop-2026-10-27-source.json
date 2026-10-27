@@ -1,0 +1,83 @@
+{
+  "suite": "Q06",
+  "backlog_kit_revision": "f76ef77a8fe8e2ed0d5ec3806435bda1540d4273",
+  "qa_kit_revision": "f98ca3c436f2c1c98c419ae7d9617cb4af6501f5",
+  "backlog_commands": [
+    "item-add",
+    "validate",
+    "show",
+    "summary"
+  ],
+  "github_credentials_removed": [
+    "GH_TOKEN",
+    "GITHUB_TOKEN",
+    "GH_ENTERPRISE_TOKEN",
+    "GITHUB_ENTERPRISE_TOKEN"
+  ],
+  "checks": [
+    {
+      "id": "I1-export-confirmed",
+      "expectation": "A confirmed finding exports one Bug payload.",
+      "held": true,
+      "observed": {
+        "output": "/tmp/tmpxfyoq9ep/bug.json",
+        "type": "Bug",
+        "finding": "F-001"
+      }
+    },
+    {
+      "id": "I2-reject-candidate",
+      "expectation": "A candidate finding is refused.",
+      "held": true,
+      "observed": "error: only confirmed findings can be exported to the backlog"
+    },
+    {
+      "id": "I3-no-guessed-inputs",
+      "expectation": "Missing planning input is refused, never defaulted.",
+      "held": true,
+      "observed": "error: backlog fields.impact must be an integer"
+    },
+    {
+      "id": "I4-status-from-backlog-workflow",
+      "expectation": "A status outside the backlog manifest's workflow is refused and changes nothing.",
+      "held": true,
+      "observed": "{\n  \"error\": \"ManifestError\",\n  \"message\": \"Item 'BUG-0001' has unknown status 'Backlog'\"\n}"
+    },
+    {
+      "id": "I5-ingest-links-evidence",
+      "expectation": "Ingestion yields a valid Bug whose description links the QA session, finding, revision and evidence digest.",
+      "held": true,
+      "observed": {
+        "item_id": "BUG-0001",
+        "type": "Bug",
+        "linked": true
+      }
+    },
+    {
+      "id": "I6-qa-ledger-untouched",
+      "expectation": "Handoff and ingestion leave the QA ledger unchanged.",
+      "held": true,
+      "observed": [
+        ".agentic-qa/sessions/q01-fixture/session.json",
+        ".agentic-qa/sessions/q06-candidate/session.json"
+      ]
+    },
+    {
+      "id": "I7-no-duplicate-ingest",
+      "expectation": "Ingesting the same finding again is refused and changes nothing.",
+      "held": true,
+      "observed": ""
+    }
+  ],
+  "backlog_summary": {
+    "items": 1,
+    "by_type": {
+      "Bug": 1
+    },
+    "by_status": {
+      "Ready": 1
+    }
+  },
+  "held": 7,
+  "failed": []
+}

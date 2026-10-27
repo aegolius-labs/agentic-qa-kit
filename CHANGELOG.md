@@ -10,6 +10,22 @@ computed version and promotes that section when it publishes.
 
 ### Added
 
+- `backlog-export` sets the payload's `source` to
+  `agentic-qa-kit:session=<session>;finding=<finding>`. Agentic Backlog Kit
+  0.20.0 and later keep it unique and refuse a second item for the same
+  finding, so a repeated handoff no longer creates a duplicate Bug (Q06-F02).
+  An older backlog kit refuses the field as unknown; update it before handing
+  off. The Seam B fixture is refreshed from a current export on both sides.
+
+### Fixed
+
+- `scripts/q06_interop.py` resolves a relative `AGENTIC_BACKLOG_KIT` path, so
+  its test no longer runs the backlog kit from the wrong directory.
+
+## [0.4.2] - 2026-10-27
+
+### Added
+
 - `scripts/q04_claude_code.py`, which runs the Q02 fixtures that carry written
   rules through the installed plugin and reads the obligation ledger each
   session left (Q04-G01), with its first recorded result.
