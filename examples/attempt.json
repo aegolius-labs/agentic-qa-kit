@@ -7,6 +7,7 @@
   "exit_code": 1,
   "observation": "Total rounded down at the half-cent boundary",
   "oracle": "Expected half-up result from an independent Decimal calculation",
+  "obligation_ids": ["ob-half-up"],
   "evidence": [
     {
       "kind": "test-output",

@@ -30,7 +30,23 @@
       "oracle": "An independently calculated decimal result",
       "budget": {"minutes": 15, "attempts": 4},
       "stop_conditions": ["Budget exhausted", "Target revision changes"],
-      "status": "planned"
+      "status": "planned",
+      "obligations": [
+        {
+          "id": "ob-half-up",
+          "technique": "boundary",
+          "source": "README: totals round half up to the cent",
+          "statement": "10.005 sits exactly on a rounding boundary",
+          "oracle": "Decimal ROUND_HALF_UP of 10.005 is 10.01"
+        },
+        {
+          "id": "ob-below-half",
+          "technique": "boundary",
+          "source": "README: totals round half up to the cent",
+          "statement": "10.004 sits just below the boundary",
+          "oracle": "Decimal ROUND_HALF_UP of 10.004 is 10.00"
+        }
+      ]
     }
   ]
 }
