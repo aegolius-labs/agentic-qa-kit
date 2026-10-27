@@ -10,13 +10,13 @@
   "effort": 1,
   "business_value": 1,
   "enabler_value": 0,
-  "status": "Backlog",
+  "status": "Inbox",
   "maturity": "refined",
   "sprint": null
 }
 ```
 
-Impact, Effort, and Business Value are integers from 1 to 5. Enabler Value is 0 to 5. The example values illustrate shape only; never substitute them for owner judgment.
+Impact, Effort, and Business Value are integers from 1 to 5. Enabler Value is 0 to 5. `status` must be one of the target backlog manifest's `workflow.statuses`; read them there, because the backlog kit refuses any other value. Its default workflow starts at `Inbox`. The example values illustrate shape only; never substitute them for owner judgment.
 
 ## Authority split
 

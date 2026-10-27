@@ -312,3 +312,26 @@ Findings about the kit:
 Limitations: the CLI surface only; one Linux host whose installed runtimes
 decide what each fixture can run; one run per fixture; and synthetic fixtures
 stand in for real projects.
+
+## Q06 backlog-kit interoperability
+
+Q06 asks whether a confirmed finding becomes a valid Agentic Backlog Kit Bug
+item, with candidates rejected, no business input guessed, QA evidence still
+linked, and synchronization left to the backlog kit. It needs no model:
+`scripts/q06_interop.py` stages the deterministic Q01 evidence fixture, exports
+its finding, and feeds the payload to a real backlog kit checkout through
+`item-add`, `validate` and `show` only, with GitHub credentials removed from
+the environment.
+
+```bash
+AGENTIC_BACKLOG_KIT=../agentic-backlog-kit python scripts/q06_interop.py
+```
+
+`tests/test_q06_interop.py` runs the same checks when a backlog kit checkout is
+found and skips otherwise; CI has none.
+
+The 2026-10-27 run
+([`results/q06-interop-2026-10-27.json`](results/q06-interop-2026-10-27.json))
+held six of seven checks. Q06-F01, a handoff example status the backlog kit's
+default workflow does not define, is fixed. Q06-F02 is open: ingesting the
+same finding twice creates a second Bug, and neither kit notices.

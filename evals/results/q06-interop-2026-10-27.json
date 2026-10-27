@@ -1,0 +1,107 @@
+{
+  "suite": "Q06",
+  "backlog_kit_revision": "9d3f33dda97fbbcdeafbe344d197fbcf52131e9a",
+  "qa_kit_revision": "f4e6175 (main) plus the change that adds this result",
+  "backlog_commands": [
+    "item-add",
+    "validate",
+    "show",
+    "summary"
+  ],
+  "github_credentials_removed": [
+    "GH_TOKEN",
+    "GITHUB_TOKEN",
+    "GH_ENTERPRISE_TOKEN",
+    "GITHUB_ENTERPRISE_TOKEN"
+  ],
+  "checks": [
+    {
+      "id": "I1-export-confirmed",
+      "expectation": "A confirmed finding exports one Bug payload.",
+      "held": true,
+      "observed": {
+        "output": "<workdir>/bug.json",
+        "type": "Bug",
+        "finding": "F-001"
+      }
+    },
+    {
+      "id": "I2-reject-candidate",
+      "expectation": "A candidate finding is refused.",
+      "held": true,
+      "observed": "error: only confirmed findings can be exported to the backlog"
+    },
+    {
+      "id": "I3-no-guessed-inputs",
+      "expectation": "Missing planning input is refused, never defaulted.",
+      "held": true,
+      "observed": "error: backlog fields.impact must be an integer"
+    },
+    {
+      "id": "I4-status-from-backlog-workflow",
+      "expectation": "A status outside the backlog manifest's workflow is refused and changes nothing.",
+      "held": true,
+      "observed": "{\n  \"error\": \"ManifestError\",\n  \"message\": \"Item 'BUG-0001' has unknown status 'Backlog'\"\n}"
+    },
+    {
+      "id": "I5-ingest-links-evidence",
+      "expectation": "Ingestion yields a valid Bug whose description links the QA session, finding, revision and evidence digest.",
+      "held": true,
+      "observed": {
+        "item_id": "BUG-0001",
+        "type": "Bug",
+        "linked": true
+      }
+    },
+    {
+      "id": "I6-qa-ledger-untouched",
+      "expectation": "Handoff and ingestion leave the QA ledger unchanged.",
+      "held": true,
+      "observed": [
+        ".agentic-qa/sessions/q01-fixture/session.json",
+        ".agentic-qa/sessions/q06-candidate/session.json"
+      ]
+    },
+    {
+      "id": "I7-no-duplicate-ingest",
+      "expectation": "Ingesting the same finding again is refused and changes nothing.",
+      "held": false,
+      "observed": {
+        "item_id": "BUG-0002",
+        "manifest_sha256": "69eedcf8be298d42abd4b94cc9a40b645a29d642938a902e6d9a8e4951b04089"
+      }
+    }
+  ],
+  "backlog_summary": {
+    "items": 2,
+    "by_type": {
+      "Bug": 2
+    },
+    "by_status": {
+      "Ready": 2
+    }
+  },
+  "held": 6,
+  "failed": [
+    "I7-no-duplicate-ingest"
+  ],
+  "date": "2026-10-27",
+  "findings": [
+    {
+      "id": "Q06-F01",
+      "summary": "The handoff contract and examples/backlog-fields.json used status 'Backlog', which the backlog kit's default workflow does not define, so following the example failed ingestion.",
+      "status": "fixed with this result: the example uses 'Inbox', and the contract says status comes from the backlog manifest's workflow.statuses"
+    },
+    {
+      "id": "Q06-F02",
+      "summary": "Ingesting the same confirmed finding twice silently creates a second Bug (check I7). Neither kit detects the repeat.",
+      "status": "open; owner decision pending on where the guard lives"
+    }
+  ],
+  "observations": [
+    {
+      "id": "Q06-O01",
+      "summary": "abk init in a directory that already holds a manifest exits with a Python traceback (FileExistsError) instead of a JSON error. Backlog-kit usability, not a QA kit defect."
+    }
+  ]
+}
