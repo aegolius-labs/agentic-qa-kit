@@ -313,6 +313,32 @@ Limitations: the CLI surface only; one Linux host whose installed runtimes
 decide what each fixture can run; one run per fixture; and synthetic fixtures
 stand in for real projects.
 
+## Q04 functional-design lane
+
+Q04-G01 asks whether representative specifications produce reviewable
+obligation ledgers and tests without presenting model coverage as defect
+absence. `scripts/q04_claude_code.py` reuses the Q02 lane on the three fixtures
+whose behavior is fixed by a written rule (`py-lib`, `monorepo`, `no-tests`),
+with a prompt that names the specification but not the technique, the
+reference or the ledger fields. On top of Q02's mechanical oracles it reads the
+obligation ledger each session left and the coverage `summary` would report.
+
+```bash
+CLAUDE_CONFIG_DIR=<dir> claude plugin marketplace add .
+CLAUDE_CONFIG_DIR=<dir> claude plugin install agentic-qa-kit@aegolius-labs-qa
+python scripts/q04_claude_code.py --config-dir <dir> --output <new dir>
+```
+
+The 2026-10-27 result
+([`results/q04-claude-code-2026-10-27.json`](results/q04-claude-code-2026-10-27.json),
+about USD 3.14) found all four planted defects in each run, and every session
+read the design pack. In run 1 only `py-lib` recorded obligations: agents copy
+`examples/session.json` for payload shapes, and it carried none (Q04-G01-F01,
+fixed). Run 2 repeated the other two fixtures and both recorded ledgers, with
+every obligation linked to an attempt. No final answer claimed defect absence.
+Whether a static read should count as exercising an obligation is open
+(Q04-G01-O01).
+
 ## Q06 backlog-kit interoperability
 
 Q06 asks whether a confirmed finding becomes a valid Agentic Backlog Kit Bug

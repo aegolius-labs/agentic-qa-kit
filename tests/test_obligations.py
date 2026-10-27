@@ -87,5 +87,21 @@ class ObligationTests(unittest.TestCase):
         self.assertEqual(obligation_coverage(other.load_session("qa-plain"))["total"], 0)
 
 
+class ExampleTests(unittest.TestCase):
+    def test_examples_show_an_obligation_ledger(self) -> None:
+        # Agents copy these payloads, so they must carry the design fields.
+        examples = Path(__file__).resolve().parents[1] / "examples"
+        session = json.loads((examples / "session.json").read_text(encoding="utf-8"))
+        attempt = json.loads((examples / "attempt.json").read_text(encoding="utf-8"))
+        with tempfile.TemporaryDirectory() as temporary:
+            store = KitStore(temporary)
+            store.initialize()
+            store.create_session(session)
+            store.add_attempt(session["id"], attempt)
+            coverage = obligation_coverage(store.load_session(session["id"]))
+        self.assertEqual(coverage["total"], 2)
+        self.assertEqual(coverage["exercised"], 1)
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -207,14 +207,16 @@ ledger-chaining hazard (Q02-F01) and a measured payload-discovery cost for Q07
 
 ### Q04 - Add model-based functional design pack
 
-- **Status:** In progress. The design pack and the obligation ledger are in place (2026-10-22); the representative-specification evaluation is open as Q04-G01
+- **Status:** Complete for its done-when (2026-10-27). The design pack and obligation ledger shipped in 0.4.0; Q04-G01 ran three representative specifications through the installed plugin and every session found its planted defects, recorded a reviewable ledger once the examples showed one, and made no defect-absence claim
 - **Importance:** High
 - **Complexity:** Medium
 - **Depends on:** Q02 findings
 - **Approach:** Encode technique selection and evidence requirements for partitions, boundaries, rules, states, scenarios, combinatorial coverage, and independent oracles.
 - **Done when:** Representative specifications produce reviewable obligation ledgers and tests without presenting model coverage as defect absence.
 - **Follow-ups:**
-  - [ ] Q04-G01: Run representative specifications through the installed plugin (Q02 fixtures with written rules) and record whether the obligation ledgers are reviewable, the oracles independent, and coverage reported without a defect-absence claim.
+  - [x] Q04-G01: Run representative specifications through the installed plugin (Q02 fixtures with written rules) and record whether the obligation ledgers are reviewable, the oracles independent, and coverage reported without a defect-absence claim. Done 2026-10-27 (`evals/results/q04-claude-code-2026-10-27.json`): 4 of 4 planted defects found in each run; Q04-G01-F01 (examples carried no obligations, so two sessions wrote none) is fixed and the rerun recorded ledgers on both.
+  - [ ] Q04-G02: Decide whether a static read counts as exercising an obligation (Q04-G01-O01: a read-only attempt with a `fail` outcome counted as exercised), and encode the answer in the pack or `obligation_coverage`.
+  - [ ] Q04-G03: Repeat the lane on more than one run per fixture and on a real repository's specification before treating the ledger rate as stable.
 
 ### Q05 - Add non-functional session packs
 

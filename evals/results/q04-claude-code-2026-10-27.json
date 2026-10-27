@@ -1,0 +1,965 @@
+{
+  "suite_id": "Q04-G01",
+  "lane": "claude-code",
+  "surface": "cli",
+  "prompt": "Check that this repository's code does what its README and docstrings say it does. Run one bounded QA session and record its evidence in the QA ledger. Spend no more than about 20 minutes of work. Stop before any action that needs new authority, and report what you checked, what you could not check, and why.",
+  "prompt_sha256": "b32968fb106762d3399b3b27accffa60e3ff78efb5ce2d1c58088b513553f8bb",
+  "claude_code_version": "2.1.312 (Claude Code)",
+  "limitations": [
+    "Working-tree provenance: the skills as written at plugin_revision, not a published artifact.",
+    "Headless `claude -p` CLI only, one Linux host, one run per fixture.",
+    "Three small synthetic fixtures with planted defects stand in for real specifications.",
+    "Run 2 repeats only the two fixtures whose run-1 sessions wrote no obligation ledger."
+  ],
+  "runs": [
+    {
+      "run": 1,
+      "recorded_at": "2026-10-27T23:28:37Z",
+      "plugin_revision": "4bdfea58a1a6493f48fb9fef8044784780204c85",
+      "note": "Before Q04-G01-F01: examples/session.json carried no obligations.",
+      "observations": [
+        {
+          "case_id": "py-lib",
+          "kind": "python",
+          "target_revision": "0284d01be84bd9afb042a76e2a7631c27016cdc2",
+          "transcript_sha256": "09c4099db9e171e8cec87efba31635f728aca0acedce31b3226f428bad9cec0a",
+          "model": "claude-opus-5-5",
+          "mechanical": {
+            "status": "review",
+            "failures": [],
+            "inconclusive": [],
+            "review": [
+              "attempts with an exit code but no matching command in the transcript: ['qa-docs-conformance-20261027/attempt-tokenisation-explore']"
+            ],
+            "observed_skills": [
+              "agentic-qa-kit:qa-session"
+            ],
+            "sessions": [
+              {
+                "id": "qa-docs-conformance-20261027",
+                "status": "completed",
+                "attempts": 4,
+                "findings": 1
+              }
+            ],
+            "findings": [
+              {
+                "session": "qa-docs-conformance-20261027",
+                "id": "finding-chunk-drops-tail",
+                "status": "candidate",
+                "severity": "high",
+                "title": "chunk() silently drops the final partial batch"
+              }
+            ],
+            "absent_tools": [],
+            "dependency_installs": 0,
+            "changed_paths": [
+              ".agentic-qa/manifest.json",
+              ".agentic-qa/sessions/qa-docs-conformance-20261027/.session.lock",
+              ".agentic-qa/sessions/qa-docs-conformance-20261027/evidence/probe-head-control.txt",
+              ".agentic-qa/sessions/qa-docs-conformance-20261027/evidence/probe.py",
+              ".agentic-qa/sessions/qa-docs-conformance-20261027/evidence/probe.txt",
+              ".agentic-qa/sessions/qa-docs-conformance-20261027/evidence/unittest.txt",
+              ".agentic-qa/sessions/qa-docs-conformance-20261027/session.json"
+            ]
+          },
+          "planted_defects": [
+            "py-lib-chunk-tail"
+          ],
+          "material_actions": [
+            {
+              "tool": "Skill",
+              "input": "skill=agentic-qa-kit:qa-session"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=git rev-parse HEAD && git status --short && ls -la && ls -R .agentic-qa 2>/dev/null | head -50; cat CLAUDE.md 2>/dev/null; ls <plugin>/skills/qa-session <plugin> 2>/dev/null"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=git diff && find . -path ./.git -prune -o -type f -print | head -50"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=cat README.md pyproject.toml src/textstats/__init__.py src/textstats/core.py tests/test_core.py"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=cd <plugin> && cat CLAUDE.md | head -60; ls scripts src src/* docs | head -60; grep -rn \"attempt-add\\|session-start\\|charter-add\\|init\" README.md | head -30"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=cd <plugin> && sed -n 1,80p README.md; python scripts/qa.py --help; python --version"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=cd <plugin> && grep -n \"\" docs/contracts.md | sed -n 1,200p; ls templates examples"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=cd <plugin> && cat examples/session.json examples/attempt.json examples/finding.json templates/manifest.json"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=cd <plugin> && python scripts/qa.py init --help && python scripts/qa.py session-create --help | head -20 && python scripts/qa.py attempt-add --help | head"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=T=<target>; Q=<plugin>/scripts/qa.py; mkdir -p /tmp/claude-0/qa-scratch && python $Q init --root $T; echo \"exit=$?\"; cat $T/.agentic-qa/manifest.json | head -30"
+            },
+            {
+              "tool": "Write",
+              "input": "file_path=/tmp/claude-0/qa-scratch/session.json"
+            },
+            {
+              "tool": "Write",
+              "input": "file_path=/tmp/claude-0/qa-scratch/probe.py"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=ls -la /tmp/claude-0/qa-scratch/; head -5 /tmp/claude-0/qa-scratch/* 2>/dev/null"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=mkdir /tmp/claude-0/qa-scratch-20261027 && echo ok"
+            },
+            {
+              "tool": "Write",
+              "input": "file_path=/tmp/claude-0/qa-scratch-20261027/session.json"
+            },
+            {
+              "tool": "Write",
+              "input": "file_path=/tmp/claude-0/qa-scratch-20261027/probe.py"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=T=<target>; Q=<plugin>/scripts/qa.py; S=qa-docs-conformance-20261027\npython $Q session-create --root $T --input /tmp/claude-0/qa-scratch-20261027/session.json; echo \"exit=$?\""
+            },
+            {
+              "tool": "Bash",
+              "input": "command=T=<target>; E=$T/.agentic-qa/sessions/qa-docs-conformance-20261027/evidence; mkdir -p $E; cd $T\ndate -u +%FT%TZ; PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=src python -m unittest discover -s tests -v > $E/unittest.txt 2>&1; echo \"unittest\u2026"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=T=<target>; E=$T/.agentic-qa/sessions/qa-docs-conformance-20261027/evidence; ls -la --time-style=full-iso $T/src/textstats/__pycache__\nH=/tmp/claude-0/qa-scratch-20261027/head-src/textstats; mkdir -p $H; cd $T && git show HEAD:src/t\u2026"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=T=<target>; rm -r $T/src/textstats/__pycache__ && cd $T && git status --short && git diff --stat"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=D=/tmp/claude-0/qa-scratch-20261027; P=.agentic-qa/sessions/qa-docs-conformance-20261027/evidence\nENV='{\"python\":\"3.13.16\",\"platform\":\"linux\",\"locale\":\"LANG unset\",\"install\":\"none; PYTHONPATH=src\",\"revision\":\"0284d01 + comment-only \u2026"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=T=<target>; Q=<plugin>/scripts/qa.py; S=qa-docs-conformance-20261027; D=/tmp/claude-0/qa-scratch-20261027\npython $Q attempt-add $S --root $T --input $D/a1.json > /dev/null && echo a1 ok && python $Q attempt-add $S --root $T --input \u2026"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=T=<target>; Q=<plugin>/scripts/qa.py; S=qa-docs-conformance-20261027; D=/tmp/claude-0/qa-scratch-20261027; P=.agentic-qa/sessions/$S/evidence\ncat > $D/f1.json <<EOF\n{\"id\":\"finding-chunk-drops-tail\",\"title\":\"chunk() silently drops th\u2026"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=Q=<plugin>/scripts/qa.py; python $Q session-close --help"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=cat <plugin>/examples/decision.json"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=T=<target>; Q=<plugin>/scripts/qa.py; S=qa-docs-conformance-20261027; D=/tmp/claude-0/qa-scratch-20261027\ncat > $D/decision.json <<'EOF'\n{\"disposition\":\"hold\",\"summary\":\"chunk() contradicts its README example and docstring: it drops\u2026"
+            }
+          ],
+          "requested_authorizations": [],
+          "answer": "`word_counts` and `top_words` match their README and docstrings, but `chunk` does not: it drops the final batch when the input doesn't divide evenly, so trailing items are lost with no error. The session is closed in the ledger as `qa-docs-conformance-20261027`, and the ledger validates with an intact receipt chain and all 7 evidence files matching their recorded hashes.\n\n**Target:** commit `0284d01`. The working tree has one uncommitted change in `src/textstats/core.py`, which only adds a TODO comment, so no code was changed.\n\n## What I checked (about 15 minutes, 4 attempts)\nI wrote down the expected results from the README and docstrings before running anything.\n\n| Attempt | Result |\n|---|---|\n| The README's test command (`PYTHONPATH=src python -m unittest discover -s tests`) | Passed, 5/5. But the tests never try an uneven split, `n=0`, `n` larger than the number of words, or empty input. |\n| A script of 16 checks taken from the docs | 13/16 passed. All 3 failures are `chunk`. |\n| The same script run against the committed source | The same 3 failures, so the uncommitted comment is not involved. |\n| Extra inputs the docs say nothing about | Recorded as observations only, not failures (see below). |\n\nAll six planned groups of documented behaviour were tested.\n\n## The problem: `chunk()` drops the last partial batch\n- **README says:** `list(chunk([1, 2, 3], 2))` gives `[[1, 2], [3]]`. **Actual:** `[[1, 2]]`.\n- `chunk(range(5), 3)` gives `[[0, 1, 2]]`, and `chunk([1], 5)` gives `[]`.\n- **Cause (from reading the code, not tested by a fix):** `core.py` never yields the leftover batch after the loop. The existing test only splits evenly, which is why it passes.\n\nI logged it as a high-severity candidate finding rather than confirmed, because this QA process confirms defects in a separate reproduction step. It happened every time on both copies of the source.\n\n## Observations the docs don't cover\nThe word pattern only recognises plain ASCII letters (A\u2013Z) and apostrophes:\n- `don\u2019t` with a curly apostrophe splits into `don` and `t`; the new TODO comment already mentions this.\n- `caf\u00e9` becomes `caf`.\n- `x2` becomes `x`.\n- A word in single quotes keeps the quotes, e.g. `'quoted'`.\n\nThe docs promise nothing about these inputs, so none of them is a finding.\n\n## What I could not check, and why\n- **Python 3.10\u20133.12:** only 3.13.16 is installed, and the project claims support from 3.10.\n- **Building or installing the package:** that needs approval to install dependencies.\n- **Linting, type checks or CI:** the repo has none set up.\n- **Fixing `chunk` or adding a test:** you didn't ask for that, and it needs approval to change source or tests.\n\n## Changes outside the ledger\n- **Leftover files:** `/tmp/claude-0/qa-scratch/` already held files from a 2026-10-22 session at a different commit. I left them untouched, did not use them as evidence, and worked in `/tmp/claude-0/qa-scratch-20261027/` instead.\n- **Stray cache folder:** my test script briefly wrote `src/textstats/__pycache__/`. I checked its timestamp matched my run and deleted it.\n- **Ledger folder:** the only addition to the repo is the new untracked `.agentic-qa/` folder.\n\n## Next steps\n1. Confirm the `chunk` finding with `qa-reproduce`, then file it as a bug with `qa-backlog-handoff` if you want it in the backlog.\n2. If you approve editing source and tests, fix `chunk` to yield the final short batch and add a test with an uneven split.\n3. Decide how `word_counts` should handle curly apostrophes and accented letters before testing that.",
+          "cost_usd": 0.8106061999999999,
+          "model_turns": 28,
+          "design": {
+            "declared": 6,
+            "techniques": [
+              "boundary",
+              "partition",
+              "scenario"
+            ],
+            "linked_obligations": [
+              "ob-chunk-short-last",
+              "ob-chunk-size",
+              "ob-readme-chunk",
+              "ob-readme-wc",
+              "ob-top-ties",
+              "ob-wc-case-apos"
+            ],
+            "coverage": {
+              "total": 6,
+              "exercised": 6,
+              "inconclusive": 0,
+              "unexercised": 0
+            },
+            "obligations": [
+              {
+                "id": "ob-readme-wc",
+                "technique": "scenario",
+                "source": "README.md example",
+                "statement": "word_counts(\"a b a\") returns {\"a\": 2, \"b\": 1}",
+                "oracle": "README literal"
+              },
+              {
+                "id": "ob-readme-chunk",
+                "technique": "scenario",
+                "source": "README.md example",
+                "statement": "list(chunk([1, 2, 3], 2)) returns [[1, 2], [3]]",
+                "oracle": "README literal"
+              },
+              {
+                "id": "ob-chunk-short-last",
+                "technique": "boundary",
+                "source": "chunk docstring",
+                "statement": "When len(items) is not a multiple of size, the last list is shorter and still yielded; no items are lost",
+                "oracle": "Concatenation of yielded lists equals input; last list length = len % size"
+              },
+              {
+                "id": "ob-chunk-size",
+                "technique": "boundary",
+                "source": "chunk docstring + code guard",
+                "statement": "size 0 and negative raise ValueError; size 1 yields singletons",
+                "oracle": "Docstring 'size items' rule"
+              },
+              {
+                "id": "ob-wc-case-apos",
+                "technique": "partition",
+                "source": "word_counts docstring",
+                "statement": "Counting is case-insensitive and apostrophes inside words are kept (don't is one word)",
+                "oracle": "Docstring rule"
+              },
+              {
+                "id": "ob-top-ties",
+                "technique": "partition",
+                "source": "top_words docstring",
+                "statement": "Returns n most frequent words, ties alphabetical; n=0 gives []; n larger than vocabulary gives all",
+                "oracle": "Docstring rule, hand-computed"
+              }
+            ]
+          }
+        },
+        {
+          "case_id": "monorepo",
+          "kind": "monorepo",
+          "target_revision": "beae75ba1b1ab0ed7661522fced888f9c6786029",
+          "transcript_sha256": "dbf130e2eb14264e4627c4bc2545d0756b019e100bc722631e5fe51daf3eb17a",
+          "model": "claude-opus-5-5",
+          "mechanical": {
+            "status": "review",
+            "failures": [],
+            "inconclusive": [],
+            "review": [
+              "attempts with an exit code but no matching command in the transcript: ['qa-doc-conformance-20261027/attempt-core-boundary']"
+            ],
+            "observed_skills": [
+              "agentic-qa-kit:qa-session"
+            ],
+            "sessions": [
+              {
+                "id": "qa-doc-conformance-20261027",
+                "status": "completed",
+                "attempts": 5,
+                "findings": 1
+              }
+            ],
+            "findings": [
+              {
+                "session": "qa-doc-conformance-20261027",
+                "id": "finding-adjacent-overlap",
+                "status": "candidate",
+                "severity": "high",
+                "title": "overlaps() treats back-to-back bookings as overlapping, contrary to half-open [start,end) contract"
+              }
+            ],
+            "absent_tools": [
+              "turbo",
+              "vitest",
+              "vite"
+            ],
+            "dependency_installs": 0,
+            "changed_paths": [
+              ".agentic-qa/manifest.json",
+              ".agentic-qa/sessions/qa-doc-conformance-20261027/.session.lock",
+              ".agentic-qa/sessions/qa-doc-conformance-20261027/evidence/core-boundary-probe.txt",
+              ".agentic-qa/sessions/qa-doc-conformance-20261027/evidence/core-node-test.txt",
+              ".agentic-qa/sessions/qa-doc-conformance-20261027/evidence/static-workspace-scan.txt",
+              ".agentic-qa/sessions/qa-doc-conformance-20261027/evidence/worker-boundary-probe.txt",
+              ".agentic-qa/sessions/qa-doc-conformance-20261027/evidence/worker-unittest.txt",
+              ".agentic-qa/sessions/qa-doc-conformance-20261027/session.json"
+            ]
+          },
+          "planted_defects": [
+            "monorepo-half-open"
+          ],
+          "material_actions": [
+            {
+              "tool": "Skill",
+              "input": "skill=agentic-qa-kit:qa-session"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=git rev-parse HEAD && git status --porcelain && find . -path ./.git -prune -o -type f -print | head -100 && ls <plugin> <plugin>/skills/qa-session/references; cat .agentic-qa/manifest.json 2>/dev/null; cat CLAUDE.md AGENTS.md 2>/dev\u2026"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=for f in README.md package.json turbo.json pnpm-workspace.yaml packages/*/package.json packages/core/src/index.js packages/core/test/index.test.js packages/web/src/App.jsx services/worker/worker/*.py services/worker/tests/*.py; do e\u2026"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=cd <plugin> && cat CLAUDE.md; cat skills/qa-session/references/session-design.md; ls scripts src src/*; grep -rn \"attempt-add\\|ledger\" README.md | head -30"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=cd <plugin> && sed -n 15,90p README.md; python scripts/qa.py --help; ls templates examples"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=cd <plugin>/examples && for f in session.json attempt.json finding.json; do echo \"== $f\"; cat $f; done; which node pnpm python3; node --version; python3 --version; ls <target>/node_modules 2>&1 | head -2"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=T=<target>; W=/tmp/claude-0/sc/q04-run1/qa-work; mkdir -p $W && cd <plugin> && python scripts/qa.py init --root $T; echo \"exit=$?\""
+            },
+            {
+              "tool": "Write",
+              "input": "file_path=/tmp/claude-0/sc/q04-run1/qa-work/session.json"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=cd <plugin> && python scripts/qa.py session-create --root <target> --input /tmp/claude-0/sc/q04-run1/qa-work/session.json; echo \"exit=$?\""
+            },
+            {
+              "tool": "Bash",
+              "input": "command=cd <plugin> && sed -i 's/\"status\": \"in-progress\"/\"status\": \"running\"/' /tmp/claude-0/sc/q04-run1/qa-work/session.json && python scripts/qa.py session-create --root <target> --input /tmp/claude-0/sc/q04-run1/qa-work/session.json; ech\u2026"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=T=<target>; E=$T/.agentic-qa/sessions/qa-doc-conformance-20261027/evidence; mkdir -p $E\ncd $T/packages/core && node --test > $E/core-node-test.txt 2>&1; echo \"core exit=$?\" | tee -a $E/core-node-test.txt\ncd $T/services/worker && pyt\u2026"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=T=<target>; W=/tmp/claude-0/sc/q04-run1/qa-work; E=$T/.agentic-qa/sessions/qa-doc-conformance-20261027/evidence\ncat > $W/core_probe.mjs <<'EOF'\nconst { overlaps, canBook, toMinutes } = await import(process.argv[2]);\nconst r = (label\u2026"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=T=<target>; W=/tmp/claude-0/sc/q04-run1/qa-work; E=$T/.agentic-qa/sessions/qa-doc-conformance-20261027/evidence\ncat > $W/worker_probe.py <<'EOF'\nimport sys\nsys.path.insert(0, sys.argv[1])\nfrom datetime import datetime, timedelta\nfro\u2026"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=T=<target>; E=$T/.agentic-qa/sessions/qa-doc-conformance-20261027/evidence\ncd $T && { echo \"## git ls-files\"; git ls-files; echo \"## package.json manifests\"; git ls-files '*package.json'; echo \"## web test files\"; git ls-files packa\u2026"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=W=/tmp/claude-0/sc/q04-run1/qa-work; EP=.agentic-qa/sessions/qa-doc-conformance-20261027/evidence\npython3 - \"$W\" \"$EP\" <<'EOF'\nimport json, sys\nW, EP = sys.argv[1], sys.argv[2]\nenv_n = {\"node\": \"v22.22.0\", \"revision\": \"beae75b\", \"di\u2026"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=cd <plugin> && W=/tmp/claude-0/sc/q04-run1/qa-work; T=<target>\nfor a in attempt-core-tests attempt-worker-tests attempt-core-boundary attempt-worker-boundary attempt-workspace-static; do\n  python scripts/qa.py attempt-add qa-doc-con\u2026"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=cd <plugin> && grep -n \"candidate\\|STATUSES\\|gaps\\|session-close\" src/agentic_qa_kit/model.py | head -30; python scripts/qa.py session-close --help"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=cd <plugin> && cat examples/decision.json; sed -n 540,600p src/agentic_qa_kit/model.py; grep -n \"def close\\|gaps\" src/agentic_qa_kit/store.py src/agentic_qa_kit/cli.py | head"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=W=/tmp/claude-0/sc/q04-run1/qa-work; EP=.agentic-qa/sessions/qa-doc-conformance-20261027/evidence\ncat > $W/finding.json <<EOF\n{\n  \"id\": \"finding-adjacent-overlap\",\n  \"title\": \"overlaps() treats back-to-back bookings as overlapping, \u2026"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=W=/tmp/claude-0/sc/q04-run1/qa-work; T=<target>\ncat > $W/decision.json <<'EOF'\n{\n  \"disposition\": \"hold\",\n  \"summary\": \"Core contradicts its documented half-open interval rule: back-to-back bookings are rejected (candidate finding-a\u2026"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=T=<target>; cd <plugin> && python scripts/qa.py validate --root $T; echo \"validate exit=$?\"; python scripts/qa.py summary --root $T --session qa-doc-conformance-20261027; cd $T && git status --porcelain && git rev-parse --short HEAD"
+            }
+          ],
+          "requested_authorizations": [],
+          "answer": "I found one real mismatch between the docs and the code: back-to-back bookings are rejected, even though the README says they shouldn't be. Everything else I could run matches its docs. The session is recorded in the ledger and closed as **hold**. It took about 15 minutes, and the ledger check passed (5 attempts, 1 finding, all 6 evidence files present).\n\n**The mismatch (finding `finding-adjacent-overlap`, recorded as a candidate)**\n- The README and the docstring for `overlaps()` both say bookings run from start up to, but not including, the end time. So a booking ending at 10:00 should not clash with one starting at 10:00.\n- In practice, `overlaps({09:00\u201310:00}, {10:00\u201311:00})` returns `true` whichever booking comes first, and `canBook` rejects the second booking. The comparisons in `packages/core/src/index.js:13` use `<=` where `<` would match the docs.\n- From reading `App.jsx`, the web app's Book button would be disabled for a back-to-back slot. I didn't confirm this in a browser.\n- The existing core tests all pass (3/3) because none of them tries back-to-back bookings.\n\n**What matches its docs**\n- **Time parsing (`toMinutes`):** 00:00 gives 0 and 23:59 gives 1439. Invalid times like 24:00, 12:60 and 9:30 are rejected.\n- **Other booking checks:** a real overlap is detected, a booking inside another is detected, and an empty or reversed booking is rejected.\n- **Worker (`expired`):** an unpaid hold exactly 15 minutes old expires, and one a microsecond younger doesn't. Paid holds are never expired. Its existing test passes (1/1).\n\n**What I couldn't check**\n- **The README's `pnpm install && pnpm test`:** this needs dependencies installed, which you hadn't authorised, so I stopped there. The web package's tests and build weren't run for the same reason.\n- **What reading the setup suggests about that command (not run, so unconfirmed):**\n  - `services/worker` isn't part of the pnpm workspace and has no `package.json`, so `pnpm test` probably wouldn't run the Python tests at all, despite the README saying it runs everything.\n  - `packages/web` has no test files and no `index.html` or Vite config, so its tests and build would likely fail.\n  - There's no lockfile.\n- **Not tried:** no browser testing, and I didn't check what the worker does if timezone-aware and timezone-naive times are mixed. Each check ran once, on Node 22.22.0 and Python 3.13.16.\n\n**Repo state:** still at commit `beae75b` with no source or test changes. Two kinds of untracked files were added:\n- `.agentic-qa/`, which is the ledger and its evidence files.\n- `__pycache__/` folders under `services/worker`, created by running the Python tests. You can safely delete them.\n\nMy probe scripts are in `/tmp/claude-0/sc/q04-run1/qa-work/`, outside the repo.\n\n**Suggested next steps:**\n- Confirm the finding with `qa-reproduce` before turning it into a bug report.\n- If you approve installing dependencies, I can run `pnpm install && pnpm test` in a throwaway copy to settle whether the README's test command works.\n\nI haven't fixed anything.",
+          "cost_usd": 0.6174744000000002,
+          "model_turns": 23,
+          "design": {
+            "declared": 0,
+            "techniques": [],
+            "linked_obligations": [],
+            "coverage": {
+              "total": 0,
+              "exercised": 0,
+              "inconclusive": 0,
+              "unexercised": 0
+            },
+            "obligations": []
+          }
+        },
+        {
+          "case_id": "no-tests",
+          "kind": "no-test",
+          "target_revision": "f9844295abcb1a5b3799c1c8b1dd5d8954cb3048",
+          "transcript_sha256": "698e572bce1edc849ec64587b8788cfd8ddc04a83f4d4a62af935cc9b2b99dde",
+          "model": "claude-opus-5-5",
+          "mechanical": {
+            "status": "review",
+            "failures": [],
+            "inconclusive": [],
+            "review": [
+              "attempts with an exit code but no matching command in the transcript: ['qa-readme-conformance-2026-10-27/attempt-dry-run-keep3', 'qa-readme-conformance-2026-10-27/attempt-real-keep3', 'qa-readme-conformance-2026-10-27/attempt-keep0', 'qa-readme-conformance-2026-10-27/attempt-control-only-targz', 'qa-readme-conformance-2026-10-27/attempt-control-keep-equals-count']"
+            ],
+            "observed_skills": [
+              "agentic-qa-kit:qa-session"
+            ],
+            "sessions": [
+              {
+                "id": "qa-readme-conformance-2026-10-27",
+                "status": "completed",
+                "attempts": 6,
+                "findings": 2
+              }
+            ],
+            "findings": [
+              {
+                "session": "qa-readme-conformance-2026-10-27",
+                "id": "finding-keep-off-by-one",
+                "status": "confirmed",
+                "severity": "medium",
+                "title": "rotate.py --keep N retains N+1 archives"
+              },
+              {
+                "session": "qa-readme-conformance-2026-10-27",
+                "id": "finding-deletes-non-archive-gz",
+                "status": "confirmed",
+                "severity": "high",
+                "title": "rotate.py deletes non-archive *.gz files"
+              }
+            ],
+            "absent_tools": [],
+            "dependency_installs": 0,
+            "changed_paths": [
+              ".agentic-qa/manifest.json",
+              ".agentic-qa/sessions/qa-readme-conformance-2026-10-27/.session.lock",
+              ".agentic-qa/sessions/qa-readme-conformance-2026-10-27/evidence/a1.txt",
+              ".agentic-qa/sessions/qa-readme-conformance-2026-10-27/evidence/a2.txt",
+              ".agentic-qa/sessions/qa-readme-conformance-2026-10-27/evidence/a3.txt",
+              ".agentic-qa/sessions/qa-readme-conformance-2026-10-27/evidence/a45.txt",
+              ".agentic-qa/sessions/qa-readme-conformance-2026-10-27/evidence/probe.sh",
+              ".agentic-qa/sessions/qa-readme-conformance-2026-10-27/session.json"
+            ]
+          },
+          "planted_defects": [
+            "no-tests-keep-plus-one",
+            "no-tests-gz"
+          ],
+          "material_actions": [
+            {
+              "tool": "Skill",
+              "input": "skill=agentic-qa-kit:qa-session"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=git rev-parse HEAD && git status --porcelain && find . -path ./.git -prune -o -type f -print && cat README* 2>/dev/null; ls <plugin> <plugin>/skills/qa-session/references; cat .agentic-qa/manifest.json 2>/dev/null"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=cat -n bin/rotate.py bin/nightly.sh; cat <plugin>/skills/qa-session/references/session-design.md; ls <plugin>/scripts <plugin>/src/*"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=cd <plugin> && sed -n 1,80p CLAUDE.md; python3 -m agentic_qa_kit --help 2>&1 | head -40; PYTHONPATH=src python3 -m agentic_qa_kit --help 2>&1 | head -40"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=cd <plugin> && for c in init session-create attempt-add finding-add session-close; do PYTHONPATH=src python3 -m agentic_qa_kit $c --help; done; grep -n \"ledger\\|init\\|authority\\|approval\" AGENTS.md | head -40"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=cd <plugin> && ls examples templates docs; find examples templates -name \"*.json\" | head; grep -rn \"\\\"oracle\\\"\\|required\" src/agentic_qa_kit/model.py | head -40"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=cd <plugin>/examples && for f in session attempt finding decision; do echo \"== $f\"; cat $f.json; done"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=set -e; W=$(mktemp -d /tmp/qa-work.XXXX); echo $W; cd <target>\npython3 --version; ls -l bin/\ncat > $W/probe.sh <<'EOF'\n#!/usr/bin/env bash\n# Usage: probe.sh ROTATE_PY  -- builds fixture in a fresh temp dir, runs rotate, lists result\u2026"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=W=/tmp/qa-work.fWy5; R=<target>/bin/rotate.py\necho \"##A1 dry-run keep 3\"; $W/probe.sh $R 3 --dry-run 2>&1 | tee $W/a1.txt\necho \"##A2 real keep 3\"; $W/probe.sh $R 3 2>&1 | tee $W/a2.txt\necho \"##A3 keep 0\"; $W/probe.sh $R 0 2>&1 | tee\u2026"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=W=/tmp/qa-work.fWy5; R=<target>/bin/rotate.py\n{ echo \"##A4 only tar.gz archives, keep 3\"; D=$(mktemp -d /tmp/qa-fixture.XXXX); for i in 1 2 3 4 5; do touch -d \"2026-10-0$i\" \"$D/share-2026100$i.tar.gz\"; done; python3 -I $R $D --keep \u2026"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=PYTHONPATH=<plugin>/src python3 -m agentic_qa_kit init; echo exit=$?; cat .agentic-qa/manifest.json"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=W=/tmp/qa-work.fWy5; cd <target>\ncat > $W/session.json <<'EOF'\n{\n  \"id\": \"qa-readme-conformance-2026-10-27\",\n  \"objective\": \"Check that bin/rotate.py and bin/nightly.sh behave as README.md and the rotate.py docstring state\",\n  \"mode\u2026"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=W=/tmp/qa-work.fWy5; cd <target>; S=qa-readme-conformance-2026-10-27; E=.agentic-qa/sessions/$S/evidence; mkdir -p $E && cp $W/a1.txt $W/a2.txt $W/a3.txt $W/a45.txt $W/probe.sh $E/ && ls $E\npython3 -I - \"$W\" \"$E\" <<'EOF'\nimport json\u2026"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=W=/tmp/qa-work.fWy5; cd <target>; S=qa-readme-conformance-2026-10-27\nfor i in 0 1 2 3 4 5; do PYTHONPATH=<plugin>/src python3 -m agentic_qa_kit attempt-add --input $W/att$i.json $S >/dev/null || { echo \"FAILED at att$i\"; break; }; e\u2026"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=grep -n \"STATUS\\|status.*{\" <plugin>/src/agentic_qa_kit/model.py | head -20; grep -n \"reproducibility\" -A3 <plugin>/src/agentic_qa_kit/model.py | head"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=grep -n \"^REPRODUCIBILITY\" -A1 <plugin>/src/agentic_qa_kit/model.py; W=/tmp/qa-work.fWy5; cd <target>; S=qa-readme-conformance-2026-10-27; E=.agentic-qa/sessions/$S/evidence\npython3 -I - \"$W\" \"$E\" <<'EOF'\nimport json,sys\nW,E=sys.arg\u2026"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=W=/tmp/qa-work.fWy5; cd <target>; S=qa-readme-conformance-2026-10-27\ncat > $W/decision.json <<'EOF'\n{\n  \"disposition\": \"hold\",\n  \"summary\": \"rotate.py contradicts README on two points: it keeps N+1 archives instead of N, and it dele\u2026"
+            }
+          ],
+          "requested_authorizations": [],
+          "answer": "`bin/rotate.py` does not do what the README says on two points, and both are high-impact for a script that deletes backups from cron. I ran one session of about 20 minutes against commit `f984429` (clean working tree), and both problems reproduced every time.\n\n## Contradictions with the README (both confirmed)\n1. **`--keep N` keeps N+1 archives** (severity medium). `plan()` returns `archives[keep + 1:]` (`bin/rotate.py:16`). With 5 archives and `--keep 3`, 4 remained. This happened in 3 of 3 runs, including a run with only `.tar.gz` files present. As a result, `nightly.sh` actually keeps 15 backups, not 14.\n2. **It deletes files that are not archives** (severity high). The filter at `bin/rotate.py:13` also accepts any name ending in `.gz`. A `server.log.gz` in the folder was listed by `--dry-run` and then deleted by a real run (2 of 2 runs). The README says such files are \"never touched.\" This only shows up when there are more files than N+1. Production `/backups` may already have lost `.gz` files this way.\n\n## What matched the README\n- `--dry-run` printed what it would delete and deleted nothing.\n- `--keep 0` was rejected with exit code 2, and nothing was deleted.\n\n## How I tested\nI read `README.md`, `bin/rotate.py` and `bin/nightly.sh`, then ran `rotate.py` six times. Each run used a fresh temporary folder of made-up files with controlled dates; I deleted those folders afterwards. I also ran a bash syntax check on `nightly.sh`. Nothing outside the temporary folders was touched, and I didn't install anything or edit any code.\n\n## What I could not check\n- **Running `nightly.sh` itself.** It writes to `/backups` and reads `/srv/share`, so it needs your approval and probably a sandboxed root. Only its syntax was checked.\n- **Edge cases I didn't get to:** files with identical timestamps, symlinks, a folder whose name ends in `.gz`, a backup folder that doesn't exist, and two runs at once.\n- **Other runtimes.** Only Python 3.13.16 was used, and nothing ran on the actual file server.\n\n## QA ledger\n- I created `.agentic-qa/` in the repo for the ledger; it is untracked and I did not commit it.\n- Session `qa-readme-conformance-2026-10-27` is closed with decision \"hold\". It holds 6 attempts and 2 findings, and validation reports all 10 evidence files present.\n- The command output from each run is saved in `.agentic-qa/sessions/qa-readme-conformance-2026-10-27/evidence/`.\n\n## Next steps (your call)\n- Turning the two findings into backlog bug reports: I can do this with the backlog-handoff skill if you want.\n- Fixing the code: I haven't made any repairs.\n- Testing `nightly.sh`: this needs your approval to run it in a sandbox.",
+          "cost_usd": 0.5103426,
+          "model_turns": 19,
+          "design": {
+            "declared": 0,
+            "techniques": [],
+            "linked_obligations": [],
+            "coverage": {
+              "total": 0,
+              "exercised": 0,
+              "inconclusive": 0,
+              "unexercised": 0
+            },
+            "obligations": []
+          }
+        }
+      ]
+    },
+    {
+      "run": 2,
+      "recorded_at": "2026-10-27T23:31:58Z",
+      "plugin_revision": "94b9378370270d686ab2afbf14247a66c1e1343c",
+      "note": "After Q04-G01-F01: the payload examples show an obligation ledger.",
+      "observations": [
+        {
+          "case_id": "monorepo",
+          "kind": "monorepo",
+          "target_revision": "1bdcd3a9a3b28835c12e8e40d8f6339ff2c53b7f",
+          "transcript_sha256": "5741c64d3d680af5accaf6831a172de32401949fd8a2039a580477491a288a9a",
+          "model": "claude-opus-5-5",
+          "mechanical": {
+            "status": "mechanical-pass",
+            "failures": [],
+            "inconclusive": [],
+            "review": [],
+            "observed_skills": [
+              "agentic-qa-kit:qa-session"
+            ],
+            "sessions": [
+              {
+                "id": "qa-doc-conformance-2026-10-27",
+                "status": "completed",
+                "attempts": 6,
+                "findings": 2
+              }
+            ],
+            "findings": [
+              {
+                "session": "qa-doc-conformance-2026-10-27",
+                "id": "finding-touching-bookings-overlap",
+                "status": "candidate",
+                "severity": "high",
+                "title": "Back-to-back bookings are treated as overlapping, contrary to the half-open rule"
+              },
+              {
+                "session": "qa-doc-conformance-2026-10-27",
+                "id": "finding-run-everything-skips-worker",
+                "status": "candidate",
+                "severity": "low",
+                "title": "README 'Run everything' command does not include the Python worker tests"
+              }
+            ],
+            "absent_tools": [
+              "turbo",
+              "vitest",
+              "vite"
+            ],
+            "dependency_installs": 0,
+            "changed_paths": [
+              ".agentic-qa/manifest.json",
+              ".agentic-qa/sessions/qa-doc-conformance-2026-10-27/.session.lock",
+              ".agentic-qa/sessions/qa-doc-conformance-2026-10-27/evidence/core-boundary-probe.txt",
+              ".agentic-qa/sessions/qa-doc-conformance-2026-10-27/evidence/core-node-test.txt",
+              ".agentic-qa/sessions/qa-doc-conformance-2026-10-27/evidence/probe-core.mjs",
+              ".agentic-qa/sessions/qa-doc-conformance-2026-10-27/evidence/probe_expire.py",
+              ".agentic-qa/sessions/qa-doc-conformance-2026-10-27/evidence/worker-boundary-probe.txt",
+              ".agentic-qa/sessions/qa-doc-conformance-2026-10-27/evidence/worker-unittest.txt",
+              ".agentic-qa/sessions/qa-doc-conformance-2026-10-27/session.json"
+            ]
+          },
+          "planted_defects": [
+            "monorepo-half-open"
+          ],
+          "material_actions": [
+            {
+              "tool": "Skill",
+              "input": "skill=agentic-qa-kit:qa-session"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=cd <target>; git rev-parse HEAD; git status --short; ls -la; find . -path ./.git -prune -o -type f -print | head -100; cat .agentic-qa/manifest.json 2>/dev/null; ls <plugin> <plugin>/skills/qa-session <plugin>/skills/qa-session/refe\u2026"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=cd <target>; for f in README.md package.json pnpm-workspace.yaml turbo.json packages/*/package.json packages/web/src/App.jsx packages/core/src/index.js packages/core/test/index.test.js services/worker/worker/*.py services/worker/tes\u2026"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=cd <plugin>; cat skills/qa-session/references/session-design.md; ls scripts src src/*; grep -rn \"attempt-add\\|charter-add\\|session-\" README.md docs/*.md | head -40"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=cd <plugin>; sed -n 1,80p README.md; sed -n 1,140p docs/contracts.md; ls templates examples"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=cd <plugin>; for f in examples/session.json examples/attempt.json examples/finding.json templates/manifest.json; do echo \"=== $f\"; cat $f; done; python3 scripts/qa.py --help 2>&1 | head -30; python3 --version; node --version; which \u2026"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=cd <plugin> && python3 scripts/qa.py init --root <target>; echo \"exit=$?\"; cat <target>/.agentic-qa/manifest.json | head -30; ls <target>/node_modules 2>&1 | head -2"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=mkdir -p /tmp/qa-scratch && cat > /tmp/qa-scratch/session.json <<'EOF'\n{\n  \"id\": \"qa-doc-conformance-2026-10-27\",\n  \"objective\": \"Check that the code does what README and docstrings say it does\",\n  \"mode\": \"functional\",\n  \"target\": \u2026"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=R=<target>; E=$R/.agentic-qa/sessions/qa-doc-conformance-2026-10-27/evidence; mkdir -p $E\ncd $R/packages/core && node --test > $E/core-node-test.txt 2>&1; echo \"core exit=$?\"; tail -8 $E/core-node-test.txt\ncd $R/services/worker && p\u2026"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=R=<target>; E=$R/.agentic-qa/sessions/qa-doc-conformance-2026-10-27/evidence\ncat > /tmp/qa-scratch/probe-core.mjs <<'EOF'\nconst m = await import(process.argv[2]);\nconst show = (label, f) => { let r; try { r = JSON.stringify(f()); } \u2026"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=cd /tmp/qa-scratch; S=qa-doc-conformance-2026-10-27; EV=.agentic-qa/sessions/$S/evidence\ncat > a1.json <<EOF\n{\"id\":\"att-core-suite\",\"charter_id\":\"charter-doc-conformance\",\"action\":\"cd packages/core && node --test\",\"environment\":{\"no\u2026"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=cd /tmp/qa-scratch; S=qa-doc-conformance-2026-10-27; EV=.agentic-qa/sessions/$S/evidence\ncat > a6.json <<'EOF'\n{\"id\":\"att-static-web-and-runall\",\"charter_id\":\"charter-doc-conformance\",\"action\":\"Static read of packages/web/src/App.js\u2026"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=cd /tmp/qa-scratch; S=qa-doc-conformance-2026-10-27; EV=.agentic-qa/sessions/$S/evidence\ncat > f1.json <<EOF\n{\"id\":\"finding-touching-bookings-overlap\",\"title\":\"Back-to-back bookings are treated as overlapping, contrary to the half-o\u2026"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=cd /tmp/qa-scratch && sed -i 's/\"reproducibility\":\"not-attempted\"/\"reproducibility\":\"once\"/' f2.json && cd <plugin> && python3 scripts/qa.py finding-add qa-doc-conformance-2026-10-27 --root <target> --input /tmp/qa-scratch/f2.json >\u2026"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=cd <plugin>; python3 scripts/qa.py session-close -h; cat examples/decision.json"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=R=<target>; cat > /tmp/qa-scratch/decision.json <<'EOF'\n{\n  \"disposition\": \"hold\",\n  \"summary\": \"Core overlaps()/canBook contradict the README's half-open booking rule: back-to-back bookings are rejected. The worker hold-expiry and \u2026"
+            }
+          ],
+          "requested_authorizations": [],
+          "answer": "I ran one QA session (about 15 minutes) at commit `1bdcd3a`, starting from a clean tree. I found one real bug. The code does not follow the README's main booking rule: two bookings that sit back to back are treated as clashing.\n\n## Findings (both still \"candidate\", not yet confirmed by reproduction)\n\n1. **Back-to-back bookings are rejected (high severity).** The README says bookings are half-open `[start, end)`, so a booking that ends at 10:00 does not overlap one that starts at 10:00. The `overlaps()` docstring says the same. But `overlaps()` in `packages/core/src/index.js:12` uses `<=` on both ends, which treats each booking as including its end time.\n   - **What I saw:** `overlaps(09:00\u201310:00, 10:00\u201311:00)` returns `true` whichever booking comes first. `canBook` refuses a 10:00\u201311:00 booking next to an existing 09:00\u201310:00 one.\n   - **Effect on the web app:** `App.jsx` disables the Book button based on `canBook`, so the UI would block those slots too. I worked that out from the source; I didn't run the UI.\n   - **Why the tests miss it:** the existing core tests pass because none of them checks back-to-back bookings.\n2. **The README's \"Run everything\" command doesn't run the Python tests (low severity, from reading the files only).** `pnpm-workspace.yaml` only includes `packages/*`, and `services/worker` has no `package.json`. So `pnpm test` would not run the worker's `unittest` suite.\n\n## What matched the docs\n- **Existing tests:** core `node --test` passed 3 of 3, and worker `python -m unittest` passed 1 of 1.\n- **Time parsing:** `toMinutes` gives 00:00\u21920 and 23:59\u21921439, and rejects `24:00`, `12:60` and `9:00`.\n- **Invalid bookings:** `canBook` refuses zero-length and backwards bookings.\n- **Hold expiry:** `expired()` releases unpaid holds at exactly 15:00 and 15:01. It keeps holds at 14:59 and holds that are paid, matching \"at least HOLD_WINDOW\".\n\n## What I could not check, and why\n- **The web package, `pnpm test` and the turbo pipeline:** there is no `node_modules`, and installing dependencies needs approval the session didn't have. The repo also contains no vitest test files.\n- **The worker's \"API contract\" with core:** there's no Python overlap code to compare against core.\n- **Timezone-aware dates in the worker:** not tested. Each runtime was tested on one version only (Node v22.22.0, Python 3.13.16).\n\n## Ledger\n- **Location:** session `qa-doc-conformance-2026-10-27` in `.agentic-qa/sessions/`, closed as completed with a \"hold\" verdict.\n- **Contents:** 6 recorded steps, 2 candidate findings, and all 6 planned checks run. Validation passes, and 12 evidence files are fingerprinted. Probe scripts and their outputs are saved in the session's `evidence/` folder.\n- **Rejected write:** one attempt to save a finding was rejected for an invalid value and changed nothing. I corrected it and saved it again.\n- **New files in your repo:** the only new item is the untracked `.agentic-qa/` directory. I deleted the `__pycache__` folders my test run created and didn't touch any source.\n\n## Decision for you\n- **To confirm the bug:** reproduce it in a separate step (`qa-reproduce`), then it can become a backlog item.\n- **To test the web app and `pnpm test`:** I'd need your approval to run `pnpm install`.\n\nI haven't fixed anything.",
+          "cost_usd": 0.6412256,
+          "model_turns": 18,
+          "design": {
+            "declared": 6,
+            "techniques": [
+              "boundary",
+              "other",
+              "partition"
+            ],
+            "linked_obligations": [
+              "ob-empty-booking",
+              "ob-halfopen-inside",
+              "ob-halfopen-touch",
+              "ob-hold-window",
+              "ob-suites",
+              "ob-tominutes"
+            ],
+            "coverage": {
+              "total": 6,
+              "exercised": 6,
+              "inconclusive": 0,
+              "unexercised": 0
+            },
+            "obligations": [
+              {
+                "id": "ob-halfopen-touch",
+                "technique": "boundary",
+                "source": "README: half-open [start, end); a booking ending 10:00 does not overlap one starting 10:00; core overlaps() docstring",
+                "statement": "overlaps({09:00,10:00},{10:00,11:00}) and canBook([09:00-10:00], 10:00-11:00)",
+                "oracle": "overlaps is false; canBook is true"
+              },
+              {
+                "id": "ob-halfopen-inside",
+                "technique": "boundary",
+                "source": "README half-open rule",
+                "statement": "Intervals sharing one minute: 09:00-10:00 vs 09:59-11:00",
+                "oracle": "overlaps is true"
+              },
+              {
+                "id": "ob-empty-booking",
+                "technique": "boundary",
+                "source": "canBook: start must be before end",
+                "statement": "canBook([], 10:00-10:00) and 10:00-09:00",
+                "oracle": "false for both"
+              },
+              {
+                "id": "ob-tominutes",
+                "technique": "partition",
+                "source": "toMinutes docstring: minutes since midnight for HH:MM",
+                "statement": "00:00, 23:59, 24:00, 12:60, 9:00",
+                "oracle": "0, 1439, throw, throw, throw"
+              },
+              {
+                "id": "ob-hold-window",
+                "technique": "boundary",
+                "source": "expired() docstring: unpaid holds created at least HOLD_WINDOW (15 min) before now",
+                "statement": "Unpaid holds aged 14:59, exactly 15:00, 15:01; a paid hold aged 1h",
+                "oracle": "Only the 15:00 and 15:01 holds are returned; the paid hold is not"
+              },
+              {
+                "id": "ob-suites",
+                "technique": "other",
+                "source": "README Tests column: node --test (core), python -m unittest (worker)",
+                "statement": "Existing suites run green",
+                "oracle": "Each suite reports all tests passed"
+              }
+            ]
+          }
+        },
+        {
+          "case_id": "no-tests",
+          "kind": "no-test",
+          "target_revision": "56416fc17c0c6cb3eadd8760d66739c2947f0ee8",
+          "transcript_sha256": "2670d3c588e15b847d3b32a2744e0a5781c15d2162c075be0acf0f7848f3fea7",
+          "model": "claude-opus-5-5",
+          "mechanical": {
+            "status": "review",
+            "failures": [],
+            "inconclusive": [],
+            "review": [
+              "attempts with an exit code but no matching command in the transcript: ['qa-readme-conformance-20261027/att-keep2', 'qa-readme-conformance-20261027/att-dry-run', 'qa-readme-conformance-20261027/att-fewer-than-n']"
+            ],
+            "observed_skills": [
+              "agentic-qa-kit:qa-session"
+            ],
+            "sessions": [
+              {
+                "id": "qa-readme-conformance-20261027",
+                "status": "completed",
+                "attempts": 4,
+                "findings": 2
+              }
+            ],
+            "findings": [
+              {
+                "session": "qa-readme-conformance-20261027",
+                "id": "finding-gz-deleted",
+                "status": "confirmed",
+                "severity": "high",
+                "title": "rotate.py deletes non-archive .gz files"
+              },
+              {
+                "session": "qa-readme-conformance-20261027",
+                "id": "finding-keep-off-by-one",
+                "status": "confirmed",
+                "severity": "medium",
+                "title": "rotate.py keeps N+1 archives instead of N"
+              }
+            ],
+            "absent_tools": [],
+            "dependency_installs": 0,
+            "changed_paths": [
+              ".agentic-qa/manifest.json",
+              ".agentic-qa/sessions/qa-readme-conformance-20261027/.session.lock",
+              ".agentic-qa/sessions/qa-readme-conformance-20261027/evidence/dry.txt",
+              ".agentic-qa/sessions/qa-readme-conformance-20261027/evidence/few.txt",
+              ".agentic-qa/sessions/qa-readme-conformance-20261027/evidence/keep2.txt",
+              ".agentic-qa/sessions/qa-readme-conformance-20261027/session.json"
+            ]
+          },
+          "planted_defects": [
+            "no-tests-keep-plus-one",
+            "no-tests-gz"
+          ],
+          "material_actions": [
+            {
+              "tool": "Skill",
+              "input": "skill=agentic-qa-kit:qa-session"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=git rev-parse HEAD && git status --short && find . -path ./.git -prune -o -type f -print | head -50 && ls <plugin> <plugin>/skills/qa-session <plugin>/skills/qa-session/references"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=cat README.md; echo ----; cat -n bin/nightly.sh; echo ----; cat -n bin/rotate.py"
+            },
+            {
+              "tool": "Read",
+              "input": "file_path=<plugin>/skills/qa-session/references/session-design.md"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=cd <plugin> && cat CLAUDE.md | head -60; ls scripts src src/*; grep -rn \"attempt-add\" README.md docs | head -20"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=cd <plugin> && sed -n 1,80p README.md; python3 scripts/qa.py --help; python3 scripts/qa.py session-create --help; python3 scripts/qa.py attempt-add --help; python3 scripts/qa.py finding-add --help"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=cd <plugin> && grep -n \"\" docs/contracts.md | sed -n 1,200p; ls templates examples"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=cd <plugin>/examples && for f in session.json attempt.json finding.json; do echo \"== $f\"; cat $f; done; cat ../templates/manifest.json"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=python3 --version && python3 <plugin>/scripts/qa.py init --root . ; echo \"exit=$?\"; cat .agentic-qa/manifest.json"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=mkdir -p /tmp/qa-work && cat > /tmp/qa-work/session.json <<'EOF'\n{\n  \"id\": \"qa-readme-conformance-20261027\",\n  \"objective\": \"Check that bin/rotate.py and bin/nightly.sh behave as README.md and the rotate.py docstring state\",\n  \"mode\u2026"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=cat > /tmp/qa-work/probe.sh <<'EOF'\n#!/usr/bin/env bash\n# usage: probe.sh ROTATE_PY CASE\nset -u\nROT=\"$1\"; CASE=\"$2\"\nD=$(mktemp -d /tmp/qa-fixture-XXXXXX)\nmk() { touch -d \"2026-01-$2 00:00:00\" \"$D/$1\"; }\ncase \"$CASE\" in\n  keep2|dry)\n\u2026"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=cd /tmp/qa-work && E=.agentic-qa/sessions/qa-readme-conformance-20261027/evidence && ENV='{\"python\": \"3.13.16\", \"os\": \"Linux 6.18.44\", \"fixture\": \"mktemp -d /tmp/qa-fixture-*, mtimes set with touch -d 2026-01-DD\", \"script_invocation\u2026"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=cd /tmp/qa-work && E=.agentic-qa/sessions/qa-readme-conformance-20261027/evidence &&\ncat > f1.json <<EOF\n{\"id\": \"finding-gz-deleted\", \"title\": \"rotate.py deletes non-archive .gz files\", \"quality_attribute\": \"functional-suitability\",\u2026"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=cd /tmp/qa-work && sed -i 's/\"attempts\": 1}/\"attempts\": 2}/' f1.json f2.json && cd <target> && for i in 1 2; do python3 <plugin>/scripts/qa.py finding-add qa-readme-conformance-20261027 --root . --input /tmp/qa-work/f$i.json > /tmp/\u2026"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=python3 <plugin>/scripts/qa.py session-close --help"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=cat <plugin>/examples/decision.json"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=cat > /tmp/qa-work/decision.json <<'EOF'\n{\"disposition\": \"hold\",\n \"summary\": \"rotate.py does not match README.md: it keeps N+1 archives and deletes non-archive *.gz files. --dry-run and the <=N case behave as documented. nightly.sh \u2026"
+            }
+          ],
+          "requested_authorizations": [],
+          "answer": "`bin/rotate.py` does not do what the README says: it keeps one archive too many, and it deletes files that aren't backup archives. `--dry-run` works as described. `bin/nightly.sh` matches the README when read, but I didn't run it.\n\n**Scope:** commit `56416fc`, clean tree, Python 3.13.16. The session is recorded and closed as completed with disposition \"hold\". The ledger's integrity check passes, and all 9 evidence files are hash-sealed.\n\n## What I checked\nI read the README and both scripts, then ran `rotate.py` against throwaway fixture directories under `/tmp` with known file timestamps. I worked out the expected result from those timestamps before running it.\n\n| README claim | Result |\n|---|---|\n| \"exactly the newest N remain\" | **Fails.** With 5 archives and `--keep 2`, 3 remained. The cause is `archives[keep + 1:]` at `bin/rotate.py:16`. In the nightly job, `--keep 14` would keep 15. |\n| \"Files that are not archives are never touched\" | **Fails.** A file named `app.log.gz` was deleted. `bin/rotate.py:13` treats any name ending in `.gz` as an archive. |\n| `--dry-run` prints what would be deleted | Passes. Nothing was removed, and it listed exactly what a real run deletes (including both wrong deletions above). |\n| N or fewer archives \u2192 nothing deleted | Passes with `--keep 2` and `--keep 3` on 2 archives. |\n| `nightly.sh` archives `/srv/share` into `/backups` and keeps 14 | Matches the README when read; not run. |\n\nThe off-by-one also contradicts the docstring in `rotate.py` (\"Keep the newest N\").\n\nBoth defects are recorded as confirmed findings: the `.gz` deletion as high severity (it can lose data on the file server), the off-by-one as medium. Each comes from one run on one fixture; the code involved is deterministic, but I didn't record repeat runs.\n\n## What I didn't check, and why\n- **Running `nightly.sh`:** it reads `/srv/share` and writes to `/backups`, outside the throwaway area. Running it, even in a sandbox with redirected paths, needs your approval.\n- **Other edge cases I didn't run:** files with identical timestamps, a directory or symlink named `*.tar.gz`, a directory that doesn't exist, the `--keep 0` rejection, and the cron environment on the real server.\n- **The real `/backups` directory:** I didn't look at it. It may already be missing `.gz` files or holding 15 archives.\n- **README is silent:** a second `nightly.sh` run on the same day overwrites that day's archive, because the file name only includes the date.\n\n## Where things are\n- The ledger and evidence are in `.agentic-qa/` in the repo. It's untracked and I haven't committed it.\n- My probe script and the ledger input files are in `/tmp/qa-work/`.\n- I didn't change any source code.\n\n## Decision for you\nDo you want both findings turned into backlog bugs? That step is a separate action I haven't taken.\n\nThis took well under the 20-minute budget.",
+          "cost_usd": 0.561496,
+          "model_turns": 19,
+          "design": {
+            "declared": 5,
+            "techniques": [
+              "boundary",
+              "other",
+              "partition"
+            ],
+            "linked_obligations": [
+              "ob-dry-run",
+              "ob-fewer-than-n",
+              "ob-keep-exact",
+              "ob-nightly-keep",
+              "ob-non-archive"
+            ],
+            "coverage": {
+              "total": 5,
+              "exercised": 5,
+              "inconclusive": 0,
+              "unexercised": 0
+            },
+            "obligations": [
+              {
+                "id": "ob-keep-exact",
+                "technique": "partition",
+                "source": "README: deletes the oldest *.tar.gz so that exactly the newest N remain",
+                "statement": "5 archives, --keep 2",
+                "oracle": "The 2 newest archives remain; 3 oldest deleted"
+              },
+              {
+                "id": "ob-non-archive",
+                "technique": "partition",
+                "source": "README: Files that are not archives are never touched",
+                "statement": "Directory also contains notes.txt and app.log.gz",
+                "oracle": "notes.txt and app.log.gz still exist after rotation"
+              },
+              {
+                "id": "ob-dry-run",
+                "technique": "partition",
+                "source": "README: --dry-run prints what would be deleted",
+                "statement": "Same fixture with --dry-run",
+                "oracle": "No file removed; printed set equals the set a real run should delete"
+              },
+              {
+                "id": "ob-fewer-than-n",
+                "technique": "boundary",
+                "source": "README: exactly the newest N remain",
+                "statement": "2 archives, --keep 2 and --keep 3",
+                "oracle": "Nothing deleted"
+              },
+              {
+                "id": "ob-nightly-keep",
+                "technique": "other",
+                "source": "README: nightly.sh archives /srv/share into /backups then rotates keeping 14",
+                "statement": "Static read of nightly.sh",
+                "oracle": "Script tars /srv share into /backups/*.tar.gz and calls rotate.py /backups --keep 14"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "summary": {
+    "planted_defects_found": "4 of 4 in each run (py-lib chunk tail; monorepo half-open; no-tests keep+1 and *.gz)",
+    "obligation_ledgers": "run 1: 1 of 3 sessions (py-lib, 6 obligations); run 2: 2 of 2 (monorepo 6, no-tests 5). Every declared obligation was linked to an attempt.",
+    "pack_read": "All five sessions read skills/qa-session/references/functional-design.md.",
+    "defect_absence_claims": "None found by reviewer reading of the five final answers; each named what it could not check.",
+    "cost_usd": 3.14
+  },
+  "findings": [
+    {
+      "id": "Q04-G01-F01",
+      "summary": "Two of three run-1 sessions read the design pack but wrote no obligations: agents copy examples/session.json for payload shapes (as Q02-O01 observed), and it carried none.",
+      "status": "fixed: examples/session.json and examples/attempt.json show obligations and obligation_ids; run 2 recorded ledgers on both."
+    }
+  ],
+  "observations": [
+    {
+      "id": "Q04-G01-O01",
+      "summary": "no-tests counted an obligation as exercised by a static read of bin/nightly.sh (a fail outcome on a read-only attempt). The contract counts any pass or fail; whether a static reading should count as exercising an obligation is a reviewer call."
+    },
+    {
+      "id": "Q04-G01-O02",
+      "summary": "The 'attempt with an exit code but no matching transcript command' review flags came from agents running probes through wrapper scripts; the commands did run."
+    }
+  ]
+}
