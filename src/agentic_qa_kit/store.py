@@ -12,6 +12,7 @@ from .model import (
     SESSION_SCHEMA_VERSION,
     TERMINAL_SESSION_STATUSES,
     ValidationError,
+    check_obligation_links,
     normalize_attempt,
     normalize_finding,
     normalize_session,
@@ -345,6 +346,7 @@ class KitStore:
         charter_ids = {charter["id"] for charter in session["charters"]}
         if attempt["charter_id"] not in charter_ids:
             raise ValidationError(f"unknown charter ID: {attempt['charter_id']}")
+        check_obligation_links(attempt, session["charters"])
         if attempt["id"] in {item["id"] for item in session["attempts"]}:
             raise ValidationError(f"attempt already exists: {attempt['id']}")
         session["attempts"].append(attempt)

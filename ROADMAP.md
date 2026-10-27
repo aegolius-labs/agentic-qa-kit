@@ -66,7 +66,7 @@ Claude Code is the primary host and Codex is supported alongside it. `skills/` i
 
 ### M4 - Technique and quality-attribute packs
 
-- [ ] Add specification/model-based design guidance: partitions, boundaries, decision tables, states, and oracle design.
+- [x] Add specification/model-based design guidance: partitions, boundaries, decision tables, states, and oracle design. `qa-session`'s functional-design reference and charter obligations (Q04, 2026-10-22).
 - [ ] Add static, contract, property, metamorphic, mutation, and adequacy routing.
 - [ ] Add performance/capacity, reliability/recovery, accessibility/compatibility/i18n, and data-integrity session packs.
 - [ ] Integrate with a dedicated security workflow when available instead of duplicating specialist security tooling.
@@ -207,12 +207,14 @@ ledger-chaining hazard (Q02-F01) and a measured payload-discovery cost for Q07
 
 ### Q04 - Add model-based functional design pack
 
-- **Status:** Not started
+- **Status:** In progress. The design pack and the obligation ledger are in place (2026-10-22); the representative-specification evaluation is open as Q04-G01
 - **Importance:** High
 - **Complexity:** Medium
 - **Depends on:** Q02 findings
 - **Approach:** Encode technique selection and evidence requirements for partitions, boundaries, rules, states, scenarios, combinatorial coverage, and independent oracles.
 - **Done when:** Representative specifications produce reviewable obligation ledgers and tests without presenting model coverage as defect absence.
+- **Follow-ups:**
+  - [ ] Q04-G01: Run representative specifications through the installed plugin (Q02 fixtures with written rules) and record whether the obligation ledgers are reviewable, the oracles independent, and coverage reported without a defect-absence claim.
 
 ### Q05 - Add non-functional session packs
 

@@ -31,6 +31,17 @@ SESSION_SCHEMA_VERSION = 2
 SESSION_SCHEMA_VERSIONS = {1, 2}
 CHARTER_STATUSES = {"planned", "running", "completed", "blocked"}
 ATTEMPT_OUTCOMES = {"pass", "fail", "inconclusive", "error"}
+# Test-design techniques an obligation can come from (Q04).
+DESIGN_TECHNIQUES = {
+    "partition",
+    "boundary",
+    "decision-table",
+    "state-transition",
+    "scenario",
+    "combinatorial",
+    "property",
+    "other",
+}
 FINDING_STATUSES = {"candidate", "confirmed", "not-reproduced", "dismissed"}
 FINDING_SEVERITIES = {"blocker", "critical", "high", "medium", "low"}
 CONFIDENCE_LEVELS = {"high", "medium", "low"}
@@ -217,6 +228,7 @@ def validate_charter(value: Any, path: str) -> None:
             "budget",
             "stop_conditions",
             "status",
+            "obligations",
         },
         path,
     )
@@ -235,6 +247,67 @@ def validate_charter(value: Any, path: str) -> None:
     _expect_int(budget.get("attempts"), f"{path}.budget.attempts", 1)
     _expect_string_list(charter.get("stop_conditions"), f"{path}.stop_conditions", nonempty=True)
     _expect_enum(charter.get("status"), CHARTER_STATUSES, f"{path}.status")
+    if "obligations" in charter:
+        validate_obligations(charter["obligations"], f"{path}.obligations")
+
+
+def validate_obligations(value: Any, path: str) -> None:
+    """A charter's test obligations: what the design says must be exercised."""
+
+    obligations = _expect_list(value, path)
+    seen: set[str] = set()
+    for index, entry_value in enumerate(obligations):
+        entry_path = f"{path}[{index}]"
+        entry = _expect_object(entry_value, entry_path)
+        _reject_unknown(entry, {"id", "technique", "source", "statement", "oracle"}, entry_path)
+        obligation_id = _expect_id(entry.get("id"), f"{entry_path}.id")
+        if obligation_id in seen:
+            raise ValidationError(f"{path} IDs must be unique: {obligation_id}")
+        seen.add(obligation_id)
+        _expect_enum(entry.get("technique"), DESIGN_TECHNIQUES, f"{entry_path}.technique")
+        for field in ("source", "statement", "oracle"):
+            _expect_string(entry.get(field), f"{entry_path}.{field}")
+
+
+def check_obligation_links(attempt: dict[str, Any], charters: list[dict[str, Any]]) -> None:
+    """An attempt may name only obligations of its own charter."""
+
+    linked = attempt.get("obligation_ids") or []
+    if not linked:
+        return
+    charter = next(item for item in charters if item["id"] == attempt["charter_id"])
+    known = {item["id"] for item in charter.get("obligations") or []}
+    unknown = sorted(set(linked) - known)
+    if unknown:
+        raise ValidationError(
+            f"attempt {attempt['id']} names obligations not in charter {charter['id']}: {', '.join(unknown)}"
+        )
+
+
+def obligation_coverage(session: dict[str, Any]) -> dict[str, int]:
+    """How many declared obligations an attempt exercised.
+
+    `exercised` means a pass or fail was observed against the obligation;
+    `inconclusive` means it was only attempted with an inconclusive or error
+    outcome. This measures the design model, not the absence of defects.
+    """
+
+    outcomes: dict[tuple[str, str], set[str]] = {}
+    for attempt in session["attempts"]:
+        for obligation_id in attempt.get("obligation_ids") or []:
+            outcomes.setdefault((attempt["charter_id"], obligation_id), set()).add(attempt["outcome"])
+    counts = {"total": 0, "exercised": 0, "inconclusive": 0, "unexercised": 0}
+    for charter in session["charters"]:
+        for obligation in charter.get("obligations") or []:
+            counts["total"] += 1
+            seen = outcomes.get((charter["id"], obligation["id"]), set())
+            if seen & {"pass", "fail"}:
+                counts["exercised"] += 1
+            elif seen:
+                counts["inconclusive"] += 1
+            else:
+                counts["unexercised"] += 1
+    return counts
 
 
 def validate_attempt(payload: dict[str, Any]) -> None:
@@ -252,6 +325,7 @@ def validate_attempt(payload: dict[str, Any]) -> None:
             "observation",
             "oracle",
             "evidence",
+            "obligation_ids",
         },
         "attempt",
     )
@@ -274,6 +348,9 @@ def validate_attempt(payload: dict[str, Any]) -> None:
     _expect_string(payload.get("observation"), "attempt.observation")
     _expect_string(payload.get("oracle"), "attempt.oracle")
     validate_evidence(payload.get("evidence"), "attempt.evidence")
+    if "obligation_ids" in payload:
+        for index, value in enumerate(_expect_list(payload["obligation_ids"], "attempt.obligation_ids")):
+            _expect_id(value, f"attempt.obligation_ids[{index}]")
 
 
 def normalize_attempt(payload: dict[str, Any]) -> dict[str, Any]:
@@ -469,6 +546,7 @@ def validate_session(payload: dict[str, Any]) -> None:
         validate_attempt(_expect_object(attempt, f"session.attempts[{index}]"))
         if attempt["charter_id"] not in charter_ids:
             raise ValidationError(f"attempt {attempt['id']} references unknown charter {attempt['charter_id']}")
+        check_obligation_links(attempt, charters)
         attempt_ids.append(attempt["id"])
     if len(attempt_ids) != len(set(attempt_ids)):
         raise ValidationError("session attempt IDs must be unique")

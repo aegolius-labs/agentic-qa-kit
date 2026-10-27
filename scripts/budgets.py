@@ -36,7 +36,9 @@ from agentic_qa_kit.cli import _session_summary  # noqa: E402
 from agentic_qa_kit.store import KitStore  # noqa: E402
 
 
-# What one activation loads: the skill body, then its single reference.
+# What one activation loads: the skill body, then the one reference its
+# trigger selects. A skill may hold several references (technique packs); each
+# is capped, and activation counts the body plus the largest of them.
 SKILL_BODY_BYTES = 3_072
 SKILL_REFERENCE_BYTES = 3_072
 SKILL_ACTIVATION_BYTES = 5_632
@@ -76,7 +78,7 @@ def skill_measurements(root: Path) -> list[dict[str, Any]]:
                 "skill": skill.parent.name,
                 "body_bytes": len(body),
                 "largest_reference_bytes": largest,
-                "activation_bytes": len(body) + sum(ref.stat().st_size for ref in references),
+                "activation_bytes": len(body) + largest,
                 "description_bytes": len(
                     _front_matter_description(body.decode("utf-8")).encode("utf-8")
                 ),

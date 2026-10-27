@@ -10,6 +10,26 @@ computed version and promotes that section when it publishes.
 
 ### Added
 
+- Functional test-design pack (Q04): a `qa-session` reference that picks
+  partition, boundary, decision-table, state-transition, scenario,
+  combinatorial or property techniques from the specification's shape, and
+  requires an obligation ledger with independent oracles before execution.
+- Charters accept optional `obligations` (id, technique, source, statement,
+  oracle), and attempts accept `obligation_ids` naming obligations of their own
+  charter. `summary` reports obligation coverage as total, exercised,
+  inconclusive and unexercised: coverage of the design model, not defect
+  absence.
+
+### Changed
+
+- The skill activation budget counts a skill body plus its largest reference,
+  since a skill reads only the reference its trigger selects. Each reference
+  stays capped at 3 KB.
+
+## [0.3.0] - 2026-10-22
+
+### Added
+
 - Evidence-file digests (Q03-G01). Attempt and finding writes record a
   SHA-256 digest of each evidence file inside the repository, and refuse a
   supplied digest that does not match the file. `validate` fails when a
