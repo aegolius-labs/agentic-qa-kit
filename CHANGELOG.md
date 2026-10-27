@@ -10,6 +10,20 @@ computed version and promotes that section when it publishes.
 
 ### Added
 
+- `scripts/q06_interop.py`, an offline check of the backlog handoff against a
+  real Agentic Backlog Kit checkout (Q06), with its first recorded result.
+
+### Fixed
+
+- The backlog handoff example used status `Backlog`, which the backlog kit's
+  default workflow does not define. It now uses `Inbox`, and the contract says
+  the status must come from the backlog manifest's `workflow.statuses`
+  (Q06-F01).
+
+## [0.4.0] - 2026-10-27
+
+### Added
+
 - Functional test-design pack (Q04): a `qa-session` reference that picks
   partition, boundary, decision-table, state-transition, scenario,
   combinatorial or property techniques from the specification's shape, and
