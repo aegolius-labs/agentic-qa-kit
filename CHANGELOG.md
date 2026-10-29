@@ -10,6 +10,22 @@ computed version and promotes that section when it publishes.
 
 ### Added
 
+- Q05-G01 lane: `scripts/q05_claude_code.py` sends one non-functional request
+  per pack through the installed plugin, two of them needing an action the
+  packs reserve for approval, and records which pack each session read and how
+  the ledger marks its attempts. The 2026-10-29 result is in
+  `evals/results/q05-claude-code-2026-10-29.json`.
+
+### Fixed
+
+- `qa-session` names what each non-functional pack covers instead of only its
+  quality attribute, so a request about paging or consistency reaches the
+  data-integrity pack (Q05-G01-F01). The data-integrity pack lists paging.
+
+## [0.6.0] - 2026-10-29
+
+### Added
+
 - Non-functional session packs (Q05): `qa-session` references for performance,
   resilience and recovery, accessibility with compatibility and i18n, and data
   integrity. Each states its workload, fault model or population, environment,
