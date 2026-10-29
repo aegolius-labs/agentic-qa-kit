@@ -24,6 +24,7 @@ Return a compact profile with:
 - Failure/recovery risk: require a fault model, steady-state oracle, blast radius, rollback, and explicit authorization (resilience pack).
 - UI/user risk: include accessibility tree, keyboard/assistive technology, locale, compatibility, and durable task outcomes (accessibility-i18n pack).
 - Persistence/migration risk: include invariants, concurrency, reconciliation, rollback/roll-forward, and data governance (data-integrity pack).
+- Flaky, order-dependent or retried suite: vary one entropy source at a time before trusting a verdict (suite-trust pack).
 - AI/agent target: version the full configuration and test repeated outcomes, trajectories, side effects, policy, memory, recovery, and cost separately.
 
 Do not select every technique. Choose the smallest portfolio that reduces the most decision-relevant uncertainty within the available budget.
