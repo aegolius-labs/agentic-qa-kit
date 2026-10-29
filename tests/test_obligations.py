@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 import tempfile
 import unittest
-from contextlib import redirect_stdout
+from contextlib import redirect_stderr, redirect_stdout
 from io import StringIO
 from pathlib import Path
 
@@ -80,6 +80,19 @@ class ObligationTests(unittest.TestCase):
             main(["summary", "--root", self.root])
         summary = json.loads(out.getvalue())["sessions"][0]
         self.assertEqual(summary["obligations"], {"total": 3, "exercised": 0, "inconclusive": 0, "unexercised": 3})
+
+    def test_summary_takes_the_session_like_show(self) -> None:
+        # Q07: agents passed the session positionally, as `show` and `session-close` take it.
+        session_id = KitStore(Path(self.root)).list_sessions()[0]["id"]
+        for argv in (["summary", session_id], ["summary", "--session", session_id]):
+            out = StringIO()
+            with redirect_stdout(out):
+                main([*argv, "--root", self.root])
+            self.assertEqual([s["id"] for s in json.loads(out.getvalue())["sessions"]], [session_id])
+        err = StringIO()
+        with redirect_stderr(err), self.assertRaises(SystemExit):
+            main(["summary", session_id, "--session", "qa-other", "--root", self.root])
+        self.assertIn("two different sessions", err.getvalue())
 
     def test_sessions_without_obligations_still_validate(self) -> None:
         other = KitStore(Path(self.root))

@@ -1,0 +1,217 @@
+{
+  "total": {
+    "tool_calls": 313,
+    "discovery_calls": 72,
+    "discovery_result_bytes": 187814,
+    "result_bytes": 543991,
+    "ledger_writes": 100,
+    "ledger_rejections": 23,
+    "input_tokens": 10391655,
+    "cost_usd": 10.82,
+    "permission_denials": 1,
+    "sessions": 18,
+    "sessions_with_discovery": 18,
+    "discovery_call_share": 0.23,
+    "discovery_byte_share": 0.345
+  },
+  "sessions": {
+    "q02-run1/dotnet-missing": {
+      "tool_calls": 20,
+      "discovery_calls": 4,
+      "discovery_result_bytes": 6092,
+      "result_bytes": 21860,
+      "ledger_writes": 11,
+      "ledger_rejections": 6,
+      "input_tokens": 690823,
+      "cost_usd": 0.6203,
+      "permission_denials": 0
+    },
+    "q02-run1/go-cli": {
+      "tool_calls": 20,
+      "discovery_calls": 5,
+      "discovery_result_bytes": 6700,
+      "result_bytes": 25487,
+      "ledger_writes": 6,
+      "ledger_rejections": 1,
+      "input_tokens": 706144,
+      "cost_usd": 0.6869,
+      "permission_denials": 1
+    },
+    "q02-run1/monorepo": {
+      "tool_calls": 13,
+      "discovery_calls": 3,
+      "discovery_result_bytes": 3733,
+      "result_bytes": 46687,
+      "ledger_writes": 4,
+      "ledger_rejections": 0,
+      "input_tokens": 445474,
+      "cost_usd": 0.5834,
+      "permission_denials": 0
+    },
+    "q02-run1/no-tests": {
+      "tool_calls": 14,
+      "discovery_calls": 2,
+      "discovery_result_bytes": 4879,
+      "result_bytes": 21555,
+      "ledger_writes": 6,
+      "ledger_rejections": 1,
+      "input_tokens": 450943,
+      "cost_usd": 0.5467,
+      "permission_denials": 0
+    },
+    "q02-run1/py-lib": {
+      "tool_calls": 14,
+      "discovery_calls": 6,
+      "discovery_result_bytes": 16909,
+      "result_bytes": 25321,
+      "ledger_writes": 4,
+      "ledger_rejections": 0,
+      "input_tokens": 426024,
+      "cost_usd": 0.4694,
+      "permission_denials": 0
+    },
+    "q02-run1/py-service": {
+      "tool_calls": 11,
+      "discovery_calls": 3,
+      "discovery_result_bytes": 10513,
+      "result_bytes": 23950,
+      "ledger_writes": 2,
+      "ledger_rejections": 0,
+      "input_tokens": 336710,
+      "cost_usd": 0.4226,
+      "permission_denials": 0
+    },
+    "q02-run1/ts-node": {
+      "tool_calls": 16,
+      "discovery_calls": 3,
+      "discovery_result_bytes": 6903,
+      "result_bytes": 22888,
+      "ledger_writes": 6,
+      "ledger_rejections": 2,
+      "input_tokens": 508045,
+      "cost_usd": 0.6364,
+      "permission_denials": 0
+    },
+    "q02-run1/ui-static": {
+      "tool_calls": 17,
+      "discovery_calls": 6,
+      "discovery_result_bytes": 11987,
+      "result_bytes": 31319,
+      "ledger_writes": 4,
+      "ledger_rejections": 2,
+      "input_tokens": 586284,
+      "cost_usd": 0.631,
+      "permission_denials": 0
+    },
+    "q04-run1/monorepo": {
+      "tool_calls": 21,
+      "discovery_calls": 3,
+      "discovery_result_bytes": 14309,
+      "result_bytes": 32733,
+      "ledger_writes": 6,
+      "ledger_rejections": 1,
+      "input_tokens": 727588,
+      "cost_usd": 0.6175,
+      "permission_denials": 0
+    },
+    "q04-run1/no-tests": {
+      "tool_calls": 17,
+      "discovery_calls": 3,
+      "discovery_result_bytes": 5010,
+      "result_bytes": 23041,
+      "ledger_writes": 0,
+      "ledger_rejections": 0,
+      "input_tokens": 542068,
+      "cost_usd": 0.5103,
+      "permission_denials": 0
+    },
+    "q04-run1/py-lib": {
+      "tool_calls": 26,
+      "discovery_calls": 6,
+      "discovery_result_bytes": 10508,
+      "result_bytes": 42490,
+      "ledger_writes": 5,
+      "ledger_rejections": 0,
+      "input_tokens": 907031,
+      "cost_usd": 0.8106,
+      "permission_denials": 0
+    },
+    "q04-run2/monorepo": {
+      "tool_calls": 16,
+      "discovery_calls": 3,
+      "discovery_result_bytes": 19981,
+      "result_bytes": 35248,
+      "ledger_writes": 8,
+      "ledger_rejections": 1,
+      "input_tokens": 570935,
+      "cost_usd": 0.6412,
+      "permission_denials": 0
+    },
+    "q04-run2/no-tests": {
+      "tool_calls": 17,
+      "discovery_calls": 5,
+      "discovery_result_bytes": 14835,
+      "result_bytes": 34003,
+      "ledger_writes": 6,
+      "ledger_rejections": 1,
+      "input_tokens": 567898,
+      "cost_usd": 0.5615,
+      "permission_denials": 0
+    },
+    "q05-run1/a11y-ui-static": {
+      "tool_calls": 18,
+      "discovery_calls": 6,
+      "discovery_result_bytes": 18873,
+      "result_bytes": 40534,
+      "ledger_writes": 6,
+      "ledger_rejections": 2,
+      "input_tokens": 654280,
+      "cost_usd": 0.8269,
+      "permission_denials": 0
+    },
+    "q05-run1/integrity-py-service": {
+      "tool_calls": 15,
+      "discovery_calls": 4,
+      "discovery_result_bytes": 10169,
+      "result_bytes": 25813,
+      "ledger_writes": 6,
+      "ledger_rejections": 1,
+      "input_tokens": 497122,
+      "cost_usd": 0.506,
+      "permission_denials": 0
+    },
+    "q05-run1/perf-py-lib": {
+      "tool_calls": 18,
+      "discovery_calls": 3,
+      "discovery_result_bytes": 14551,
+      "result_bytes": 33107,
+      "ledger_writes": 6,
+      "ledger_rejections": 1,
+      "input_tokens": 590226,
+      "cost_usd": 0.6021,
+      "permission_denials": 0
+    },
+    "q05-run1/resilience-py-service": {
+      "tool_calls": 24,
+      "discovery_calls": 5,
+      "discovery_result_bytes": 8982,
+      "result_bytes": 34850,
+      "ledger_writes": 8,
+      "ledger_rejections": 1,
+      "input_tokens": 724230,
+      "cost_usd": 0.6506,
+      "permission_denials": 0
+    },
+    "q05-run2/integrity-py-service": {
+      "tool_calls": 16,
+      "discovery_calls": 2,
+      "discovery_result_bytes": 2880,
+      "result_bytes": 23105,
+      "ledger_writes": 6,
+      "ledger_rejections": 3,
+      "input_tokens": 459830,
+      "cost_usd": 0.4979,
+      "permission_denials": 0
+    }
+  }
+}

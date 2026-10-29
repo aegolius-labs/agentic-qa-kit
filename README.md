@@ -13,7 +13,7 @@ The design is derived from `Modern_Quality_Engineering_2026.md`: quality is a co
 - `qa-report`: normalize attempts and findings into an evidence package and QA session report.
 - `qa-backlog-handoff`: generate a reviewed Bug payload and optionally feed it to Agentic Backlog Kit.
 
-The skills use the host's existing repository, shell, browser, and connector capabilities. The first release deliberately has no MCP server: the local ledger supplies deterministic artifact handling while the agent selects the tools already available in the host.
+The skills use the host's existing repository, shell, browser, and connector capabilities. There is deliberately no MCP server ([Q07 decision](docs/q07-mcp-decision.md)): the local ledger supplies deterministic artifact handling while the agent selects the tools already available in the host.
 
 ## Local ledger
 
