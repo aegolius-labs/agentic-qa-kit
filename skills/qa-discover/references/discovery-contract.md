@@ -20,10 +20,10 @@ Return a compact profile with:
 - Broad input space: consider properties, metamorphic relations, fuzzing, or constrained combinations.
 - Weak suite sensitivity: consider mutation or differential evidence, not coverage alone.
 - Change-focused request: inspect dependency/change facts, then choose conservative impacted tests plus mandatory gates.
-- Timing/capacity risk: require a declared workload, environment, telemetry, and acceptance distribution.
-- Failure/recovery risk: require a fault model, steady-state oracle, blast radius, rollback, and explicit authorization.
-- UI/user risk: include accessibility tree, keyboard/assistive technology, locale, compatibility, and durable task outcomes.
-- Persistence/migration risk: include invariants, concurrency, reconciliation, rollback/roll-forward, and data governance.
+- Timing/capacity risk: require a declared workload, environment, telemetry, and acceptance distribution (qa-session's performance pack).
+- Failure/recovery risk: require a fault model, steady-state oracle, blast radius, rollback, and explicit authorization (resilience pack).
+- UI/user risk: include accessibility tree, keyboard/assistive technology, locale, compatibility, and durable task outcomes (accessibility-i18n pack).
+- Persistence/migration risk: include invariants, concurrency, reconciliation, rollback/roll-forward, and data governance (data-integrity pack).
 - AI/agent target: version the full configuration and test repeated outcomes, trajectories, side effects, policy, memory, recovery, and cost separately.
 
 Do not select every technique. Choose the smallest portfolio that reduces the most decision-relevant uncertainty within the available budget.

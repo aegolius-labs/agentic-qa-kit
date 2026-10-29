@@ -68,9 +68,10 @@ commit before release automation (owner decision, 2026-10-16). The first
 ## Repository settings
 
 - Immutable releases are enabled and enforced by the organization owner.
-- The repository is private on the free plan, so rulesets and branch protection
-  are not available. Merging only green pull requests is a working rule, not an
-  enforced one.
+- The repository is public (since 2026-10-29). Rulesets match Agentic Backlog
+  Kit: `main` requires one code-owner review, the `test` check and CodeQL, and
+  allows squash merges only, with an admin bypass for pull requests;
+  `release-tags` stops any `v*` tag from being moved or deleted.
 
 ## Recovery
 
