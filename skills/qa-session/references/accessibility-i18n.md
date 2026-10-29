@@ -21,8 +21,8 @@ Without approval, record the attempt as `inconclusive` and stop.
 
 Name:
 - the conformance target, such as WCAG 2.2 AA, or the stated support baseline;
-- the pages or components, states and complete journeys in scope;
-- the user populations and input modes considered, such as keyboard only, screen reader, zoom or reflow, touch, reduced motion, RTL script, or an IME.
+- the pages or components, states and full journeys in scope;
+- the populations and input modes considered, such as keyboard only, screen reader, zoom or reflow, touch, reduced motion, RTL script or an IME.
 
 Anything outside it stays unevaluated.
 
@@ -30,7 +30,7 @@ Anything outside it stays unevaluated.
 
 Record:
 - browser and engine versions, OS and device, viewport and zoom;
-- any assistive technology, with its version and settings;
+- any assistive technology, its version and settings;
 - locale, script and time zone;
 - the rule engine and its version.
 
@@ -43,7 +43,7 @@ A result holds only for the stack it ran on.
   - the expected name, role, state, focus order or announcement;
   - for a journey, task completion by the named input mode.
 - **Compatibility:** the same observable behavior across the baseline matrix.
-- **i18n:** results computed with the platform's locale data, with test text that includes:
+- **i18n:** results from the platform's locale data, with test text that includes:
   - long expansion and mixed RTL/LTR text;
   - combining marks, emoji and zero-width characters;
   - plural forms, locale-sensitive dates and numbers, and DST edges.
@@ -52,7 +52,7 @@ A scanner's score is not an oracle.
 
 ## Uncertainty
 
-Automated rules cover only part of any criterion. Keep `cantTell`, `untested` and `unsupported` outcomes as `inconclusive`; never coerce them to pass. A sample of pages does not support a whole-product claim. No session here substitutes for testing with disabled users. Say so in the report.
+Automated rules cover only part of any criterion. Keep `cantTell`, `untested` and `unsupported` outcomes as `inconclusive`; never coerce them to pass. A page sample does not support a whole-product claim. No session substitutes for testing with disabled users; say so in the report.
 
 ## Stop conditions
 

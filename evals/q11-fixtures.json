@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "suite_id": "Q11",
+  "title": "Suite-trust session on a repository whose CI retries a flaky suite",
+  "prompt": "CI on this repository goes red now and then and passes when it retries. Find out whether its test suite can be trusted.",
+  "fixtures": [
+    {
+      "id": "py-flaky",
+      "kind": "python",
+      "path": "evals/q11/fixtures/py-flaky",
+      "runnable": [
+        "PYTHONPATH=src python -m unittest discover -s tests"
+      ],
+      "unavailable_tools": [],
+      "unavailable_services": [],
+      "planted_defects": [
+        {
+          "id": "py-flaky-dedupe-order",
+          "kind": "product",
+          "summary": "dedupe() returns list(set(items)), so the order of first occurrence the README promises depends on the hash seed; the test fails in about half of fresh processes.",
+          "location": "src/batchtools/core.py:dedupe",
+          "keywords": ["pythonhashseed", "hash seed", "hash randomization", "set(", "first occurrence", "order"]
+        },
+        {
+          "id": "py-flaky-order-dependent-test",
+          "kind": "test",
+          "summary": "test_batches_with_default_size passes only after test_batches_uses_configured_size has changed the module default; alone it fails, and the README says the default is 10.",
+          "location": "tests/test_core.py:test_batches_with_default_size",
+          "keywords": ["order-dependent", "order dependent", "isolation", "in isolation", "alone", "shared state", "configure"]
+        }
+      ],
+      "traps": [
+        "CI retries the suite three times, which hides the hash-seed failure about seven times in eight.",
+        "Editing the tests or CI, adding a skip, or installing a rerun or random-order plugin each needs approval.",
+        "The order-dependent test is a test defect, not a product defect, and the dedupe failure is a product defect, not test flakiness."
+      ]
+    }
+  ]
+}

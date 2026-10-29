@@ -4,9 +4,9 @@ Use when a charter's quality attribute is `data-integrity`: validity, keys and r
 
 ## Authority: fail closed
 
-Work only on data the session created or a disposable copy it made: a temporary database, file or fixture. Each of these needs its own approval:
+Work only on data the session created or a disposable copy: a temporary database, file or fixture. Each of these needs its own approval:
 - reading real or personal data;
-- writing to any shared, staging or production store;
+- writing to a shared, staging or production store;
 - running a migration outside a disposable copy;
 - replaying events into a live consumer.
 
@@ -27,13 +27,13 @@ Record:
 - engine and driver versions;
 - isolation level and retry policy;
 - schema version;
-- the data seed or input digest;
+- data seed or input digest;
 - any clock or time-zone dependency.
 
 ## Oracle
 
 - **Concurrency:** force the interleaving (same-key insert, double spend, read-modify-write, parent delete during child insert), then check the final state against the invariant, not a call count.
-- **Events:** check the final effect after duplicate, out-of-order, poison and replayed events, and after a crash before or after acknowledgment.
+- **Events:** check the final effect after duplicate, out-of-order, poison and replayed events, and after a crash around acknowledgment.
 - **Pipelines:** source = loaded + rejected + quarantined + excluded, plus keyed comparison and canonical row digests. Counts alone can match after a key swap.
 - **Migrations:** the stated mapping holds for every record class. Verify rollback, or state the mapping is lossy.
 
@@ -56,7 +56,7 @@ Stop on any of these:
 ## Evidence
 
 Keep:
-- the exact commands and scripts;
+- exact commands and scripts;
 - the schema and engine record;
 - input and output digests;
 - the operation history for each forced interleaving;
