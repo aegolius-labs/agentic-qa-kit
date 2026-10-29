@@ -208,6 +208,28 @@ class StoreTests(unittest.TestCase):
         )
         self.assertEqual(updated["reproduction"]["attempts"], 2)
 
+    def test_ledger_counts_reproduction_attempts_when_omitted(self) -> None:
+        # Q07: restating a derived count was the most frequent rejected write.
+        self.store.add_attempt("qa-example", attempt_input())
+        finding = candidate_finding()
+        del finding["reproduction"]["attempts"]
+        added = self.store.add_finding("qa-example", finding)
+        self.assertEqual(added["reproduction"]["attempts"], len(added["attempt_ids"]))
+        later = attempt_input()
+        later["id"] = "attempt-later"
+        self.store.add_attempt("qa-example", later)
+        updated = self.store.update_finding(
+            "qa-example", "finding-rounding", {"attempt_ids": added["attempt_ids"] + ["attempt-later"]}
+        )
+        self.assertEqual(updated["reproduction"]["attempts"], len(updated["attempt_ids"]))
+
+    def test_a_supplied_reproduction_count_is_still_checked(self) -> None:
+        self.store.add_attempt("qa-example", attempt_input())
+        finding = candidate_finding()
+        finding["reproduction"]["attempts"] = len(finding["attempt_ids"]) + 1
+        with self.assertRaisesRegex(ValidationError, r"linked attempt_ids \(\d+\); omit it"):
+            self.store.add_finding("qa-example", finding)
+
     def test_every_history_field_rejects_removal_and_rewrite(self) -> None:
         self.store.add_attempt("qa-example", attempt_input())
         other = attempt_input()

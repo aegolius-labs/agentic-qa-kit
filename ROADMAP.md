@@ -245,12 +245,14 @@ ledger-chaining hazard (Q02-F01) and a measured payload-discovery cost for Q07
 
 ### Q07 - Decide whether to build an MCP server
 
-- **Status:** Not started
+- **Status:** Done (2026-10-29). Keep the skills-only architecture: [docs/q07-mcp-decision.md](docs/q07-mcp-decision.md) records the transcript measurements, the reading of each gap, and when to revisit
 - **Importance:** Conditional
 - **Complexity:** Hard
 - **Depends on:** Q01, Q02, token/call measurements
 - **Approach:** Measure whether host tools plus the local ledger leave authorization, compact-query, portability, or structured-result gaps.
 - **Done when:** Evidence supports either retaining the skills-only architecture or building a narrowly scoped server with explicit tools and permissions.
+- **Follow-ups:**
+  - [ ] Q07-G01: After the CLI fixes in the decision record, repeat `scripts/q07_measure.py` on the next lane's transcripts. Revisit the decision if payload discovery stays above about 20% of tool calls; that also answers Q02-O01.
 
 ### Q08 - Agentic-system assurance pack
 

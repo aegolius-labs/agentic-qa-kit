@@ -97,6 +97,22 @@ def _check_finding_history(current: dict[str, Any], updated: dict[str, Any]) -> 
                 )
 
 
+def _count_reproduction_attempts(payload: dict[str, Any], supplied: Any) -> dict[str, Any]:
+    """Fill `reproduction.attempts` from `attempt_ids` when the caller left it out.
+
+    It is derived, so asking the caller to restate it only adds a way to be
+    wrong. A value the caller does supply is still checked against the links.
+    """
+
+    reproduction = payload.get("reproduction")
+    attempt_ids = payload.get("attempt_ids")
+    if not isinstance(reproduction, dict) or not isinstance(attempt_ids, list):
+        return payload
+    if isinstance(supplied, dict) and "attempts" in supplied:
+        return payload
+    return {**payload, "reproduction": {**reproduction, "attempts": len(attempt_ids)}}
+
+
 def atomic_write_json(path: Path, payload: dict[str, Any]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     handle, temporary_name = tempfile.mkstemp(prefix=f".{path.name}.", suffix=".tmp", dir=path.parent)
@@ -366,7 +382,7 @@ class KitStore:
         session = self._load_for_write(session_id)
         if session["status"] in TERMINAL_SESSION_STATUSES:
             raise ValidationError("cannot add a finding to a terminal session")
-        finding = normalize_finding(input_payload)
+        finding = normalize_finding(_count_reproduction_attempts(input_payload, input_payload.get("reproduction")))
         self._seal_evidence(finding["evidence"], "finding.evidence")
         if finding["id"] in {item["id"] for item in session["findings"]}:
             raise ValidationError(f"finding already exists: {finding['id']}")
@@ -394,7 +410,7 @@ class KitStore:
         merged = dict(current)
         merged.update(input_payload)
         merged["id"] = finding_id
-        updated = normalize_finding(merged)
+        updated = normalize_finding(_count_reproduction_attempts(merged, input_payload.get("reproduction")))
         recorded = current.get("evidence") or []
         for before, entry in zip(recorded, updated["evidence"]):
             # A caller restating an earlier entry need not repeat its digest.

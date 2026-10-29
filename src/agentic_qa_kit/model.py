@@ -416,7 +416,10 @@ def validate_finding(payload: dict[str, Any]) -> None:
     if len(attempt_ids) != len(set(attempt_ids)):
         raise ValidationError("finding.attempt_ids must be unique")
     if reproduction.get("attempts") != len(attempt_ids):
-        raise ValidationError("finding.reproduction.attempts must equal the number of linked attempt_ids")
+        raise ValidationError(
+            f"finding.reproduction.attempts must equal the number of linked attempt_ids ({len(attempt_ids)}); "
+            "omit it and the ledger counts them"
+        )
     evidence = validate_evidence(payload.get("evidence"), "finding.evidence")
     _expect_string_list(payload.get("limitations"), "finding.limitations")
     criteria = _expect_string_list(payload.get("acceptance_criteria"), "finding.acceptance_criteria")

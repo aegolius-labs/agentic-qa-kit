@@ -54,6 +54,7 @@ def _parser() -> argparse.ArgumentParser:
 
     summary = subparsers.add_parser("summary", help="Show a compact session summary")
     with_root(summary)
+    summary.add_argument("session_id", nargs="?", help="Limit to one session ID, as with --session")
     summary.add_argument("--session", help="Limit to one session ID")
 
     show = subparsers.add_parser("show", help="Show one session or finding")
@@ -116,7 +117,10 @@ def run(args: argparse.Namespace) -> Any:
     if args.command == "session-close":
         return store.close_session(args.session_id, args.status, read_json(Path(args.input)))
     if args.command == "summary":
-        sessions = [store.load_session(args.session)] if args.session else store.list_sessions()
+        if args.session and args.session_id and args.session != args.session_id:
+            raise ValidationError("summary names two different sessions")
+        session_id = args.session or args.session_id
+        sessions = [store.load_session(session_id)] if session_id else store.list_sessions()
         return {"sessions": [_session_summary(session) for session in sessions]}
     if args.command == "show":
         session = store.load_session(args.session_id)

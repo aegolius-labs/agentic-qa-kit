@@ -10,6 +10,24 @@ computed version and promotes that section when it publishes.
 
 ### Added
 
+- Q07 decision record (`docs/q07-mcp-decision.md`): keep the skills-only
+  architecture. `scripts/q07_measure.py` measured 18 retained lane
+  transcripts. 23% of tool calls went on learning payload shapes, and 23 of
+  100 ledger writes were rejected, mostly for CLI ergonomics an MCP server
+  would not fix.
+
+### Changed
+
+- `finding-add` and `finding-update` count `reproduction.attempts` from
+  `attempt_ids` when the caller leaves it out. A supplied count is still
+  checked, and the error states the expected number.
+- `summary` takes the session ID positionally, as `show` and `session-close`
+  do. `--session` still works.
+
+## [0.6.1] - 2026-10-29
+
+### Added
+
 - Q05-G01 lane: `scripts/q05_claude_code.py` sends one non-functional request
   per pack through the installed plugin, two of them needing an action the
   packs reserve for approval, and records which pack each session read and how
