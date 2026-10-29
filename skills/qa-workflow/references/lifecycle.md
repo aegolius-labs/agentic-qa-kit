@@ -14,6 +14,7 @@
 ## Partial entry rules
 
 - Start at discovery when the codebase, intended use, risks, or runnable surface are materially unknown.
+- Start at discovery after an incident or a defect that reached users, and read `qa-discover`'s `references/escapes.md` before planning.
 - Start at session execution when a reviewed charter or exact requested check already exists.
 - Start at reproduction when there is a concrete observed anomaly with enough context to establish a baseline.
 - Start at reporting when raw attempts/findings already exist and the user wants a defensible summary.

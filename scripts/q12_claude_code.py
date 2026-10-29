@@ -35,11 +35,15 @@ for entry in (PLUGIN_ROOT, PLUGIN_ROOT / "src"):
 
 from scripts.q01_claude_code import KIT, LaneError, _plugin_list, _run, child_environment, install_location, parse_stream  # noqa: E402
 from scripts.q02_claude_code import load_suite, read_ledger, run_fixture  # noqa: E402
-from scripts.q05_claude_code import SUFFIX  # noqa: E402
 
 SUITE = PLUGIN_ROOT / "evals" / "q12-fixtures.json"
 REFERENCE = "qa-discover/references/escapes.md"
 INCIDENT_WORDS = ("postmortem", "incident", "2026-09-18", "escape")
+# Q05's suffix asks for a session to be run; a planning request must not.
+SUFFIX = (
+    " Spend no more than about 20 minutes of work. Stop before any action that needs new authority, and report "
+    "what you planned, what you could not establish, and why."
+)
 
 
 def read_reference(stdout: str) -> bool:
