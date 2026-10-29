@@ -1,6 +1,6 @@
 ---
 name: qa-discover
-description: Discover an unfamiliar codebase and turn product context, repository structure, runtimes, existing checks, risks, and evidence gaps into a QA profile and bounded charters. Use before broad QA planning or when the runnable/test surface is unclear; do not use merely to execute an already specified check.
+description: Discover an unfamiliar codebase and turn product context, repository structure, runtimes, existing checks, risks, and evidence gaps into a QA profile and bounded charters. Use before broad QA planning, when planning QA after an incident or escaped defect, or when the runnable/test surface is unclear; do not use merely to execute an already specified check.
 ---
 
 # Discover a QA target
