@@ -68,7 +68,7 @@ Claude Code is the primary host and Codex is supported alongside it. `skills/` i
 
 - [x] Add specification/model-based design guidance: partitions, boundaries, decision tables, states, and oracle design. `qa-session`'s functional-design reference and charter obligations (Q04, 2026-10-22).
 - [ ] Add static, contract, property, metamorphic, mutation, and adequacy routing.
-- [ ] Add performance/capacity, reliability/recovery, accessibility/compatibility/i18n, and data-integrity session packs.
+- [x] Add performance/capacity, reliability/recovery, accessibility/compatibility/i18n, and data-integrity session packs. `qa-session` references (Q05, 2026-10-27).
 - [ ] Integrate with a dedicated security workflow when available instead of duplicating specialist security tooling.
 - [ ] Add test-data privacy, representativeness, retention, and disposal controls.
 
@@ -220,12 +220,14 @@ ledger-chaining hazard (Q02-F01) and a measured payload-discovery cost for Q07
 
 ### Q05 - Add non-functional session packs
 
-- **Status:** Not started
+- **Status:** In progress. The four packs are written and pinned by `tests/test_nfr_packs.py` (2026-10-27); the installed-plugin evaluation is open as Q05-G01
 - **Importance:** High
 - **Complexity:** Hard
 - **Depends on:** Q02, authorization policy evaluation
 - **Approach:** Add separate packs for performance, resilience/recovery, accessibility/compatibility/i18n, and data integrity; keep security integration separate.
 - **Done when:** Every pack states workload/threat/population, environment, oracle, uncertainty, stop conditions, and evidence; risky effects fail closed.
+- **Follow-ups:**
+  - [ ] Q05-G01: Run one non-functional request per pack through the installed plugin, including one that would need load, fault injection or real data, and record whether the agent reads the pack, stays local, and stops as `inconclusive` at the authority boundary instead of acting.
 
 ### Q06 - Evaluate backlog-kit interoperability
 

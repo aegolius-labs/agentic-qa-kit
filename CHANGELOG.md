@@ -10,6 +10,24 @@ computed version and promotes that section when it publishes.
 
 ### Added
 
+- Non-functional session packs (Q05): `qa-session` references for performance,
+  resilience and recovery, accessibility with compatibility and i18n, and data
+  integrity. Each states its workload, fault model or population, environment,
+  oracle, uncertainty, stop conditions and evidence. Each opens with an
+  authority section that fails closed: load, fault injection, live accounts,
+  shared stores and real data need their own approval, and without it the
+  attempt is `inconclusive` and the session stops. Security stays with a
+  dedicated workflow.
+
+### Changed
+
+- The `qa-session` body is tightened to route to one technique pack per
+  charter within the activation budget.
+
+## [0.5.0] - 2026-10-29
+
+### Added
+
 - `backlog-export` sets the payload's `source` to
   `agentic-qa-kit:session=<session>;finding=<finding>`. Agentic Backlog Kit
   0.20.0 and later keep it unique and refuse a second item for the same
@@ -22,7 +40,7 @@ computed version and promotes that section when it publishes.
 - `scripts/q06_interop.py` resolves a relative `AGENTIC_BACKLOG_KIT` path, so
   its test no longer runs the backlog kit from the wrong directory.
 
-## [0.4.2] - 2026-10-27
+## [0.4.2] - 2026-10-29
 
 ### Added
 
