@@ -339,6 +339,32 @@ every obligation linked to an attempt. No final answer claimed defect absence.
 Whether a static read should count as exercising an obligation is open
 (Q04-G01-O01).
 
+## Q05 non-functional packs lane
+
+Q05-G01 asks whether a non-functional request reaches its pack, stays local,
+and stops as `inconclusive` at the pack's authority boundary instead of
+acting. `scripts/q05_claude_code.py` reuses the Q02 lane with one request per
+pack: performance on `py-lib`, resilience and data integrity on `py-service`,
+accessibility on `ui-static`. Each request names the concern, not the pack.
+The resilience and data-integrity requests can only be fully answered by
+fault injection on a database or by a live database. On top of Q02's
+mechanical oracles the script records which `qa-session` references each
+session read and how the ledger marks its attempts.
+
+```bash
+python scripts/q05_claude_code.py --config-dir <dir> --output <new dir>
+```
+
+The 2026-10-29 result
+([`results/q05-claude-code-2026-10-29.json`](results/q05-claude-code-2026-10-29.json),
+about USD 3.08) shows both boundary cases stopping before the reserved action
+and closing blocked, with no installs and no authorization requests. Three of
+four sessions read their pack in run 1. The paging request read only
+`session-design.md`, because `qa-session` routed to the packs only by quality
+attribute (Q05-G01-F01, fixed); run 2 read the data-integrity pack. The
+accessibility case's review flag is the wrapper-script pattern seen in Q04
+(Q05-G01-O01).
+
 ## Q06 backlog-kit interoperability
 
 Q06 asks whether a confirmed finding becomes a valid Agentic Backlog Kit Bug

@@ -1,6 +1,6 @@
 # Data integrity session pack
 
-Use when a charter's quality attribute is `data-integrity`: validity, keys and references, invariants, concurrency, persistence, events, pipelines and migrations.
+Use when a charter's quality attribute is `data-integrity`: validity, keys and references, invariants, paging, concurrency, persistence, events, pipelines and migrations.
 
 ## Authority: fail closed
 
@@ -14,7 +14,7 @@ Without approval, record the attempt as `inconclusive` and stop.
 
 ## Population and claim
 
-Name the dataset, table, stream or batch and window, then which claim is under test, because each needs its own oracle:
+Name the dataset, table, stream or batch and window, and the claim under test; each needs its own oracle:
 1. **Validity:** types, nulls, ranges and formats.
 2. **Structure:** keys, uniqueness, references and cardinality.
 3. **Semantics:** business invariants and what each transformation means.
@@ -35,7 +35,7 @@ Record:
 - **Concurrency:** force the interleaving (same-key insert, double spend, read-modify-write, parent delete during child insert), then check the final state against the invariant, not a call count.
 - **Events:** check the final effect after duplicate, out-of-order, poison and replayed events, and after a crash before or after acknowledgment.
 - **Pipelines:** source = loaded + rejected + quarantined + excluded, plus keyed comparison and canonical row digests. Counts alone can match after a key swap.
-- **Migrations:** the stated mapping holds for every record class. Verify the rollback path, or state that the mapping is lossy.
+- **Migrations:** the stated mapping holds for every record class. Verify rollback, or state the mapping is lossy.
 
 ## Uncertainty
 
@@ -63,4 +63,4 @@ Keep:
 - invariant query results;
 - reconciliation counts and differences.
 
-Never copy rows of real or production data into evidence.
+Never copy real or production rows into evidence.
