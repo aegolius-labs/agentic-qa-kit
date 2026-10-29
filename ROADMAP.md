@@ -229,7 +229,7 @@ ledger-chaining hazard (Q02-F01) and a measured payload-discovery cost for Q07
 
 ### Q06 - Evaluate backlog-kit interoperability
 
-- **Status:** In progress. The offline interoperability check runs against a real backlog kit (2026-10-27); six of seven checks hold
+- **Status:** In progress. The offline interoperability check runs against a real backlog kit (2026-10-27); all seven checks hold since the backlog kit refuses a repeated handoff (Q06-F02)
 - **Importance:** High
 - **Complexity:** Medium
 - **Depends on:** Stable Agentic Backlog Kit ingestion contract
@@ -237,7 +237,7 @@ ledger-chaining hazard (Q02-F01) and a measured payload-discovery cost for Q07
 - **Done when:** Confirmed findings become valid Bug items, candidates are rejected, missing business inputs are never guessed, and synchronization remains outside this plugin.
 - **Follow-ups:**
   - [x] Q06-F01: The handoff example used status `Backlog`, which the backlog kit's default workflow does not define, so following it failed ingestion. The example now uses `Inbox`, and the contract says the status comes from the backlog manifest's `workflow.statuses` (2026-10-27).
-  - [ ] Q06-F02: Ingesting the same confirmed finding twice creates a second Bug, and neither kit notices. Where the guard lives is an owner decision.
+  - [x] Q06-F02: Ingesting the same confirmed finding twice created a second Bug. Felix chose a backlog-kit guard (2026-10-27): items accept a unique `source`, the export sets it to the session and finding, and a repeat is refused.
   - [ ] Q06-O01: `abk init` over an existing manifest exits with a Python traceback rather than a JSON error. This is a backlog-kit report, not a QA kit defect.
 
 ### Q07 - Decide whether to build an MCP server

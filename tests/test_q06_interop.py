@@ -36,6 +36,9 @@ class BacklogInteropTests(unittest.TestCase):
     def test_handoff_leaves_the_qa_ledger_alone(self) -> None:
         self.assertHeld("I6-qa-ledger-untouched")
 
+    def test_the_same_finding_is_not_ingested_twice(self) -> None:
+        self.assertHeld("I7-no-duplicate-ingest")
+
     def test_run_never_reaches_github(self) -> None:
         self.assertNotIn("snapshot", self.result["backlog_commands"])
         self.assertNotIn("sync-apply", self.result["backlog_commands"])

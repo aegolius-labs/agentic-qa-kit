@@ -36,4 +36,6 @@ Agentic Backlog Kit owns:
 - workflow status and sprint planning; and
 - GitHub Issues/Projects plan, confirmation, apply, and verification.
 
+The payload's `source` names the QA session and finding. Agentic Backlog Kit 0.20.0 and later keep it unique, so a repeated handoff of one finding is refused; treat that refusal as "already handed off" and show the existing item instead of retrying.
+
 The handoff does not make QA evidence the backlog system of record and does not make backlog priority part of the QA verdict.
