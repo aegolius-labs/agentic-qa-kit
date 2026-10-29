@@ -15,7 +15,7 @@ If the rollback is unknown, do not inject. Record the attempt as `inconclusive` 
 
 ## Fault model
 
-State the hypothesis before acting. For example: "losing the cache keeps writes durable and recovers within 30 s." Then name:
+State the hypothesis first, for example: "losing the cache keeps writes durable and recovers within 30 s." Then name:
 - the single fault injected, such as process loss, dependency error or delay, duplicate or reordered message, storage full or read-only, clock skew, or a restore from a backup;
 - where it is injected;
 - what is held constant.
@@ -30,7 +30,7 @@ Record:
 - data seed and state before the fault;
 - the health check used for "recovered".
 
-Take a baseline window before injecting the fault.
+Take a baseline window before the fault.
 
 ## Oracle
 
