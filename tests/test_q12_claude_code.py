@@ -7,7 +7,9 @@ import unittest
 from pathlib import Path
 
 from scripts.q02_claude_code import load_suite
-from scripts.q12_claude_code import PLUGIN_ROOT, SUITE, leaked_personal_data, plan_facts
+import json
+
+from scripts.q12_claude_code import PLUGIN_ROOT, SUITE, leaked_personal_data, plan_facts, read_reference
 
 
 FIXTURE = load_suite(SUITE)["fixtures"][0]
@@ -45,6 +47,12 @@ class LaneTests(unittest.TestCase):
         self.assertEqual(["c1"], facts["charters_citing_incident"])
         self.assertEqual(0, facts["attempts"])
         self.assertIn("chunk", facts["defects_named"]["py-escape-chunk-tail"])
+
+    def test_a_relative_read_of_the_reference_counts(self) -> None:
+        use = {"type": "tool_use", "id": "a", "name": "Bash",
+               "input": {"command": "cd /kit/skills/qa-discover && cat references/escapes.md"}}
+        line = json.dumps({"type": "assistant", "message": {"content": [use]}})
+        self.assertTrue(read_reference(line))
 
 
 if __name__ == "__main__":

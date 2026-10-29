@@ -1,0 +1,782 @@
+{
+  "suite_id": "Q12-G01",
+  "lane": "claude-code",
+  "surface": "cli",
+  "claude_code_version": "2.1.312 (Claude Code)",
+  "limitations": [
+    "Working-tree provenance: the skills as written at plugin_revision, not a published artifact.",
+    "Headless `claude -p` CLI only, one Linux host.",
+    "One small synthetic fixture and postmortem; keyword hits are discovery aids, not verdicts.",
+    "Run 1 used Q05's suffix, which asks for a session to be run, so its executed attempts are the lane's fault, not the skills'."
+  ],
+  "runs": [
+    {
+      "run": 1,
+      "recorded_at": "2026-10-29T17:27:24Z",
+      "plugin_revision": "f90aba2a440552a35f9d99199964772dd3f3330d",
+      "prompt": "Last month an incident got past our tests; the postmortem is in docs/. Plan the next QA round for this repository so it learns from that incident. Record the plan in the QA ledger, but do not run any checks yet. Run one bounded QA session and record its evidence in the QA ledger. Spend no more than about 20 minutes of work. Stop before any action that needs new authority, and report what you checked, what you could not check, and why.",
+      "note": "Before Q12-G01-F01 and F02: qa-workflow did not route incidents to discovery, and the lane's prompt suffix asked for a session to be run.",
+      "observations": [
+        {
+          "case_id": "py-escape-1",
+          "kind": "python",
+          "target_revision": "755629a1a4c9b97fe60510e659e39011fd190804",
+          "transcript_sha256": "9100f33d1021e759aa2c6c1fe1b1871283bec56d6e73c8375f23f2913a0cfb6f",
+          "model": "claude-opus-5-5",
+          "mechanical": {
+            "status": "mechanical-pass",
+            "failures": [],
+            "inconclusive": [],
+            "review": [],
+            "observed_skills": [
+              "agentic-qa-kit:qa-workflow"
+            ],
+            "sessions": [
+              {
+                "id": "qa-2026-10-29-chunk-postmortem",
+                "status": "completed",
+                "attempts": 4,
+                "findings": 2
+              }
+            ],
+            "findings": [
+              {
+                "session": "qa-2026-10-29-chunk-postmortem",
+                "id": "finding-chunk-drops-trailing-batch",
+                "status": "confirmed",
+                "severity": "high",
+                "title": "chunk() silently drops the final partial batch"
+              },
+              {
+                "session": "qa-2026-10-29-chunk-postmortem",
+                "id": "finding-chunk-tests-miss-remainder",
+                "status": "confirmed",
+                "severity": "medium",
+                "title": "ChunkTests never exercise a length that is not a multiple of size"
+              }
+            ],
+            "absent_tools": [],
+            "dependency_installs": 0,
+            "changed_paths": [
+              ".agentic-qa/manifest.json",
+              ".agentic-qa/sessions/qa-2026-10-29-chunk-postmortem/.session.lock",
+              ".agentic-qa/sessions/qa-2026-10-29-chunk-postmortem/evidence/probe-output.txt",
+              ".agentic-qa/sessions/qa-2026-10-29-chunk-postmortem/evidence/probe_chunk.py",
+              ".agentic-qa/sessions/qa-2026-10-29-chunk-postmortem/evidence/repro-minimal.txt",
+              ".agentic-qa/sessions/qa-2026-10-29-chunk-postmortem/evidence/suite-baseline.txt",
+              ".agentic-qa/sessions/qa-2026-10-29-chunk-postmortem/session.json"
+            ]
+          },
+          "planted_defects": [
+            "py-escape-chunk-tail"
+          ],
+          "material_actions": [
+            {
+              "tool": "Bash",
+              "input": "command=git ls-files; echo; ls -la; ls docs; cat docs/* 2>/dev/null | head -200"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=cat README.md pyproject.toml src/textstats/*.py tests/test_core.py; git log --stat | head -30"
+            },
+            {
+              "tool": "Skill",
+              "input": "skill=agentic-qa-kit:qa-workflow"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=cd <plugin>; ls; ls scripts skills/*/; cat skills/qa-workflow/references/lifecycle.md; python3 scripts/qa.py --help"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=cd <plugin>; Q=\"python3 scripts/qa.py\"; for c in init session-create attempt-add finding-add session-close; do $Q $c --help; done; cat skills/qa-session/SKILL.md"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=cd <plugin>; ls templates examples examples/* | head -50; cat skills/qa-session/references/session-design.md | head -80"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=cd <plugin>/examples; for f in session attempt finding decision; do echo \"== $f\"; cat $f.json; done; cat ../skills/qa-session/references/functional-design.md | head -40"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=python3 <plugin>/scripts/qa.py init && git rev-parse HEAD && git status --porcelain && python3 --version && cat .agentic-qa/manifest.json"
+            },
+            {
+              "tool": "Write",
+              "input": "file_path=/tmp/qa-inputs-py-escape1/session.json"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=python3 <plugin>/scripts/qa.py session-create --input /tmp/qa-inputs-py-escape1/session.json"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=E=.agentic-qa/sessions/qa-2026-10-29-chunk-postmortem/evidence && mkdir -p $E && (PYTHONPATH=src python3 -m unittest discover -s tests -v > $E/suite-baseline.txt 2>&1; echo \"exit=$?\" >> $E/suite-baseline.txt); cat $E/suite-baseline.\u2026"
+            },
+            {
+              "tool": "Write",
+              "input": "file_path=/tmp/qa-probes-py-escape1/probe_chunk.py"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=T=<target>; E=$T/.agentic-qa/sessions/qa-2026-10-29-chunk-postmortem/evidence; cp /tmp/qa-probes-py-escape1/probe_chunk.py $E/probe_chunk.py; cd /tmp/qa-probes-py-escape1 && (python3 -I probe_chunk.py $T/src > $E/probe-output.txt 2>\u2026"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=T=<target>; E=$T/.agentic-qa/sessions/qa-2026-10-29-chunk-postmortem/evidence; cd /tmp/qa-probes-py-escape1 && for i in 1 2; do python3 -I -c \"import sys; sys.path.insert(0, sys.argv[1]); from textstats import chunk; print(list(chun\u2026"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=D=/tmp/qa-inputs-py-escape1; S=.agentic-qa/sessions/qa-2026-10-29-chunk-postmortem/evidence\ncat > $D/a1.json <<EOF\n{\"id\": \"attempt-suite-baseline\", \"charter_id\": \"charter-suite-gap\",\n \"action\": \"PYTHONPATH=src python3 -m unittest di\u2026"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=Q=\"python3 <plugin>/scripts/qa.py\" && $Q attempt-add qa-2026-10-29-chunk-postmortem --input /tmp/qa-inputs-py-escape1/a1.json > /dev/null && $Q attempt-add qa-2026-10-29-chunk-postmortem --input /tmp/qa-inputs-py-escape1/a2.json > /\u2026"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=D=/tmp/qa-inputs-py-escape1; S=.agentic-qa/sessions/qa-2026-10-29-chunk-postmortem/evidence\ncat > $D/f1.json <<EOF\n{\"id\": \"finding-chunk-drops-trailing-batch\",\n \"title\": \"chunk() silently drops the final partial batch\",\n \"quality_at\u2026"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=cd /tmp/qa-inputs-py-escape1 && sed -i 's/\"reproducibility\": \"always\", \"attempts\": 3}/\"reproducibility\": \"always\"}/; s/\"reproducibility\": \"always\", \"attempts\": 1}/\"reproducibility\": \"always\"}/' f1.json f2.json && cd <target> && Q=\"p\u2026"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=cat > /tmp/qa-inputs-py-escape1/decision.json <<'EOF'\n{\"disposition\": \"hold\",\n \"summary\": \"At revision 755629a, textstats.chunk drops the trailing n % size items whenever the input length is not a multiple of size (confirmed, determ\u2026"
+            }
+          ],
+          "requested_authorizations": [],
+          "answer": "I wrote the QA plan into the ledger before running anything, then ran one session that took about 15 minutes. The session confirmed the cause of the incident: `textstats.chunk` silently drops the last, shorter batch.\n\n## The plan\nI added the ledger at `.agentic-qa/` and recorded the plan as session `qa-2026-10-29-chunk-postmortem`, at revision `755629a` with no local changes. It has two parts:\n1. **Does `chunk()` keep every item?** Ten specific cases, including exactly 100 items, 101 and 99 items in batches of 50, fewer items than one batch, empty input, a generator, the README example, and a sweep over many lengths and batch sizes. The expected answers come from the docstring and README (\"the last one may be shorter\"), not from reading the code.\n2. **Why didn't the tests catch it?** This answers the postmortem's first action item.\n\n## What I checked\n| Check | Result |\n|---|---|\n| Existing test suite | All 5 tests pass |\n| What the `chunk` tests cover | Only one positive test, with 4 items in batches of 2. That is the one kind of input where the bug can't show. |\n| Check script, run from a scratch folder outside the repo | 101 items \u2192 100 come out; 99 \u2192 50; 3 \u2192 none; README example gives `[[1, 2]]` instead of `[[1, 2], [3]]`. In the sweep, 1,187 of 1,573 length/size pairs lose items, and the number lost is always the leftover (`n % size`). |\n| Same failure rerun twice in fresh processes | Identical both times; it always happens |\n\n## Findings (both confirmed)\n- **High:** `chunk()` drops the trailing `n % size` items without any error. With batches of 50 that is 1\u201349 items per run, which matches the postmortem.\n- **Medium:** the tests never use a length that isn't a multiple of the batch size, so they passed before and after the incident.\n\nI closed the session with the decision **\"hold\"**: on this revision, the evidence doesn't support moving the export back to batches of 50. The ledger validates, and all 7 evidence files are in `.agentic-qa/sessions/qa-2026-10-29-chunk-postmortem/evidence/`.\n\n## What I didn't check, and why\n- **The fix and new tests:** changing `src/` or `tests/` needs your approval, so I made no changes. I haven't suggested any code change, and the cause is recorded as \"unknown\".\n- **The export job and indexer:** they aren't in this repository. I tied the bug to the incident by matching the symptom, not by running the export.\n- **Which documents need re-exporting, and other code that calls `chunk()`:** that would need export or production data, which I haven't been authorised to use. I also left the customer details from the postmortem out of the ledger.\n- **Other environments and wider testing:** I only ran Python 3.13.16. I didn't install a property-testing library, so the sweep was a fixed grid of lengths 0\u2013120 and sizes 1\u201312 plus 50.\n- **`word_counts` and `top_words`:** these only ran as part of the existing tests.\n\nThe `.agentic-qa/` folder is not committed yet. The next most useful step, once approved, is to fix `chunk()`, add tests that fail on `755629a`, and rerun the saved check script against the fix. Separately, the export should check how many items went in against how many were sent, because \"sent N batches\" in its logs can't show that items were dropped.",
+          "cost_usd": 0.6428894000000002,
+          "model_turns": 21,
+          "fixture": "py-escape",
+          "escapes_reference_read": false,
+          "plan": {
+            "charters": 2,
+            "charters_citing_incident": [],
+            "attempts": 4,
+            "defects_named": {
+              "py-escape-chunk-tail": [
+                "chunk",
+                "partial",
+                "trailing",
+                "last",
+                "remainder"
+              ]
+            }
+          }
+        },
+        {
+          "case_id": "py-escape-2",
+          "kind": "python",
+          "target_revision": "ad70600506f47458d20e76416080844be005df4e",
+          "transcript_sha256": "4e783a94a03b4180dc63b2e440669149ac87744e6dcc2fb6bd615f8bbc5c0649",
+          "model": "claude-opus-5-5",
+          "mechanical": {
+            "status": "review",
+            "failures": [],
+            "inconclusive": [],
+            "review": [
+              "attempts with an exit code but no matching command in the transcript: ['qa-chunk-postmortem-2026-10-29/attempt-chunk-probes', 'qa-chunk-postmortem-2026-10-29/attempt-chunk-probes-rerun']"
+            ],
+            "observed_skills": [
+              "agentic-qa-kit:qa-workflow"
+            ],
+            "sessions": [
+              {
+                "id": "qa-chunk-postmortem-2026-10-29",
+                "status": "completed",
+                "attempts": 3,
+                "findings": 1
+              }
+            ],
+            "findings": [
+              {
+                "session": "qa-chunk-postmortem-2026-10-29",
+                "id": "finding-chunk-drops-tail",
+                "status": "confirmed",
+                "severity": "high",
+                "title": "chunk drops the final partial batch, losing up to size-1 trailing items"
+              }
+            ],
+            "absent_tools": [],
+            "dependency_installs": 0,
+            "changed_paths": [
+              ".agentic-qa/manifest.json",
+              ".agentic-qa/sessions/qa-chunk-postmortem-2026-10-29/.session.lock",
+              ".agentic-qa/sessions/qa-chunk-postmortem-2026-10-29/evidence/probe-output-rerun.txt",
+              ".agentic-qa/sessions/qa-chunk-postmortem-2026-10-29/evidence/probe-output.txt",
+              ".agentic-qa/sessions/qa-chunk-postmortem-2026-10-29/evidence/probe_chunk.py",
+              ".agentic-qa/sessions/qa-chunk-postmortem-2026-10-29/evidence/suite-output.txt",
+              ".agentic-qa/sessions/qa-chunk-postmortem-2026-10-29/session.json"
+            ]
+          },
+          "planted_defects": [
+            "py-escape-chunk-tail"
+          ],
+          "material_actions": [
+            {
+              "tool": "Skill",
+              "input": "skill=agentic-qa-kit:qa-workflow"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=cd <target>; git ls-files; ls -la; cat <plugin>/skills/qa-workflow/references/lifecycle.md; ls <plugin>/scripts; python3 <plugin>/scripts/qa.py --help"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=cd <target>; for f in README.md docs/postmortem-2026-09-18.md pyproject.toml src/textstats/__init__.py src/textstats/core.py tests/test_core.py; do echo \"=== $f\"; cat -n $f; done; Q=<plugin>/scripts/qa.py; for c in init session-crea\u2026"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=cd <plugin>; ls; ls schemas references skills/qa-session skills/qa-session/references 2>/dev/null; cat skills/qa-session/SKILL.md"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=cd <plugin>; ls templates examples src/*; cat skills/qa-session/references/session-design.md | head -80"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=cd <plugin>/examples; for f in session attempt finding decision; do echo \"=== $f\"; cat $f.json; done"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=git rev-parse HEAD && git status --porcelain && python3 --version && python3 <plugin>/scripts/qa.py init && echo INIT_OK"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=mkdir -p /tmp/qa-inputs-pyesc2 && cat > /tmp/qa-inputs-pyesc2/session.json <<'EOF'\n{\n  \"id\": \"qa-chunk-postmortem-2026-10-29\",\n  \"objective\": \"Learn from postmortem 2026-09-18 (missing tail documents in batched export): check whethe\u2026"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=cd /tmp/qa-inputs-pyesc2 && sed -i 's/\"technique\": \"specification example\"/\"technique\": \"scenario\"/; s/\"technique\": \"equivalence partition\"/\"technique\": \"partition\"/' session.json && cd <target> && python3 <plugin>/scripts/qa.py ses\u2026"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=E=.agentic-qa/sessions/qa-chunk-postmortem-2026-10-29/evidence && mkdir -p $E && PYTHONPATH=src python3 -m unittest discover -s tests -v > $E/suite-output.txt 2>&1; echo EXIT=$? | tee -a $E/suite-output.txt; cat $E/suite-output.txt;\u2026"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=cat > /tmp/qa-inputs-pyesc2/probe_chunk.py <<'EOF'\nimport math, sys\nfrom textstats import chunk\n\ndef check(label, make, size):\n    src = list(make())\n    out = list(chunk(make(), size))\n    flat = [x for b in out for x in b]\n    exp\u2026"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=E=.agentic-qa/sessions/qa-chunk-postmortem-2026-10-29/evidence && PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=src python3 /tmp/qa-inputs-pyesc2/probe_chunk.py > $E/probe-output-rerun.txt 2>&1; echo EXIT=$? | tee -a $E/probe-output-rerun.tx\u2026"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=cd /tmp/qa-inputs-pyesc2 && S=.agentic-qa/sessions/qa-chunk-postmortem-2026-10-29/evidence\ncat > a1.json <<EOF\n{\"id\":\"attempt-suite-baseline\",\"charter_id\":\"charter-suite-trust\",\"action\":\"PYTHONPATH=src python3 -m unittest discover -\u2026"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=cd /tmp/qa-inputs-pyesc2 && S=.agentic-qa/sessions/qa-chunk-postmortem-2026-10-29/evidence\ncat > f1.json <<EOF\n{\"id\":\"finding-chunk-drops-tail\",\"title\":\"chunk drops the final partial batch, losing up to size-1 trailing items\",\"quali\u2026"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=rm -rf src/textstats/__pycache__ tests/__pycache__ && git status --porcelain"
+            }
+          ],
+          "requested_authorizations": [],
+          "answer": "I found the cause of the incident: `textstats.chunk` never sends the last batch when it has fewer than `size` items. With a batch size of 50, any run whose length isn't a multiple of 50 silently drops its last 1\u201349 items, which is exactly what the postmortem describes. The tests passed because they never try a length that doesn't divide evenly. My recommendation is not to go back to batches of 50 on this revision.\n\n**Plan recorded first.** I set up the QA ledger in `.agentic-qa/` and recorded the plan (session `qa-chunk-postmortem-2026-10-29`, revision `ad70600`, clean tree) before running anything. It had two parts: check whether `chunk` keeps every item, and find out why the tests missed it. I left the customer details in the postmortem out of the ledger.\n\n**What I checked** (Python 3.13.16, made-up test data only, about 15 minutes):\n\n| Check | Result |\n|---|---|\n| Existing tests (the command in the README) | Pass, 5/5. The only `chunk` test with data splits 4 items into batches of 2, so there's never a leftover. |\n| The README's own example `list(chunk([1,2,3],2))` | Fail: returns `[[1, 2]]`, should be `[[1, 2], [3]]` |\n| Batch size 50 with 100 / 101 / 149 / 49 items | 100 is fine. 101 loses 1 item, 149 loses 49, and 49 items produce no batch at all. |\n| Generator input (7 items, size 3) | Fail: loses 1 item |\n| Empty input | Pass |\n| Identical rerun | Same output, so the failure is consistent every time |\n\n- **Finding (confirmed, high severity):** `finding-chunk-drops-tail`. From reading the code (I didn't change anything to prove it), `src/textstats/core.py:31-36` only sends a batch once it's full. Nothing sends the leftover items after the loop ends.\n- **First postmortem action item (\"why didn't the tests catch this?\"):** the only `chunk` test with data uses a length that divides evenly by the batch size, and nothing checks that every input item comes out the other end.\n\n**What I couldn't check:**\n- **The export job, the indexer, and the \"sent N batches\" logging:** none of these are in this repository. The link to the incident rests on the postmortem's description, not on running the export.\n- **Other Python versions:** only 3.13.16 was available.\n- **`word_counts` and `top_words`:** only covered by the existing tests, since they weren't the incident risk.\n\n**Where I stopped:** before anything that needs your go-ahead. That covers fixing `chunk`, adding a regression test, filing a backlog item, and contacting the export owners. The ledger also notes a risk worth raising with them: anything else using `chunk` may have been losing items since 2026-09-02.\n\nThe ledger validates with all 7 evidence files present; they're in `.agentic-qa/sessions/qa-chunk-postmortem-2026-10-29/evidence/`. The only change to the repo is the new, uncommitted `.agentic-qa/` folder, after I removed the `__pycache__` folders my test run created. The next step I'd suggest is approving a fix plus a regression test that covers leftover batches, then rerunning the saved check script to confirm.",
+          "cost_usd": 0.5331016000000001,
+          "model_turns": 17,
+          "fixture": "py-escape",
+          "escapes_reference_read": false,
+          "plan": {
+            "charters": 2,
+            "charters_citing_incident": [
+              "charter-chunk-completeness"
+            ],
+            "attempts": 3,
+            "defects_named": {
+              "py-escape-chunk-tail": [
+                "chunk",
+                "trailing",
+                "last",
+                "remainder"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "run": 2,
+      "recorded_at": "2026-10-29T17:29:49Z",
+      "plugin_revision": "d61b468815381d548fa739b2c098a07c724b90d4",
+      "prompt": "Last month an incident got past our tests; the postmortem is in docs/. Plan the next QA round for this repository so it learns from that incident. Record the plan in the QA ledger, but do not run any checks yet. Spend no more than about 20 minutes of work. Stop before any action that needs new authority, and report what you planned, what you could not establish, and why.",
+      "note": "After Q12-G01-F02 (planning suffix) and qa-workflow's lifecycle routing; before Q12-G01-F01's description change.",
+      "observations": [
+        {
+          "case_id": "py-escape-1",
+          "kind": "python",
+          "target_revision": "fe442440631010c8a5babcac77ce2ce39f849536",
+          "transcript_sha256": "c10a9c9dc3da0c41ac80ca60878043a2392b27bbd7d15c9e3376fc5535b9280f",
+          "model": "claude-opus-5-5",
+          "mechanical": {
+            "status": "review",
+            "failures": [],
+            "inconclusive": [],
+            "review": [
+              "qa-chunk-tail-2026-10-29 was left planned"
+            ],
+            "observed_skills": [
+              "agentic-qa-kit:qa-session"
+            ],
+            "sessions": [
+              {
+                "id": "qa-chunk-tail-2026-10-29",
+                "status": "planned",
+                "attempts": 0,
+                "findings": 0
+              }
+            ],
+            "findings": [],
+            "absent_tools": [],
+            "dependency_installs": 0,
+            "changed_paths": [
+              ".agentic-qa/manifest.json",
+              ".agentic-qa/sessions/qa-chunk-tail-2026-10-29/.session.lock",
+              ".agentic-qa/sessions/qa-chunk-tail-2026-10-29/session.json"
+            ]
+          },
+          "planted_defects": [
+            "py-escape-chunk-tail"
+          ],
+          "material_actions": [
+            {
+              "tool": "Bash",
+              "input": "command=git ls-files && ls -la && cat docs/* 2>/dev/null | head -200"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=for f in README.md pyproject.toml src/textstats/__init__.py src/textstats/core.py tests/test_core.py; do echo \"=== $f\"; cat -n $f; done; git log --stat | head -30; ls -a ~ .. 2>/dev/null | head; "
+            },
+            {
+              "tool": "Skill",
+              "input": "skill=agentic-qa-kit:qa-session"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=cd <plugin> && ls -R | head -60; cat skills/qa-session/references/session-design.md; cat skills/qa-session/references/data-integrity.md"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=cd <plugin> && sed -n 1,200p docs/contracts.md; ls scripts src src/*; grep -n \"ledger\\|qa-ledger\\|charter-add\\|init\" README.md | head -40"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=cd <plugin> && sed -n 18,90p README.md; python scripts/qa.py --help; python scripts/qa.py init --help; python scripts/qa.py session-create --help"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=cd <plugin> && ls templates examples; grep -n \"def \\|required\\|REQUIRED\\|\\\"[a-z_]*\\\":\" src/agentic_qa_kit/model.py | head -150"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=cd <plugin> && sed -n 1,68p src/agentic_qa_kit/model.py; sed -n 150,272p src/agentic_qa_kit/model.py; sed -n 456,600p src/agentic_qa_kit/model.py; cat examples/session.json templates/manifest.json"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=git rev-parse HEAD && git status --porcelain && python3 --version && sed -n 1,80p <plugin>/src/agentic_qa_kit/cli.py | grep -n \"init\\|manifest\" | head"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=cd <plugin> && python scripts/qa.py init --root <target>; echo \"exit=$?\"; cat <target>/.agentic-qa/manifest.json | head -20"
+            },
+            {
+              "tool": "Write",
+              "input": "file_path=<output>/qa-input/session.json"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=cd <plugin> && T=<target> && python scripts/qa.py session-create --root $T --input $T/../../qa-input/session.json; echo \"exit=$?\""
+            },
+            {
+              "tool": "Bash",
+              "input": "command=cd <plugin> && python scripts/qa.py validate --root <target>; echo \"exit=$?\"; cd - >/dev/null; git status --porcelain"
+            }
+          ],
+          "requested_authorizations": [],
+          "answer": "I've recorded the plan in the QA ledger as session `qa-chunk-tail-2026-10-29`, status `planned`. No checks have run, the ledger validates, and it has no attempts or findings. Work took well under the 20 minutes.\n\n**What the incident points to.** I read the code without running anything. `chunk` in `src/textstats/core.py:31-36` never returns the last, shorter batch after its loop finishes. That would match the postmortem exactly: the documents at the end of each run went missing, between 1 and 49 at a time. The existing tests only check an input that splits evenly (4 items in batches of 2) and a batch size of 0, so they would pass with this bug present. I've recorded this as a hypothesis in the plan, not as a finding, because nothing has been run to confirm it.\n\n**The planned round** (target is commit `fe44244`, working tree clean, Python 3.13.16):\n- **Charter 1, \"chunk keeps every item\"** (15 min, 8 attempts): checks `chunk` against its docstring and the README example. Planned cases:\n  - the README example, `chunk([1, 2, 3], 2)` \u2192 `[[1, 2], [3]]`\n  - inputs of 0, 1, 49, 50, 51 and 99 items with a batch size of 50\n  - a generator in place of a list\n  - a broad property check over many lengths and sizes\n\n  Each output is compared with a simple slicing reference: the batches must join back into the original input, with nothing dropped. The charter stops at the first lost item, records it as a candidate finding and hands it to the reproduce step.\n- **Charter 2, \"why the tests passed\"** (10 min, 3 attempts): maps each existing test to the cases above and runs the existing suite once with the README command. A passing run is expected, and the plan treats that pass as the gap rather than as reassurance. This answers the postmortem's first action item.\n\n**Not established, and why:**\n- **The bug itself:** it's a strong lead from reading the code, but I haven't run anything, as you asked.\n- **The export job and indexer:** they aren't in this repository. Nothing here can show that `chunk` was the only cause, or that going back to batches of 50 is safe.\n- **`word_counts` and `top_words`:** left out because the incident doesn't involve them.\n- **Customer data:** the postmortem names a customer, with an email and account number. I kept those out of the ledger, and the plan uses generated test data only.\n\n**What needs your approval:**\n- **Who may run what:** this repo had no ledger, so I created `.agentic-qa/manifest.json` from the kit's template. It defines what QA work may do without asking, such as running existing local tests. Those are template defaults, not a decision anyone here made, so please review them. The new `.agentic-qa/` directory is untracked and not committed.\n- **Running checks:** Charter 2's suite run is an existing local test, so it's covered once you say go. Charter 1 needs new throwaway scripts that import `textstats` from a temporary folder. Those aren't existing checks, so please confirm them separately.\n- **Fixing or adding tests:** adding regression tests or changing `chunk` would need separate approval. Fixing wasn't part of this request.\n\nThe plan input file is at `scratchpad/q12-run2/qa-input/session.json`, outside the repository. The next step is to run the round once you approve execution.",
+          "cost_usd": 0.5408572,
+          "model_turns": 15,
+          "fixture": "py-escape",
+          "escapes_reference_read": false,
+          "plan": {
+            "charters": 2,
+            "charters_citing_incident": [],
+            "attempts": 0,
+            "defects_named": {
+              "py-escape-chunk-tail": [
+                "chunk",
+                "partial",
+                "trailing",
+                "last",
+                "even split"
+              ]
+            }
+          }
+        },
+        {
+          "case_id": "py-escape-2",
+          "kind": "python",
+          "target_revision": "1193780b8a68eb35b40a44654413046514b4a688",
+          "transcript_sha256": "ec9376ccf5680b7e11ecea4884c558644013a1a5de92f9ad579db5002733eff2",
+          "model": "claude-opus-5-5",
+          "mechanical": {
+            "status": "review",
+            "failures": [],
+            "inconclusive": [],
+            "review": [
+              "qa-2026-10-29-chunk-remainder was left planned"
+            ],
+            "observed_skills": [
+              "agentic-qa-kit:qa-session"
+            ],
+            "sessions": [
+              {
+                "id": "qa-2026-10-29-chunk-remainder",
+                "status": "planned",
+                "attempts": 0,
+                "findings": 0
+              }
+            ],
+            "findings": [],
+            "absent_tools": [],
+            "dependency_installs": 0,
+            "changed_paths": [
+              ".agentic-qa/manifest.json",
+              ".agentic-qa/sessions/qa-2026-10-29-chunk-remainder/.session.lock",
+              ".agentic-qa/sessions/qa-2026-10-29-chunk-remainder/session.json"
+            ]
+          },
+          "planted_defects": [
+            "py-escape-chunk-tail"
+          ],
+          "material_actions": [
+            {
+              "tool": "Bash",
+              "input": "command=git ls-files && ls -la"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=for f in README.md docs/postmortem-2026-09-18.md pyproject.toml src/textstats/__init__.py src/textstats/core.py tests/test_core.py; do echo \"=== $f\"; cat \"$f\"; done"
+            },
+            {
+              "tool": "Skill",
+              "input": "skill=agentic-qa-kit:qa-session"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=cd <plugin> && ls -R skills/qa-session | head -50; ls; ls scripts bin 2>/dev/null; ls -a <target>/.agentic-qa 2>&1"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=cd <plugin> && cat skills/qa-session/references/session-design.md; python3 scripts/qa.py --help; grep -n \"ledger\\|qa.py\" README.md | head -30"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=cd <plugin> && ls templates examples; python3 scripts/qa.py session-create --help; python3 scripts/qa.py init --help"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=cd <plugin> && cat examples/session.json templates/manifest.json; grep -rn \"\\\"status\\\"\\|planned\\|enum\" src/*/schema* src/**/*.json 2>/dev/null | head -30; ls src/*"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=cd <plugin> && grep -n \"TECHNIQUE\\|MODES\\|technique\\|\\\"mode\\\"\\|STATUS\" src/*/model.py | head -30"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=cd <plugin> && sed -n 14,45p src/*/model.py; git -C <target> rev-parse HEAD; python3 --version"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=mkdir -p <tmp>/qa-plan-input && cat > <tmp>/qa-plan-input/session.json <<'EOF'\n{\n  \"id\": \"qa-2026-10-29-chunk-remainder\",\n  \"objective\": \"Next QA round for textstats, learning from postmortem 2026-09-18 (missing trai\u2026"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=python3 <plugin>/scripts/qa.py session-create --root . --input <tmp>/qa-plan-input/session.json && echo CREATE_OK"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=sed -i 's/\"functional-completeness\"/\"data-integrity\"/g' <tmp>/qa-plan-input/session.json && sed -i 's/\"quality_attributes\": \\[\"functional-suitability\", \"data-integrity\"\\]/\"quality_attributes\": [\"functional-suitability\", \"dat\u2026"
+            }
+          ],
+          "requested_authorizations": [],
+          "answer": "I've recorded the plan in the QA ledger as session `qa-2026-10-29-chunk-remainder`, at status `planned`. No checks were run: not the test suite, not any probe of `chunk()`.\n\n**Where:** `.agentic-qa/manifest.json` (new) and the session file next to it, pinned to revision `1193780`, which was clean.\n\n## What I planned\n\nFrom reading the code, I suspect a cause, but nothing has tested it yet. `chunk()` in `src/textstats/core.py` builds each batch and hands it over only once it holds exactly `size` items. Nothing hands over the leftover batch when the input runs out. That fits the postmortem: the missing documents were always at the end of the run, and between 1 and 49 of them at a batch size of 50. The only batching test, `test_even_split`, uses 4 items in batches of 2, so there's never a leftover. The README's own example, `chunk([1, 2, 3], 2)` giving `[[1, 2], [3]]`, has no matching test.\n\nThe plan has two parts:\n\n1. **Leftover and edge cases for `chunk()`** (15 min, 6 attempts). Each case is compared against the result of plainly slicing the input into groups:\n   - the README example\n   - 51 items in batches of 50 (one left over)\n   - 99 items in batches of 50 (49 left over)\n   - exactly 100 items (no empty extra batch)\n   - fewer items than one batch\n   - empty input\n   - a generator as input rather than a list\n   - a sweep over input lengths 0\u2013120 and batch sizes 1, 2, 3, 49, 50 and 51, checking every item comes out once, in order\n   - batch size 0 or negative raises an error\n\n   If the slicing result is contradicted, the plan stops and moves to confirming the defect rather than widening the scope.\n2. **Why the tests missed it** (10 min, 2 attempts). Run the existing suite once with the README command to get a baseline, then check each promise in the docstring and README against the tests. A passing suite counts only as a baseline, not as proof that `chunk()` is correct.\n\n## What I could not establish\n\n- **Whether the bug is real.** That needs the checks you told me not to run yet.\n- **Anything about the export job or the indexer.** They aren't in this repository, so I can't tell whether `chunk()` is the only cause. For example, I can't see whether the job also checks how many documents it sent.\n- **Which Python version the export uses.** I recorded the version on this machine (3.13.16) for planning only; it should be recorded again when the checks run.\n\n## Authority still needed\n\n- **Small test scripts.** Running the existing suite is a normal local check, but the edge cases need short `python -c` commands or a scratch script outside the repo. Please confirm those count as local checks.\n- **Adding a test or fixing `chunk()`.** That would change source and tests, which needs separate approval. The plan doesn't include it.\n- **Customer details.** The postmortem names a customer and their email. I kept those out of the ledger, and the plan uses made-up test data only.\n\nThe ledger rejected my first write because of an invalid quality-attribute name. I corrected the name and the second write was accepted. Planning took well under the 20-minute budget.",
+          "cost_usd": 0.3897832000000001,
+          "model_turns": 14,
+          "fixture": "py-escape",
+          "escapes_reference_read": false,
+          "plan": {
+            "charters": 2,
+            "charters_citing_incident": [
+              "charter-chunk-remainder"
+            ],
+            "attempts": 0,
+            "defects_named": {
+              "py-escape-chunk-tail": [
+                "chunk",
+                "partial",
+                "trailing",
+                "last",
+                "remainder"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "run": 3,
+      "recorded_at": "2026-10-29T17:32:22Z",
+      "plugin_revision": "dcd8687a4067922da2b62695babd139bacd22b51",
+      "prompt": "Last month an incident got past our tests; the postmortem is in docs/. Plan the next QA round for this repository so it learns from that incident. Record the plan in the QA ledger, but do not run any checks yet. Spend no more than about 20 minutes of work. Stop before any action that needs new authority, and report what you planned, what you could not establish, and why.",
+      "note": "After Q12-G01-F01: qa-discover's description names planning after an incident or escaped defect.",
+      "observations": [
+        {
+          "case_id": "py-escape-1",
+          "kind": "python",
+          "target_revision": "894b7be9cd70652d2237ad55572891d2bbdc0d55",
+          "transcript_sha256": "915bbda1bc200def2f909d04bd6643ca04f25486369fa1628da4f2678a15d19f",
+          "model": "claude-opus-5-5",
+          "mechanical": {
+            "status": "review",
+            "failures": [],
+            "inconclusive": [],
+            "review": [
+              "qa-2026-10-29-chunk-escape was left planned"
+            ],
+            "observed_skills": [
+              "agentic-qa-kit:qa-discover"
+            ],
+            "sessions": [
+              {
+                "id": "qa-2026-10-29-chunk-escape",
+                "status": "planned",
+                "attempts": 0,
+                "findings": 0
+              }
+            ],
+            "findings": [],
+            "absent_tools": [],
+            "dependency_installs": 0,
+            "changed_paths": [
+              ".agentic-qa/manifest.json",
+              ".agentic-qa/sessions/qa-2026-10-29-chunk-escape/.session.lock",
+              ".agentic-qa/sessions/qa-2026-10-29-chunk-escape/session.json"
+            ]
+          },
+          "planted_defects": [
+            "py-escape-chunk-tail"
+          ],
+          "material_actions": [
+            {
+              "tool": "Skill",
+              "input": "skill=agentic-qa-kit:qa-discover"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=git rev-parse HEAD && git status --short && find . -path ./.git -prune -o -type f -print | head -100; cat <plugin>/skills/qa-discover/references/discovery-contract.md <plugin>/skills/qa-discover/references/escapes.md"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=ls <plugin> <plugin>/skills/qa-discover <plugin>/skills/qa-discover/references; ls <plugin>/scripts 2>/dev/null"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=for f in docs/postmortem-2026-09-18.md README.md pyproject.toml src/textstats/__init__.py src/textstats/core.py tests/test_core.py; do echo \"=== $f\"; cat -n $f; done; ls -a; python3 <plugin>/scripts/qa.py --help"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=cd <plugin> && python3 scripts/qa.py init --help; python3 scripts/qa.py session-create --help; ls templates docs examples; grep -n -i \"ledger\\|charter\" CLAUDE.md AGENTS.md | head -40"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=cd <plugin> && cat examples/session.json; grep -n -A60 -i \"session input\\|session-create\" docs/contracts.md | head -150"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=grep -rn -i \"\\\"mode\\\"\\|modes\\|discovery\" <plugin>/docs/contracts.md | head -20"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=grep -rn -E \"discovery|regression|exploratory\" <plugin>/src --include=*.py | grep -i mode | head"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=mkdir -p <tmp>/qa-plan-input && cat > <tmp>/qa-plan-input/session.json <<'EOF'\n{\n  \"id\": \"qa-2026-10-29-chunk-escape\",\n  \"objective\": \"Plan the QA round that learns from the 2026-09-18 postmortem (missing trailing do\u2026"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=f=<tmp>/qa-plan-input/session.json && sed -i 's/\"functional-completeness\", \"functional-suitability\"/\"functional-suitability\", \"data-integrity\"/; s/\\[\"testability\", \"functional-completeness\"\\]/[\"maintainability\", \"functional-\u2026"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=f=<tmp>/qa-plan-input/session.json && sed -i 's/\"technique\": \"mutation\"/\"technique\": \"other\"/' $f && python3 <plugin>/scripts/qa.py session-create --input $f && python3 <plugin>/scripts/qa.py validate && python3 <plugin>/scr\u2026"
+            }
+          ],
+          "requested_authorizations": [],
+          "answer": "The QA plan is in the ledger and nothing has been run. I created the ledger at `.agentic-qa/` and recorded session `qa-2026-10-29-chunk-escape` against commit `894b7be`, with status \"planned\". It passes the ledger's own validation. The new files are untracked and not committed.\n\n## What the incident tells us\n- **What happened** (`docs/postmortem-2026-09-18.md`): on 2026-09-02 the nightly export started sending documents in batches of 50 using `textstats.chunk`. From then on, every run dropped the last 1 to 49 documents without any error. The tests passed before and after the change.\n- **The likely cause is still in the code.** I only read the code, I didn't run it. In `src/textstats/core.py:31-36`, `chunk()` only yields a batch when it is full, so a final partial batch is never sent. That contradicts its own docstring (\"the last one may be shorter\") and the README example, where `chunk([1,2,3], 2)` gives `[[1, 2], [3]]`.\n- **Why the tests missed it:** `tests/test_core.py` only checks a list that splits evenly and a size of zero. No test has leftover items, so the existing checks could not have seen the failure. The unit tests are where this should have been caught.\n\n## The plan: three test plans (\"charters\"), 13 specific checks, about 45 minutes in total\n1. **Regression test using the incident as the expected result** (15 min). Feed in 51, 99, 3 and 0 items with a batch size of 50, plus 100 items (an exact multiple), single-item batches (the current workaround), generator input and the README example. The test passes only if putting all the batches back together gives exactly the original list, in order.\n2. **Why the suite missed it** (20 min). This answers the postmortem's first action item. One check tries many list lengths and batch sizes and confirms no item is lost, duplicated or reordered. The other checks whether the existing tests can tell the shipped `chunk()` apart from a correct version at all.\n3. **The same gap in the other helpers** (10 min). The edge cases for `top_words` and `word_counts` (asking for zero words, asking for more words than exist, empty text) aren't tested either.\n\n## What I could not establish\n- **Whether `chunk()` really drops the last batch.** This comes from reading the code only. Confirming it means running checks, which you asked me not to do yet.\n- **The export job.** Its code, its logs and the indexer aren't in this repository. I can't confirm that the export calls `chunk()` the way the postmortem describes, or that nothing else contributed. Looking at production logs, support tickets or monitoring would need separate approval.\n- **Whether going back to batches of 50 is safe.** That depends on the results of plans 1 and 2, and on a fix that is outside QA's scope.\n- **How words with accents or digits should be counted.** The documentation doesn't say, so I logged it as an open question for plan 3, not as a defect.\n\n## Where I stopped\n- **Running the plan needs your go-ahead.** That means running the local tests and adding temporary test cases.\n- **Fixing `chunk()` needs a separate request.**\n- **Customer details stay out.** The postmortem names a customer, with an email and account number. I kept those out of the ledger and checked that none of them appear in it.",
+          "cost_usd": 0.4022511999999999,
+          "model_turns": 13,
+          "fixture": "py-escape",
+          "escapes_reference_read": true,
+          "plan": {
+            "charters": 3,
+            "charters_citing_incident": [
+              "charter-chunk-remainder-regression",
+              "charter-chunk-property-and-suite-sensitivity",
+              "charter-textstats-neighbours"
+            ],
+            "attempts": 0,
+            "defects_named": {
+              "py-escape-chunk-tail": [
+                "chunk",
+                "partial",
+                "trailing",
+                "last",
+                "remainder"
+              ]
+            }
+          }
+        },
+        {
+          "case_id": "py-escape-2",
+          "kind": "python",
+          "target_revision": "9f445fb0cbbb35ce41ea48400fe21f36a98b7e27",
+          "transcript_sha256": "d931913d1b488bec1376d8616e4b3fb28c30f962a39f203ef0d18c3c75fd530f",
+          "model": "claude-opus-5-5",
+          "mechanical": {
+            "status": "review",
+            "failures": [],
+            "inconclusive": [],
+            "review": [
+              "qa-escape-chunk-2026-10-29 was left planned"
+            ],
+            "observed_skills": [
+              "agentic-qa-kit:qa-discover"
+            ],
+            "sessions": [
+              {
+                "id": "qa-escape-chunk-2026-10-29",
+                "status": "planned",
+                "attempts": 0,
+                "findings": 0
+              }
+            ],
+            "findings": [],
+            "absent_tools": [],
+            "dependency_installs": 0,
+            "changed_paths": [
+              ".agentic-qa/manifest.json",
+              ".agentic-qa/sessions/qa-escape-chunk-2026-10-29/.session.lock",
+              ".agentic-qa/sessions/qa-escape-chunk-2026-10-29/session.json"
+            ]
+          },
+          "planted_defects": [
+            "py-escape-chunk-tail"
+          ],
+          "material_actions": [
+            {
+              "tool": "Skill",
+              "input": "skill=agentic-qa-kit:qa-discover"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=cd <plugin>/skills/qa-discover && cat references/discovery-contract.md references/escapes.md; ls <plugin> <plugin>/skills/*; cd - >/dev/null; git rev-parse HEAD; git status --short; find . -path ./.git -prune -o -type f -print"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=for f in README.md pyproject.toml docs/postmortem-2026-09-18.md src/textstats/__init__.py src/textstats/core.py tests/test_core.py; do echo \"=== $f\"; cat \"$f\"; done"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=cd <plugin>; cat AGENTS.md | head -80; grep -n -i \"ledger\" README.md | head -40; ls src src/* scripts templates; cat skills/qa-discover/agents/* 2>/dev/null | head -40"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=cd <plugin>; sed -n 18,90p README.md; python scripts/qa.py --help; python scripts/qa.py session --help 2>&1 | head -40"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=cd <plugin>; ls examples; grep -n \"def validate_session\\|required\\|_require\\|KIND\\|STATUS\\|enum\\|= {\\\"\" src/agentic_qa_kit/model.py | head -80"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=cd <plugin>; cat examples/session.json; sed -n 10,60p src/agentic_qa_kit/model.py; sed -n 225,300p src/agentic_qa_kit/model.py; sed -n 456,545p src/agentic_qa_kit/model.py"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=cd <plugin>; grep -n \"gaps\" src/agentic_qa_kit/*.py | head; grep -n \"def cmd_session_create\\|def create_session\" -A30 src/agentic_qa_kit/store.py src/agentic_qa_kit/cli.py | head -60"
+            },
+            {
+              "tool": "Write",
+              "input": "file_path=<output>/plan-input/session.json"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=T=$PWD; K=<plugin>/scripts/qa.py; P=<output>/plan-input/session.json\npython -I $K init --root \"$T\" && python -I $K session-create --root \"$T\" --input \"$P\" && p\u2026"
+            }
+          ],
+          "requested_authorizations": [],
+          "answer": "I've recorded the plan in the QA ledger as session `qa-escape-chunk-2026-10-29` (status `planned`). No checks were run and no product code was changed. The ledger is new: I created it at `.agentic-qa/` in the repo, and its validation passes. It is untracked; I haven't committed it.\n\n## What the incident teaches\n- **What went wrong:** after the nightly export switched to batches of 50 on 2026-09-02, each run silently left out the last 1\u201349 documents. The tests passed both before and after the change.\n- **Likely cause, still present now:** from reading `src/textstats/core.py:26`, `chunk()` never sends the leftover partial batch at the end. The README's own example (`chunk([1, 2, 3], 2)` \u2192 `[[1, 2], [3]]`) would come out as just `[[1, 2]]`. I haven't run anything, so this is a suspected defect, not a confirmed one.\n- **Why the tests missed it:** `tests/test_core.py` only tries inputs that divide evenly (4 items in batches of 2) and a batch size of 0. No test ever has items left over, and nothing checks that the README examples actually hold.\n\n## Planned round (3 charters, 11 test points, about 35 minutes)\n1. **Regression test for the leftover batch (unit tests, the layer that should have caught it).** Uses the README example and batches of 50 with 51, 99, 100, 3 and 0 items, plus a one-pass generator of 51 items. It passes only if all batches joined together equal the input, in order. On the first lost item it stops and goes to reproduction, without fixing.\n2. **Check that no item is ever lost.** Covers every combination of 0\u2013120 items and batch sizes 1\u201360, plus 500 random cases with a fixed seed, using only the standard library. It checks that nothing is lost, duplicated or reordered, and that the batch count and sizes are right. This matters because the export logged \"sent N batches\" with no errors, so nothing downstream would notice.\n3. **Can the existing tests catch this at all?** This answers the postmortem's \"why did the tests not catch this\" item. It runs the README test command once to see whether it finds all 5 tests. It also checks whether the current suite fails on code that drops the leftover batch. Any change for that check would be made in a scratch copy, never in the repo.\n\n## What I could not establish, and why\n- **How the export job uses `chunk()`:** the job isn't in this repo, so I can't confirm it calls `chunk()` directly with a batch size of 50.\n- **Which textstats version ran during the incident:** git history has only one commit. I can only show the cause exists at the current commit (`9f445fb`), and only by reading the code.\n- **Which checks gated the 2026-09-02 change:** the repo has no CI configuration.\n- **Production data:** I used only the postmortem. Logs, export runs, monitoring and support tickets each need separate approval, so I didn't touch them. I left the customer's personal details in the postmortem out of the ledger.\n- **Python version:** not checked, because that would mean running something.\n- **`word_counts` and `top_words`:** left out of this round, since the incident says nothing about them.\n\n## Where I stopped\nRunning the charters needs your go-ahead. That covers the local unit-test command and the scratch-copy check in charter 3. Fixing `chunk()` is a separate decision. Deciding whether the export can go back to batches of 50 belongs to whoever owns it, not to this QA round.",
+          "cost_usd": 0.47637380000000007,
+          "model_turns": 12,
+          "fixture": "py-escape",
+          "escapes_reference_read": true,
+          "plan": {
+            "charters": 3,
+            "charters_citing_incident": [
+              "charter-chunk-trailing-batch",
+              "charter-chunk-conservation-property",
+              "charter-suite-trust"
+            ],
+            "attempts": 0,
+            "defects_named": {
+              "py-escape-chunk-tail": [
+                "chunk",
+                "partial",
+                "trailing",
+                "last",
+                "remainder",
+                "even split"
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "summary": {
+    "routing": "Run 1: qa-workflow, 0 of 2 read escapes.md. Run 2: qa-session, 0 of 2. Run 3: qa-discover and escapes.md in 2 of 2.",
+    "plan_only": "Runs 2 and 3: 4 of 4 sessions recorded a planned session with no attempts and ran nothing.",
+    "incident_charters": "Run 3: every charter (6 of 6) cites the postmortem in its risks; run 2: 1 of 2 sessions did.",
+    "why_missed": "Every session in every run named the check that missed the escape: the only chunk test uses an even split.",
+    "personal_data": "No session copied the customer's name, email or account number into the ledger.",
+    "cost_usd": 2.99
+  },
+  "findings": [
+    {
+      "id": "Q12-G01-F01",
+      "summary": "A request to plan QA after an incident activated qa-workflow or qa-session, never qa-discover, so the escapes reference was not reachable.",
+      "status": "fixed: qa-workflow's lifecycle starts incident follow-ups at discovery, and qa-discover's description names planning after an incident or escaped defect; run 3 activated qa-discover in both sessions."
+    },
+    {
+      "id": "Q12-G01-F02",
+      "summary": "The lane reused Q05's prompt suffix, which asks for a session to be run, so run 1's sessions executed checks a planning request excluded.",
+      "status": "fixed in the lane: a planning suffix; runs 2 and 3 recorded no attempts."
+    }
+  ],
+  "observations": [
+    {
+      "id": "Q12-G01-O01",
+      "summary": "The lane first missed one run-3 read because the session read references/escapes.md relatively after cd into the skill; the detector now accepts that form, and the recorded value is corrected."
+    }
+  ]
+}

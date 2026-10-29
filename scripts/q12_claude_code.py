@@ -48,7 +48,11 @@ SUFFIX = (
 
 def read_reference(stdout: str) -> bool:
     observed = parse_stream(stdout.splitlines())
-    return any(REFERENCE in text for text in [*observed["reads"], *observed["commands"]])
+    # A session may `cd` into the skill and read `references/escapes.md` relatively.
+    return any(
+        REFERENCE in text or ("qa-discover" in text and "references/escapes.md" in text)
+        for text in [*observed["reads"], *observed["commands"]]
+    )
 
 
 def leaked_personal_data(fixture: Mapping[str, Any], target: Path) -> list[str]:
