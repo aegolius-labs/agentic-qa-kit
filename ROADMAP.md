@@ -77,7 +77,7 @@ Claude Code is the primary host and Codex is supported alongside it. `skills/` i
 - [x] Add hermetic environment, fixture, entropy, retry, quarantine, and suite-trust evidence. `qa-session`'s suite-trust reference (Q11, 2026-10-29).
 - [ ] Add observability-contract and diagnosability verification.
 - [ ] Add progressive-delivery, synthetic, shadow, and field-feedback session modes with explicit production authorization.
-- [ ] Feed confirmed escapes and incident evidence back into discovery models and regression charters.
+- [x] Feed confirmed escapes and incident evidence back into discovery models and regression charters. `qa-discover`'s escapes reference (Q12, 2026-10-29).
 - [ ] Define cross-session metrics with denominators, uncertainty, anti-gaming guardrails, and no individual ranking.
 
 ### M6 - AI and agentic-system QA
@@ -329,6 +329,18 @@ ledger-chaining hazard (Q02-F01) and a measured payload-discovery cost for Q07
 - **Follow-ups:**
   - [x] Q11-G01: Run the request through the installed plugin on a fixture with a hash-seed product defect, an order-dependent test and CI retries. Two of two sessions read the pack and found both causes; `evals/results/q11-claude-code-2026-10-29.json`.
   - [ ] Q11-G02: Add fixtures for time-zone, locale, wall-clock and leftover-file dependence, and a real repository's flaky suite, before treating the classification rate as stable.
+
+### Q12 - Learn from escapes and incidents in discovery
+
+- **Status:** Done (2026-10-29). On the installed plugin, after two routing fixes, both sessions entered discovery, read the escapes reference, planned without running anything, cited the postmortem in every charter, and kept the customer's data out of the ledger (Q12-G01)
+- **Importance:** High
+- **Complexity:** Medium
+- **Depends on:** Q11
+- **Approach:** M5's fourth item. A `qa-discover` reference that turns supplied incident material and confirmed findings into a raised risk and a regression charter. It treats an escape as evidence about the checks, never as new intent.
+- **Done when:** A QA round planned after an incident names the check that missed it, adds a regression charter whose oracle is the observed failure and that cites the incident, copies no personal data into the ledger, and runs nothing it was not asked to run.
+- **Follow-ups:**
+  - [x] Q12-G01: Plan from a postmortem through the installed plugin. Run 1 never reached discovery (Q12-G01-F01, fixed in `qa-workflow` and the `qa-discover` description), and the lane's own suffix asked for execution (Q12-G01-F02, fixed); run 3 met the done-when in 2 of 2 sessions; `evals/results/q12-claude-code-2026-10-29.json`.
+  - [ ] Q12-G02: Repeat with an escape recorded as a confirmed finding in an existing ledger, not only as a postmortem, and with incident material that contradicts the documented behavior.
 
 ## Dependency and execution waves
 

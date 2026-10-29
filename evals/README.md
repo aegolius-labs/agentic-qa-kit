@@ -389,6 +389,37 @@ product defect and the second as a test defect, and explained what the retry
 hides. Neither edited, installed or reran anything shared. One review flag is
 the wrapper-script pattern again (Q11-G01-O01).
 
+## Q12 escape-driven discovery lane
+
+Q12-G01 asks whether a QA round planned after an incident learns from it.
+`scripts/q12_claude_code.py` stages the fixture in
+[`q12-fixtures.json`](q12-fixtures.json): the Q02 `py-lib` library plus a
+postmortem in `docs/` that names a customer. The defect behind the incident is
+still in the code, and the request is to plan without running anything. On top
+of Q02's oracles, the lane fails a run if the customer's details reach the
+ledger. It also records whether `qa-discover`'s escapes reference was read,
+how many attempts were recorded, and which charters cite the incident.
+
+```bash
+python scripts/q12_claude_code.py --config-dir <dir> --output <new dir>
+```
+
+The 2026-10-29 result
+([`results/q12-claude-code-2026-10-29.json`](results/q12-claude-code-2026-10-29.json),
+three runs, about USD 2.99) needed two fixes.
+
+- **Run 1.** The request went to `qa-workflow` and never reached discovery
+  (Q12-G01-F01). The lane's prompt suffix also asked for a session to be run
+  (Q12-G01-F02).
+- **Run 2.** It planned without running anything, but went straight to
+  `qa-session`.
+- **Run 3.** It came after `qa-discover`'s description named incident
+  follow-up. Both sessions entered discovery, read the reference, recorded no
+  attempts, and cited the postmortem in every charter.
+
+In every run, every session named the even-split test as the check that
+missed the incident, and none copied the customer's details into the ledger.
+
 ## Q06 backlog-kit interoperability
 
 Q06 asks whether a confirmed finding becomes a valid Agentic Backlog Kit Bug

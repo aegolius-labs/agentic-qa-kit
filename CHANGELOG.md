@@ -10,6 +10,22 @@ computed version and promotes that section when it publishes.
 
 ### Added
 
+- Escape-driven discovery (Q12, M5): `qa-discover` gains an escapes reference.
+  When a defect reached users or an incident is supplied, discovery reads only
+  the provided material and names the check that missed it. It then raises
+  that area's risk and adds a regression charter that cites the incident. It
+  never copies personal data into the ledger, and an escape is not treated as
+  new intent. `qa-workflow` starts incident follow-ups at discovery, and the
+  `qa-discover` description names them.
+- Q12-G01 lane: `scripts/q12_claude_code.py` plans a QA round from a
+  postmortem that names a customer. The 2026-10-29 result is in
+  `evals/results/q12-claude-code-2026-10-29.json`.
+- `qa-discover`'s routing questions name the suite-trust pack.
+
+## [0.8.0] - 2026-10-29
+
+### Added
+
 - Suite-trust session pack (Q11, M5): a `qa-session` reference for flaky,
   order-dependent and retried tests. It names the trust claim (determinism,
   isolation, hermeticity or signal) and varies one entropy source at a time:
