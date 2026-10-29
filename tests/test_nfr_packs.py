@@ -1,4 +1,4 @@
-"""Q05: each non-functional pack states what its done-when requires and fails closed."""
+"""Q05 and Q11: each session pack states what its done-when requires and fails closed."""
 
 from __future__ import annotations
 
@@ -17,9 +17,11 @@ PACKS = {
     "accessibility-i18n.md": {"interaction-capability", "compatibility"},
     "data-integrity.md": {"data-integrity"},
 }
+# Q11: a pack about the test suite itself, not a product quality attribute.
+SUITE_PACKS = ("suite-trust.md",)
 # Workload, threat or population; environment; oracle; uncertainty; stop
 # conditions; evidence. The first heading varies with what the pack scopes.
-SCOPE_HEADINGS = {"Workload", "Fault model", "Population and scope", "Population and claim"}
+SCOPE_HEADINGS = {"Workload", "Fault model", "Population and scope", "Population and claim", "Suite and claim"}
 REQUIRED_HEADINGS = ["Environment", "Oracle", "Uncertainty", "Stop conditions", "Evidence"]
 
 
@@ -29,7 +31,7 @@ def _headings(text: str) -> list[str]:
 
 class NonFunctionalPackTests(unittest.TestCase):
     def test_every_pack_states_the_done_when_sections_in_order(self) -> None:
-        for name in PACKS:
+        for name in [*PACKS, *SUITE_PACKS]:
             with self.subTest(pack=name):
                 headings = _headings((SKILL / "references" / name).read_text(encoding="utf-8"))
                 self.assertEqual("Authority: fail closed", headings[0])
@@ -37,7 +39,7 @@ class NonFunctionalPackTests(unittest.TestCase):
                 self.assertEqual(REQUIRED_HEADINGS, headings[2:])
 
     def test_every_pack_fails_closed_to_inconclusive(self) -> None:
-        for name in PACKS:
+        for name in [*PACKS, *SUITE_PACKS]:
             with self.subTest(pack=name):
                 text = (SKILL / "references" / name).read_text(encoding="utf-8")
                 authority = text.split("## ", 2)[1]
@@ -54,8 +56,15 @@ class NonFunctionalPackTests(unittest.TestCase):
 
     def test_the_skill_routes_to_every_pack(self) -> None:
         body = (SKILL / "SKILL.md").read_text(encoding="utf-8")
-        for name in PACKS:
+        for name in [*PACKS, *SUITE_PACKS]:
             self.assertIn(f"(references/{name})", body)
+
+    def test_suite_trust_never_makes_a_suite_pass_by_editing_it(self) -> None:
+        text = (SKILL / "references" / "suite-trust.md").read_text(encoding="utf-8")
+        authority = text.split("## ", 2)[1]
+        self.assertIn("Never skip, retry away or quarantine a test to make a suite pass", authority)
+        for effect in ("editing tests", "installing test plugins", "rerunning shared CI jobs"):
+            self.assertIn(effect, authority)
 
 
 if __name__ == "__main__":

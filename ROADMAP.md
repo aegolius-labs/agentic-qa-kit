@@ -74,7 +74,7 @@ Claude Code is the primary host and Codex is supported alongside it. `skills/` i
 
 ### M5 - CI, shift-right, and fleet learning
 
-- [ ] Add hermetic environment, fixture, entropy, retry, quarantine, and suite-trust evidence.
+- [x] Add hermetic environment, fixture, entropy, retry, quarantine, and suite-trust evidence. `qa-session`'s suite-trust reference (Q11, 2026-10-29).
 - [ ] Add observability-contract and diagnosability verification.
 - [ ] Add progressive-delivery, synthetic, shadow, and field-feedback session modes with explicit production authorization.
 - [ ] Feed confirmed escapes and incident evidence back into discovery models and regression charters.
@@ -317,6 +317,18 @@ ledger-chaining hazard (Q02-F01) and a measured payload-discovery cost for Q07
   hosts is recorded as a limitation, never resolved by forking a skill.
 - **Note:** This item exists so that de-gating Q02 does not quietly become
   dropping Codex support. Codex remains a supported host.
+
+### Q11 - Add the suite-trust session pack
+
+- **Status:** Done (2026-10-29). The pack is pinned by `tests/test_nfr_packs.py`; on the installed plugin both sessions found both planted causes, classified them correctly, and changed nothing (Q11-G01)
+- **Importance:** High
+- **Complexity:** Medium
+- **Depends on:** Q05
+- **Approach:** M5's first item. A `qa-session` reference for flaky, order-dependent and retried suites that varies one entropy source at a time, separates product defects from test defects, and never edits a suite to make it pass.
+- **Done when:** A session asked whether a suite can be trusted finds the entropy a verdict depends on, classifies each cause, says what a retry policy hides, and edits no test, CI file or dependency.
+- **Follow-ups:**
+  - [x] Q11-G01: Run the request through the installed plugin on a fixture with a hash-seed product defect, an order-dependent test and CI retries. Two of two sessions read the pack and found both causes; `evals/results/q11-claude-code-2026-10-29.json`.
+  - [ ] Q11-G02: Add fixtures for time-zone, locale, wall-clock and leftover-file dependence, and a real repository's flaky suite, before treating the classification rate as stable.
 
 ## Dependency and execution waves
 

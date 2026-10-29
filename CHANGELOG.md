@@ -10,6 +10,28 @@ computed version and promotes that section when it publishes.
 
 ### Added
 
+- Suite-trust session pack (Q11, M5): a `qa-session` reference for flaky,
+  order-dependent and retried tests. It names the trust claim (determinism,
+  isolation, hermeticity or signal) and varies one entropy source at a time:
+  hash seed, order, locale or time zone, and parallelism. It then classifies
+  each cause as a product defect, a test defect or the environment. Editing
+  tests or CI, installing rerun or random-order plugins, and rerunning shared
+  CI each need approval, and no test is skipped, retried away or quarantined to
+  make a suite pass.
+- Q11-G01 lane: `scripts/q11_claude_code.py` runs two fresh sessions on a
+  fixture whose CI retries a suite that fails on about half of hash seeds and
+  hides an order-dependent test. The 2026-10-29 result is in
+  `evals/results/q11-claude-code-2026-10-29.json`.
+
+### Changed
+
+- The other non-functional packs are trimmed so the activation budget holds
+  with a fifth pack.
+
+## [0.7.0] - 2026-10-29
+
+### Added
+
 - Q07 decision record (`docs/q07-mcp-decision.md`): keep the skills-only
   architecture. `scripts/q07_measure.py` measured 18 retained lane
   transcripts. 23% of tool calls went on learning payload shapes, and 23 of

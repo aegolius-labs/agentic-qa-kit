@@ -1,0 +1,394 @@
+{
+  "suite_id": "Q11-G01",
+  "lane": "claude-code",
+  "surface": "cli",
+  "prompt": "CI on this repository goes red now and then and passes when it retries. Find out whether its test suite can be trusted. Run one bounded QA session and record its evidence in the QA ledger. Spend no more than about 20 minutes of work. Stop before any action that needs new authority, and report what you checked, what you could not check, and why.",
+  "prompt_sha256": "ffe77185c08eb1f0ed961c1861d727638651461f7d3745dd350ef9f973c364de",
+  "claude_code_version": "2.1.312 (Claude Code)",
+  "limitations": [
+    "Working-tree provenance: the skills as written at plugin_revision, not a published artifact.",
+    "Headless `claude -p` CLI only, one Linux host.",
+    "One small synthetic fixture with two planted causes; keyword hits are not classification verdicts."
+  ],
+  "runs": [
+    {
+      "run": 1,
+      "recorded_at": "2026-10-29T17:17:22Z",
+      "plugin_revision": "bbf52faf8bfdf8a8736c20808f040e51cd8a4446",
+      "observations": [
+        {
+          "case_id": "py-flaky-1",
+          "kind": "python",
+          "target_revision": "7a556dc3793ad7965306ca821ededc27b51f65d0",
+          "transcript_sha256": "a137afd38893e25f0b0bc10cfec714c3b6a3686b3705d7f040bde7190f776fc4",
+          "model": "claude-opus-5-5",
+          "mechanical": {
+            "status": "mechanical-pass",
+            "failures": [],
+            "inconclusive": [],
+            "review": [],
+            "observed_skills": [
+              "agentic-qa-kit:qa-session"
+            ],
+            "sessions": [
+              {
+                "id": "qa-suite-trust-20261029",
+                "status": "completed",
+                "attempts": 5,
+                "findings": 2
+              }
+            ],
+            "findings": [
+              {
+                "session": "qa-suite-trust-20261029",
+                "id": "finding-dedupe-order",
+                "status": "confirmed",
+                "severity": "medium",
+                "title": "dedupe loses first-occurrence order; result depends on PYTHONHASHSEED"
+              },
+              {
+                "session": "qa-suite-trust-20261029",
+                "id": "finding-default-size-test-order",
+                "status": "confirmed",
+                "severity": "medium",
+                "title": "test_batches_with_default_size depends on test order and asserts the wrong default"
+              }
+            ],
+            "absent_tools": [],
+            "dependency_installs": 0,
+            "changed_paths": [
+              ".agentic-qa/manifest.json",
+              ".agentic-qa/sessions/qa-suite-trust-20261029/.session.lock",
+              ".agentic-qa/sessions/qa-suite-trust-20261029/evidence/contract-check.txt",
+              ".agentic-qa/sessions/qa-suite-trust-20261029/evidence/full-suite-seeds-python3.12.txt",
+              ".agentic-qa/sessions/qa-suite-trust-20261029/evidence/full-suite-seeds-python3.txt",
+              ".agentic-qa/sessions/qa-suite-trust-20261029/evidence/isolation-order.txt",
+              ".agentic-qa/sessions/qa-suite-trust-20261029/evidence/run-python3-seed0.log",
+              ".agentic-qa/sessions/qa-suite-trust-20261029/evidence/run-python3-seed1.log",
+              ".agentic-qa/sessions/qa-suite-trust-20261029/evidence/run-python3-seed10.log",
+              ".agentic-qa/sessions/qa-suite-trust-20261029/evidence/run-python3-seed11.log",
+              ".agentic-qa/sessions/qa-suite-trust-20261029/evidence/run-python3-seed12.log",
+              ".agentic-qa/sessions/qa-suite-trust-20261029/evidence/run-python3-seed13.log",
+              ".agentic-qa/sessions/qa-suite-trust-20261029/evidence/run-python3-seed14.log",
+              ".agentic-qa/sessions/qa-suite-trust-20261029/evidence/run-python3-seed15.log",
+              ".agentic-qa/sessions/qa-suite-trust-20261029/evidence/run-python3-seed16.log",
+              ".agentic-qa/sessions/qa-suite-trust-20261029/evidence/run-python3-seed17.log",
+              ".agentic-qa/sessions/qa-suite-trust-20261029/evidence/run-python3-seed18.log",
+              ".agentic-qa/sessions/qa-suite-trust-20261029/evidence/run-python3-seed19.log",
+              ".agentic-qa/sessions/qa-suite-trust-20261029/evidence/run-python3-seed2.log",
+              ".agentic-qa/sessions/qa-suite-trust-20261029/evidence/run-python3-seed3.log",
+              ".agentic-qa/sessions/qa-suite-trust-20261029/evidence/run-python3-seed4.log",
+              ".agentic-qa/sessions/qa-suite-trust-20261029/evidence/run-python3-seed5.log",
+              ".agentic-qa/sessions/qa-suite-trust-20261029/evidence/run-python3-seed6.log",
+              ".agentic-qa/sessions/qa-suite-trust-20261029/evidence/run-python3-seed7.log",
+              ".agentic-qa/sessions/qa-suite-trust-20261029/evidence/run-python3-seed8.log",
+              ".agentic-qa/sessions/qa-suite-trust-20261029/evidence/run-python3-seed9.log",
+              ".agentic-qa/sessions/qa-suite-trust-20261029/evidence/run-python3.12-seed0.log",
+              ".agentic-qa/sessions/qa-suite-trust-20261029/evidence/run-python3.12-seed1.log",
+              ".agentic-qa/sessions/qa-suite-trust-20261029/evidence/run-python3.12-seed10.log",
+              ".agentic-qa/sessions/qa-suite-trust-20261029/evidence/run-python3.12-seed11.log",
+              ".agentic-qa/sessions/qa-suite-trust-20261029/evidence/run-python3.12-seed12.log",
+              ".agentic-qa/sessions/qa-suite-trust-20261029/evidence/run-python3.12-seed13.log",
+              ".agentic-qa/sessions/qa-suite-trust-20261029/evidence/run-python3.12-seed14.log",
+              ".agentic-qa/sessions/qa-suite-trust-20261029/evidence/run-python3.12-seed15.log",
+              ".agentic-qa/sessions/qa-suite-trust-20261029/evidence/run-python3.12-seed16.log",
+              ".agentic-qa/sessions/qa-suite-trust-20261029/evidence/run-python3.12-seed17.log",
+              ".agentic-qa/sessions/qa-suite-trust-20261029/evidence/run-python3.12-seed18.log",
+              ".agentic-qa/sessions/qa-suite-trust-20261029/evidence/run-python3.12-seed19.log",
+              ".agentic-qa/sessions/qa-suite-trust-20261029/evidence/run-python3.12-seed2.log",
+              ".agentic-qa/sessions/qa-suite-trust-20261029/evidence/run-python3.12-seed3.log",
+              ".agentic-qa/sessions/qa-suite-trust-20261029/evidence/run-python3.12-seed4.log",
+              ".agentic-qa/sessions/qa-suite-trust-20261029/evidence/run-python3.12-seed5.log",
+              ".agentic-qa/sessions/qa-suite-trust-20261029/evidence/run-python3.12-seed6.log",
+              ".agentic-qa/sessions/qa-suite-trust-20261029/evidence/run-python3.12-seed7.log",
+              ".agentic-qa/sessions/qa-suite-trust-20261029/evidence/run-python3.12-seed8.log",
+              ".agentic-qa/sessions/qa-suite-trust-20261029/evidence/run-python3.12-seed9.log",
+              ".agentic-qa/sessions/qa-suite-trust-20261029/session.json"
+            ]
+          },
+          "planted_defects": [
+            "py-flaky-dedupe-order",
+            "py-flaky-order-dependent-test"
+          ],
+          "material_actions": [
+            {
+              "tool": "Skill",
+              "input": "skill=agentic-qa-kit:qa-session"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=git rev-parse HEAD && git status --porcelain && ls -la && find . -path ./.git -prune -o -type f -print | head -50; date -u"
+            },
+            {
+              "tool": "Read",
+              "input": "file_path=<plugin>/skills/qa-session/references/suite-trust.md"
+            },
+            {
+              "tool": "Read",
+              "input": "file_path=<plugin>/skills/qa-session/references/session-design.md"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=cat README.md .github/workflows/test.yml src/batchtools/*.py tests/test_core.py; ls -a <plugin>; ls <plugin>/scripts 2>/dev/null; python3 --version; python3 -m pytest --version"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=cd <plugin> && python3 scripts/qa.py --help; python3 scripts/qa.py attempt-add --help; python3 scripts/qa.py init --help 2>&1 | head -30; grep -n \"ledger\\|qa.py\" skills/qa-session/SKILL.md CLAUDE.md AGENTS.md | head -30"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=cd <plugin> && python3 scripts/qa.py session-create --help; python3 scripts/qa.py finding-add --help; python3 scripts/qa.py session-close --help; ls templates examples; ls src/*"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=cd <plugin>/examples && for f in session attempt finding decision; do echo \"== $f\"; cat $f.json; done"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=ls .agentic-qa 2>&1; which python3.12; python3 <plugin>/scripts/qa.py init; echo \"exit=$?\"; cat .agentic-qa/manifest.json; echo; env | grep -E '^(PYTHON|TZ|LANG|LC_)' ; locale 2>/dev/null | head -2"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=mkdir -p <tmp>/qa-py-flaky-in && cat > <tmp>/qa-py-flaky-in/session.json <<'EOF'\n{\n  \"id\": \"qa-suite-trust-20261029\",\n  \"objective\": \"Determine whether the unittest suite's verdicts can be trusted, given CI failures \u2026"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=cd <tmp>/qa-py-flaky-in && sed -i 's/\"technique\": \"entropy-variation\"/\"technique\": \"property\"/; s/\"technique\": \"order-variation\"/\"technique\": \"property\"/; s/\"technique\": \"specification\"/\"technique\": \"scenario\"/g; s/\"techniqu\u2026"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=E=.agentic-qa/sessions/qa-suite-trust-20261029/evidence && mkdir -p $E && export PYTHONDONTWRITEBYTECODE=1 TZ=UTC\nfor py in python3 python3.12; do\n out=$E/full-suite-seeds-$py.txt; : > $out\n for s in $(seq 0 19); do\n  PYTHONHASHSEED\u2026"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=E=.agentic-qa/sessions/qa-suite-trust-20261029/evidence && export PYTHONDONTWRITEBYTECODE=1 TZ=UTC PYTHONHASHSEED=0\ncd tests\n{ for t in test_batches_uses_configured_size test_batches_with_default_size test_dedupe_keeps_first_occurre\u2026"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=ls src/batchtools/__pycache__ && rm -r src/batchtools/__pycache__ && git status --porcelain"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=D=<tmp>/qa-py-flaky-in; S=.agentic-qa/sessions/qa-suite-trust-20261029/evidence\ncat > $D/a1.json <<EOF\n{\"id\":\"attempt-seed-sweep-313\",\"charter_id\":\"charter-suite-trust\",\"action\":\"for s in 0..19: PYTHONHASHSEED=\\$s PYTHONPATH\u2026"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=for a in a1 a2 a3 a4 a5; do python3 <plugin>/scripts/qa.py attempt-add qa-suite-trust-20261029 --input <tmp>/qa-py-flaky-in/$a.json > <tmp>/qa-py-flaky-in/$a.out 2>&1 || { echo \"FAILED $a\"; tail -3 <tmp>/qa-p\u2026"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=D=<tmp>/qa-py-flaky-in; S=.agentic-qa/sessions/qa-suite-trust-20261029/evidence\ncat > $D/f1.json <<EOF\n{\"id\":\"finding-dedupe-order\",\"title\":\"dedupe loses first-occurrence order; result depends on PYTHONHASHSEED\",\"quality_att\u2026"
+            }
+          ],
+          "requested_authorizations": [],
+          "answer": "No, the suite can't be trusted as it stands. The red CI runs aren't random: they come from a real bug in the code, and the CI retry loop is hiding it. A second test passes only because of the order the tests happen to run in.\n\nThe work took about 5 minutes. The repo was at commit `7a556dc` with no uncommitted changes, and I changed no source, tests or CI config.\n\n## What I found\n\n**1. `dedupe` loses order, which is what makes CI go red now and then (confirmed).**\n- `src/batchtools/core.py:8` does `list(set(items))`. A set doesn't keep insertion order, so the result changes with Python's random string hashing (`PYTHONHASHSEED`).\n- The README promises `dedupe([\"b\",\"a\",\"b\"])` is `[\"b\",\"a\"]`. Called directly, it returned `[\"a\",\"b\"]` for seeds 1, 3 and 4.\n- I ran the full suite with the README's command under seeds 0\u201319 on Python 3.12.3 (CI pins 3.12) and 3.13.16. On both, 10 of 20 runs failed, on the same seeds, always in `test_dedupe_keeps_first_occurrence_order`.\n- The failure is predictable once the seed is fixed. To reproduce: `PYTHONHASHSEED=2 PYTHONPATH=src python3 -m unittest discover -s tests`.\n- CI picks a random seed on each try. With a failure about half the time, three tries all fail roughly 1 time in 8, which matches \"red now and then, green on retry.\"\n\n**2. `test_batches_with_default_size` depends on test order and expects the wrong value (confirmed).**\n- It fails when run on its own, and when run before `test_batches_uses_configured_size` (`AssertionError: 4 != 2`).\n- It passes in the full suite only because the other test runs first alphabetically and its `configure(batch_size=2)` call permanently changes a shared default.\n- It also expects a batch size of 2, but the README says the default is 10. Called directly, the code correctly uses 10, so the test is wrong, not the code.\n- CI never sees this today. Running tests in a different order, running a single test, or running them in parallel would expose it.\n\n## What I checked\n- Read the README, source, tests and the CI workflow.\n- Varied the hash seed (0\u201319) on two Python versions.\n- Ran each test on its own, and the two batch tests in reverse order.\n- Called `dedupe` and `batches` directly and compared them with the README.\n\n## What I couldn't check, and why\n- **The real CI.** I didn't re-run CI jobs or look at their history; that needs separate approval. My local Python 3.12.3 may not be the exact version CI installs.\n- **Shuffling all the tests.** That would need a random-order test plugin, and installing one isn't approved, so I only reordered the one suspicious pair. Other order dependencies may exist.\n- **Time zone, locale and parallel runs.** I didn't vary these, so I can't say anything about them.\n\nOne mistake to note: one of my checks wrote a bytecode cache into `src/batchtools/__pycache__`. I deleted it and noted it in the ledger, so the repo now differs from before only by the new `.agentic-qa/` folder.\n\n## Ledger\nThe ledger is in `.agentic-qa/`. The session is `qa-suite-trust-20261029`, with 5 test runs, 2 confirmed findings and the raw outputs under `.agentic-qa/sessions/qa-suite-trust-20261029/evidence/`. It's marked \"hold\" and passes the ledger's own validation. I left `.agentic-qa/` uncommitted.\n\n## Decisions for you\nI stopped short of all of these:\n- **Fix `dedupe`:** `list(dict.fromkeys(items))` keeps first-occurrence order.\n- **Fix the test:** reset the shared defaults after each test, and expect the README's default of 10.\n- **Remove the CI retry loop** once those are fixed, so a failure means something again.\n- **Backlog:** turn the two findings into backlog items with the `qa-backlog-handoff` skill.",
+          "cost_usd": 0.5809284,
+          "model_turns": 19,
+          "fixture": "py-flaky",
+          "pack": {
+            "expected": "suite-trust.md",
+            "read": [
+              "session-design.md",
+              "suite-trust.md"
+            ],
+            "expected_read": true
+          },
+          "attempt_outcomes": {
+            "fail": 5
+          },
+          "defects_named": {
+            "py-flaky-dedupe-order": [
+              "pythonhashseed",
+              "hash seed",
+              "set(",
+              "order"
+            ],
+            "py-flaky-order-dependent-test": [
+              "alone",
+              "configure"
+            ]
+          }
+        },
+        {
+          "case_id": "py-flaky-2",
+          "kind": "python",
+          "target_revision": "2712220645e8596d49ecfe310afd3e965f248ec7",
+          "transcript_sha256": "95e259372ac7a2689fade924d27fd57f875660c347de685867999b9322d9ca82",
+          "model": "claude-opus-5-5",
+          "mechanical": {
+            "status": "review",
+            "failures": [],
+            "inconclusive": [],
+            "review": [
+              "attempts with an exit code but no matching command in the transcript: ['qa-suite-trust-2026-10-29/attempt-static-review']"
+            ],
+            "observed_skills": [
+              "agentic-qa-kit:qa-session"
+            ],
+            "sessions": [
+              {
+                "id": "qa-suite-trust-2026-10-29",
+                "status": "completed",
+                "attempts": 4,
+                "findings": 2
+              }
+            ],
+            "findings": [
+              {
+                "session": "qa-suite-trust-2026-10-29",
+                "id": "finding-dedupe-hash-order",
+                "status": "candidate",
+                "severity": "medium",
+                "title": "dedupe() loses first-occurrence order; the result depends on PYTHONHASHSEED"
+              },
+              {
+                "session": "qa-suite-trust-2026-10-29",
+                "id": "finding-default-size-order-dependent",
+                "status": "candidate",
+                "severity": "medium",
+                "title": "test_batches_with_default_size passes only through state leaked by an earlier test, and its assertion contradicts the README"
+              }
+            ],
+            "absent_tools": [],
+            "dependency_installs": 0,
+            "changed_paths": [
+              ".agentic-qa/manifest.json",
+              ".agentic-qa/sessions/qa-suite-trust-2026-10-29/.session.lock",
+              ".agentic-qa/sessions/qa-suite-trust-2026-10-29/evidence/a1-first-failure-seed2.txt",
+              ".agentic-qa/sessions/qa-suite-trust-2026-10-29/evidence/a1-full-suite-seeds.txt",
+              ".agentic-qa/sessions/qa-suite-trust-2026-10-29/evidence/a2-dedupe-fixed-seed.txt",
+              ".agentic-qa/sessions/qa-suite-trust-2026-10-29/evidence/a3-default-size-order.txt",
+              ".agentic-qa/sessions/qa-suite-trust-2026-10-29/session.json"
+            ]
+          },
+          "planted_defects": [
+            "py-flaky-dedupe-order",
+            "py-flaky-order-dependent-test"
+          ],
+          "material_actions": [
+            {
+              "tool": "Skill",
+              "input": "skill=agentic-qa-kit:qa-session"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=git rev-parse HEAD && git status --porcelain && ls -la && ls -R .agentic-qa 2>/dev/null | head -50; cat .agentic-qa/manifest.json 2>/dev/null; cat CLAUDE.md AGENTS.md 2>/dev/null"
+            },
+            {
+              "tool": "Read",
+              "input": "file_path=<plugin>/skills/qa-session/references/suite-trust.md"
+            },
+            {
+              "tool": "Read",
+              "input": "file_path=<plugin>/skills/qa-session/references/session-design.md"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=cat README.md; find .github src tests -type f | xargs -I{} sh -c 'echo \"=== {}\"; cat {}'; ls <plugin> <plugin>/scripts 2>/dev/null"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=cd <plugin> && python scripts/qa.py --help; python scripts/qa.py attempt-add --help; python scripts/qa.py init --help 2>&1 | head -30; grep -n \"ledger\" CLAUDE.md AGENTS.md | head -20"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=cd <plugin> && ls templates docs examples; python scripts/qa.py session-create --help; python scripts/qa.py finding-add --help; python scripts/qa.py session-close --help"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=cd <plugin>/examples && for f in session.json attempt.json finding.json decision.json; do echo \"=== $f\"; cat $f; done; cat ../templates/manifest.json"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=python <plugin>/scripts/qa.py init; echo \"exit=$?\"; python --version; echo \"TZ=$TZ LANG=$LANG LC_ALL=$LC_ALL PYTHONHASHSEED=$PYTHONHASHSEED\"; nproc; date -u"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=mkdir -p /tmp/qa-py-flaky-2-inputs && cat > /tmp/qa-py-flaky-2-inputs/session.json <<'EOF'\n{\n  \"id\": \"qa-suite-trust-2026-10-29\",\n  \"objective\": \"Decide whether the unittest suite's verdicts can be trusted, given CI failures that pa\u2026"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=cd /tmp/qa-py-flaky-2-inputs && sed -i 's/\"technique\": \"entropy-variation\"/\"technique\": \"property\"/; s/\"technique\": \"order-isolation\"/\"technique\": \"scenario\"/; s/\"technique\": \"static-review\"/\"technique\": \"other\"/' session.json && cd\u2026"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=E=.agentic-qa/sessions/qa-suite-trust-2026-10-29/evidence && mkdir -p $E && export PYTHONDONTWRITEBYTECODE=1 TZ=UTC LC_ALL=C.UTF-8\n# A1: full suite, 30 seeds\n{ for s in $(seq 0 29); do PYTHONHASHSEED=$s PYTHONPATH=src python -B -m u\u2026"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=E=.agentic-qa/sessions/qa-suite-trust-2026-10-29/evidence && export PYTHONDONTWRITEBYTECODE=1 TZ=UTC LC_ALL=C.UTF-8 PYTHONPATH=src\n# A2: fixed-seed repeatability of the dedupe test alone\n{ for s in 2 2 2 0 0 0; do PYTHONHASHSEED=$s \u2026"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=cd /tmp/qa-py-flaky-2-inputs && S=.agentic-qa/sessions/qa-suite-trust-2026-10-29/evidence\ncat > a0.json <<EOF\n{\"id\":\"attempt-static-review\",\"charter_id\":\"charter-suite-trust\",\"action\":\"Read README.md, .github/workflows/test.yml, src\u2026"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=cd /tmp/qa-py-flaky-2-inputs && S=.agentic-qa/sessions/qa-suite-trust-2026-10-29/evidence\ncat > f1.json <<EOF\n{\"id\":\"finding-dedupe-hash-order\",\"title\":\"dedupe() loses first-occurrence order; the result depends on PYTHONHASHSEED\",\"q\u2026"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=cd /tmp/qa-py-flaky-2-inputs && sed -i 's/,\"attempts\":[0-9]*}/}/' f1.json f2.json && cd <target> && python <plugin>/scripts/qa.py finding-add qa-suite-trust-2026-10-29 --input /tmp/qa-py-flaky-2-inputs/f1.json >/dev/null; echo \"f1 e\u2026"
+            },
+            {
+              "tool": "Bash",
+              "input": "command=python <plugin>/scripts/qa.py finding-add qa-suite-trust-2026-10-29 --input /tmp/qa-py-flaky-2-inputs/f2.json >/dev/null; echo \"f2 exit=$?\""
+            },
+            {
+              "tool": "Bash",
+              "input": "command=python <plugin>/scripts/qa.py session-close qa-suite-trust-2026-10-29 --status completed --input /tmp/qa-py-flaky-2-inputs/decision.json >/dev/null; echo \"close exit=$?\""
+            },
+            {
+              "tool": "Bash",
+              "input": "command=python <plugin>/scripts/qa.py validate; echo \"validate exit=$?\"; python <plugin>/scripts/qa.py summary qa-suite-trust-2026-10-29 2>&1 | head -30; git status --porcelain; git rev-parse HEAD"
+            }
+          ],
+          "requested_authorizations": [],
+          "answer": "**No, the suite can't be trusted at commit `2712220`.** The red builds come from a real bug in the code. CI's retry hides that bug most of the time, and a second test passes only by accident. The session is recorded in the ledger as `qa-suite-trust-2026-10-29`: 4 attempts, 2 candidate findings, and the ledger's validate check passes.\n\n## What I checked (about 15 minutes, local runs only)\n\n| Run | What I did | Result |\n|---|---|---|\n| 1 | Read the README, the CI workflow, the source and the tests | CI runs the suite up to 3 times and exits green on the first pass, so earlier failures are thrown away |\n| 2 | Ran the full suite in a fresh process for each of 30 hash seeds (0 to 29) | **17 of 30 failed**, every time in `test_dedupe_keeps_first_occurrence_order` |\n| 3 | Ran that one test repeatedly with fixed seeds | Seed 2 failed 3 of 3 times; seed 0 passed 3 of 3 times. The outcome is set entirely by the hash seed |\n| 4 | Ran `test_batches_with_default_size` alone, in reversed order, and in normal order | It fails alone and reversed (`4 != 2`) and passes only in normal order |\n\n## Findings (both recorded as candidates)\n\n1. **`dedupe()` doesn't keep first-occurrence order. This is the flaky failure and a real bug in the code.** It is written as `list(set(items))`, so for strings the output order depends on Python's per-process hash seed. The README promises `dedupe` keeps first-occurrence order, so the test is right and the code is wrong. CI doesn't fix the seed, so each run fails about half the time. Three tries in a row therefore all fail about 1 in 8 times, and that is the occasional red build. The other times, the retry hides the bug.\n2. **`test_batches_with_default_size` passes only by accident, and that never shows up as flakiness.** It expects a default batch size of 2, but the README (and the code) say the default is 10. It passes only because an earlier test calls `configure(batch_size=2)`, which changes a shared global setting and never resets it. The tests always run in alphabetical order, so this one always passes in CI while checking nothing real.\n\n## What I could not check\n- **CI's Python 3.12:** only Python 3.13.16 is installed locally, and installing another version needs your approval.\n- **CI history and logs, and rerunning CI jobs:** these are shared jobs, so they need separate authority.\n- **Other variables:** I varied only the hash seed and test order. Time zone, locale, parallel runs and other `dedupe` inputs weren't tested.\n\n## Stopped before\nFixing `dedupe`, editing the tests, removing the CI retry loop, and handing the findings to the backlog. Each of these needs your decision. The likely fixes are `dict.fromkeys` for `dedupe`, resetting the shared defaults between tests, and dropping the retry loop once those are in.\n\nThe only change to the repo is the new, uncommitted `.agentic-qa/` folder. The run output is in `.agentic-qa/sessions/qa-suite-trust-2026-10-29/evidence/`.",
+          "cost_usd": 0.5922616,
+          "model_turns": 21,
+          "fixture": "py-flaky",
+          "pack": {
+            "expected": "suite-trust.md",
+            "read": [
+              "session-design.md",
+              "suite-trust.md"
+            ],
+            "expected_read": true
+          },
+          "attempt_outcomes": {
+            "fail": 4
+          },
+          "defects_named": {
+            "py-flaky-dedupe-order": [
+              "pythonhashseed",
+              "hash seed",
+              "hash randomization",
+              "set(",
+              "order"
+            ],
+            "py-flaky-order-dependent-test": [
+              "alone",
+              "configure"
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "summary": {
+    "pack_read": "2 of 2 sessions read suite-trust.md.",
+    "causes_found": "Both sessions found both planted causes and classified them as the oracle does: dedupe's set order is a product defect exposed by the hash seed (10 of 20 and 17 of 30 seeds failed), and test_batches_with_default_size is a test defect that passes only after another test changes a shared default.",
+    "retry_policy": "Both explained that CI's three tries hide the hash-seed failure about seven times in eight.",
+    "stayed_local": "No test, CI or source edits, no installs, no CI reruns, no authorization requests; each named the random-order plugin and CI history as needing approval.",
+    "defect_absence_claims": "None found by reviewer reading of the two final answers.",
+    "cost_usd": 1.17
+  },
+  "findings": [],
+  "observations": [
+    {
+      "id": "Q11-G01-O01",
+      "summary": "py-flaky-2's review flag is the wrapper-script pattern seen in Q04-G01-O02 and Q05-G01-O01: a static-review attempt carried an exit code with no matching transcript command."
+    }
+  ]
+}

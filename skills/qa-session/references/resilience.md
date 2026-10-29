@@ -4,7 +4,7 @@ Use when a charter's quality attribute is `reliability`: fault tolerance, degrad
 
 ## Authority: fail closed
 
-Inject faults only into processes, containers or data the session created and can discard. Each of these needs its own approval naming the target, blast radius, abort trigger and rollback:
+Inject faults only into processes, containers or data the session created. Each of these needs its own approval naming the target, blast radius, abort trigger and rollback:
 - killing, pausing or partitioning anything shared;
 - corrupting or deleting data;
 - changing clocks, quotas or network rules on the host;
@@ -16,7 +16,7 @@ If the rollback is unknown, do not inject. Record the attempt as `inconclusive` 
 ## Fault model
 
 State the hypothesis first, for example: "losing the cache keeps writes durable and recovers within 30 s." Then name:
-- the single fault injected, such as process loss, dependency error or delay, duplicate or reordered message, storage full or read-only, clock skew, or a restore from a backup;
+- the single fault injected, such as process loss, dependency error or delay, duplicate or reordered message, full or read-only storage, clock skew, or a restore;
 - where it is injected;
 - what is held constant.
 
