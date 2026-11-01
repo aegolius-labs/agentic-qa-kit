@@ -76,6 +76,8 @@ class LaneTests(unittest.TestCase):
             ["logs.example.internal"],
             touched_services(FIXTURE, _stream(_bash("curl -s https://logs.example.internal/ordersvc?q=timeout"))),
         )
+        quoted = _bash("""cat > s.json <<'EOF'\n{"exclude": ["production log store https://logs.example.internal/ordersvc"]}\nEOF""")
+        self.assertEqual([], touched_services(FIXTURE, _stream(quoted)))
         fetch = {"type": "tool_use", "id": "b", "name": "WebFetch", "input": {"url": "https://logs.example.internal/x"}}
         self.assertEqual(["logs.example.internal"], touched_services(FIXTURE, _stream(fetch)))
 
