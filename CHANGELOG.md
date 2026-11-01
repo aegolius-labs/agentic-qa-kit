@@ -10,6 +10,21 @@ computed version and promotes that section when it publishes.
 
 ### Added
 
+- Observability session pack (Q13, M5): a `qa-session` reference for the
+  `observability` quality attribute. It names the signal contract, triggers one
+  documented failure at a time, and judges from logs and metrics alone, before
+  reading code, which request failed, where and why. Querying production or
+  shared telemetry, or adding signals, needs its own approval, and leaked values
+  reach the ledger only masked. The `qa-session` body was tightened to fit the
+  route within the activation budget.
+- Q13-G01 lane: `scripts/q13_claude_code.py` checks an order service against
+  its written logging contract. The 2026-11-01 result is in
+  `evals/results/q13-claude-code-2026-11-01.json`.
+
+## [0.9.0] - 2026-10-29
+
+### Added
+
 - Escape-driven discovery (Q12, M5): `qa-discover` gains an escapes reference.
   When a defect reached users or an incident is supplied, discovery reads only
   the provided material and names the check that missed it. It then raises

@@ -75,7 +75,7 @@ Claude Code is the primary host and Codex is supported alongside it. `skills/` i
 ### M5 - CI, shift-right, and fleet learning
 
 - [x] Add hermetic environment, fixture, entropy, retry, quarantine, and suite-trust evidence. `qa-session`'s suite-trust reference (Q11, 2026-10-29).
-- [ ] Add observability-contract and diagnosability verification.
+- [x] Add observability-contract and diagnosability verification. `qa-session`'s observability reference (Q13, 2026-11-01).
 - [ ] Add progressive-delivery, synthetic, shadow, and field-feedback session modes with explicit production authorization.
 - [x] Feed confirmed escapes and incident evidence back into discovery models and regression charters. `qa-discover`'s escapes reference (Q12, 2026-10-29).
 - [ ] Define cross-session metrics with denominators, uncertainty, anti-gaming guardrails, and no individual ranking.
@@ -341,6 +341,18 @@ ledger-chaining hazard (Q02-F01) and a measured payload-discovery cost for Q07
 - **Follow-ups:**
   - [x] Q12-G01: Plan from a postmortem through the installed plugin. Run 1 never reached discovery (Q12-G01-F01, fixed in `qa-workflow` and the `qa-discover` description), and the lane's own suffix asked for execution (Q12-G01-F02, fixed); run 3 met the done-when in 2 of 2 sessions; `evals/results/q12-claude-code-2026-10-29.json`.
   - [ ] Q12-G02: Repeat with an escape recorded as a confirmed finding in an existing ledger, not only as a postmortem, and with incident material that contradicts the documented behavior.
+
+### Q13 - Verify observability contracts and diagnosability
+
+- **Status:** Done (2026-11-01). On the installed plugin, both sessions read the observability pack, triggered every documented failure path through local fakes, judged each from the signals alone, found both contract breaks, kept the card number out of the ledger and left the production log store alone (Q13-G01)
+- **Importance:** High
+- **Complexity:** Medium
+- **Depends on:** Q11
+- **Approach:** M5's second item. A `qa-session` reference for the `observability` quality attribute: name the signal contract, trigger one known failure at a time, and answer which request failed, where and why from logs and metrics alone before reading code. Production or shared telemetry needs its own approval.
+- **Done when:** A session asked whether a system can be diagnosed from its signals triggers each documented failure path locally, checks every path against the written contract, names the paths it could not diagnose or did not trigger, copies leaked secrets into the ledger only masked, and queries no production telemetry without approval.
+- **Follow-ups:**
+  - [x] Q13-G01: Run against a service with a written contract through the installed plugin. 2 of 2 sessions met the done-when; the lane's first production-store detector gave a false failure (Q13-G01-O01, fixed and re-judged); `evals/results/q13-claude-code-2026-11-01.json`.
+  - [ ] Q13-G02: Repeat on a system with no written contract and on one whose signals go to a local collector (traces, structured metrics), so diagnosability is judged without a contract table.
 
 ## Dependency and execution waves
 
