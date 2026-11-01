@@ -1,4 +1,4 @@
-"""Q05 and Q11: each session pack states what its done-when requires and fails closed."""
+"""Q05, Q11 and Q13: each session pack states what its done-when requires and fails closed."""
 
 from __future__ import annotations
 
@@ -16,12 +16,13 @@ PACKS = {
     "resilience.md": {"reliability"},
     "accessibility-i18n.md": {"interaction-capability", "compatibility"},
     "data-integrity.md": {"data-integrity"},
+    "observability.md": {"observability"},
 }
 # Q11: a pack about the test suite itself, not a product quality attribute.
 SUITE_PACKS = ("suite-trust.md",)
 # Workload, threat or population; environment; oracle; uncertainty; stop
 # conditions; evidence. The first heading varies with what the pack scopes.
-SCOPE_HEADINGS = {"Workload", "Fault model", "Population and scope", "Population and claim", "Suite and claim"}
+SCOPE_HEADINGS = {"Workload", "Fault model", "Population and scope", "Population and claim", "Suite and claim", "Signal contract"}
 REQUIRED_HEADINGS = ["Environment", "Oracle", "Uncertainty", "Stop conditions", "Evidence"]
 
 
@@ -65,6 +66,14 @@ class NonFunctionalPackTests(unittest.TestCase):
         self.assertIn("Never skip, retry away or quarantine a test to make a suite pass", authority)
         for effect in ("editing tests", "installing test plugins", "rerunning shared CI jobs"):
             self.assertIn(effect, authority)
+
+    def test_observability_keeps_production_telemetry_and_leaked_values_out(self) -> None:
+        text = (SKILL / "references" / "observability.md").read_text(encoding="utf-8")
+        authority = text.split("## ", 2)[1]
+        self.assertIn("querying production or shared log stores", authority)
+        self.assertIn("editing code or configuration to add signals", authority)
+        self.assertIn("from the signals alone, without reading the code", text)
+        self.assertIn("Copy a leaked value into the ledger only masked", text)
 
 
 if __name__ == "__main__":
