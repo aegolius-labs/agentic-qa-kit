@@ -10,7 +10,7 @@ from pathlib import Path
 from agentic_qa_kit.metrics import compute
 from agentic_qa_kit.store import KitStore
 from scripts.q02_claude_code import load_suite
-from scripts.q15_claude_code import PLUGIN_ROOT, SUITE, report_facts, seed_ledger
+from scripts.q15_claude_code import PLUGIN_ROOT, SUITE, drop_seed_judgements, report_facts, seed_ledger
 
 SUITE_DATA = load_suite(SUITE)
 ROOT = PLUGIN_ROOT / SUITE_DATA["fixture"]["path"]
@@ -55,6 +55,13 @@ class FixtureTests(unittest.TestCase):
 
 
 class LaneTests(unittest.TestCase):
+    def test_judgements_about_seeded_sessions_are_dropped_and_others_kept(self) -> None:
+        mechanical = {"status": "fail", "failures": ["qa-tax-rules records revision 'x', not the target HEAD"],
+                      "review": ["attempts with an exit code but no matching command: ['qa-tax-rules/attempt-1']", "other"]}
+        dropped = drop_seed_judgements(mechanical, ["qa-tax-rules"])
+        self.assertEqual(2, len(dropped))
+        self.assertEqual(("mechanical-pass", [], ["other"]), (mechanical["status"], mechanical["failures"], mechanical["review"]))
+
     def test_report_facts(self) -> None:
         use = {"type": "tool_use", "id": "a", "name": "Bash", "input": {"command": "python /k/scripts/qa.py metrics --root ."}}
         stdout = json.dumps({"type": "assistant", "message": {"content": [use]}})

@@ -44,6 +44,10 @@ SUFFIX = (
 )
 
 
+def _area(session_id: str) -> str:
+    return session_id.removeprefix("qa-").replace("-", " ")
+
+
 def _charter(attributes: list[str]) -> dict[str, Any]:
     return {
         "id": "charter-main",
@@ -59,12 +63,12 @@ def _charter(attributes: list[str]) -> dict[str, Any]:
     }
 
 
-def _finding(index: int, status: str, attempt_id: str, recorded_at: str, evidence: str) -> dict[str, Any]:
+def _finding(session_id: str, index: int, status: str, attempt_id: str, recorded_at: str, evidence: str) -> dict[str, Any]:
     reproducibility = {"confirmed": "always", "not-reproduced": "not-reproduced"}.get(status, "once")
     return {
         "id": f"finding-{index}",
         "recorded_at": recorded_at,
-        "title": f"Observed deviation {index}",
+        "title": f"{_area(session_id).capitalize()} differs from the documented rule ({index})",
         "quality_attribute": "functional-suitability",
         "severity": "medium",
         "confidence": "high" if status == "confirmed" else "medium",
@@ -80,7 +84,7 @@ def _finding(index: int, status: str, attempt_id: str, recorded_at: str, evidenc
         },
         "attempt_ids": [attempt_id],
         "evidence": [{"kind": "test-output", "location": evidence}],
-        "limitations": ["Synthetic seed record"],
+        "limitations": ["Only Python 3.11 was exercised"],
         "acceptance_criteria": ["The documented result holds"],
         "suspected_root_cause": "unknown",
     }
@@ -94,7 +98,7 @@ def seed_ledger(target: Path, specs: Sequence[Mapping[str, Any]], revision: str)
         store.create_session(
             {
                 "id": sid,
-                "objective": f"QA session {sid}",
+                "objective": f"Check {_area(sid)}",
                 "mode": spec["mode"],
                 "created_at": spec["created_at"],
                 "target": {"root": ".", "revision": revision, "dirty": False, "runtime": ["Python 3.11"]},
@@ -131,14 +135,14 @@ def seed_ledger(target: Path, specs: Sequence[Mapping[str, Any]], revision: str)
             (target / evidence).parent.mkdir(parents=True, exist_ok=True)
             (target / evidence).write_text(f"{sid}: recorded test output\n", encoding="utf-8")
         for index, status in enumerate(spec["findings"], start=1):
-            store.add_finding(sid, _finding(index, status, "attempt-1", spec["created_at"], evidence))
+            store.add_finding(sid, _finding(sid, index, status, "attempt-1", spec["created_at"], evidence))
         store.close_session(
             sid,
             "completed",
             {
                 "disposition": "hold" if spec["findings"] else "acceptable",
-                "summary": f"Seeded session {sid}",
-                "limitations": ["Synthetic seed record"],
+                "summary": f"Closed after checking {_area(sid)}",
+                "limitations": ["Only Python 3.11 was exercised"],
                 "residual_risks": [],
                 "next_actions": [],
             },
@@ -150,12 +154,25 @@ def _seeding_stage(specs: Sequence[Mapping[str, Any]]):
 
     def stage(fixture: Mapping[str, Any], target: Path) -> str:
         head = original(fixture, target)
+        # Left uncommitted, as `.agentic-qa/` usually is, so the seeded sessions record the target HEAD.
         seed_ledger(target, specs, head)
-        q02_claude_code._git(target, "add", "--all")
-        q02_claude_code._git(target, "commit", "--quiet", "--no-verify", "-m", "QA ledger")
-        return q02_claude_code._git(target, "rev-parse", "HEAD")
+        return head
 
     return stage
+
+
+def drop_seed_judgements(mechanical: dict[str, Any], seed_ids: Sequence[str]) -> list[str]:
+    """Remove Q02 judgements about sessions the lane seeded; the session under test did not write them."""
+
+    dropped = []
+    for key in ("failures", "review"):
+        kept = []
+        for entry in mechanical.get(key) or []:
+            (dropped if any(sid in entry for sid in seed_ids) else kept).append(entry)
+        mechanical[key] = kept
+    if mechanical.get("status") == "fail" and not mechanical["failures"]:
+        mechanical["status"] = "mechanical-pass"
+    return dropped
 
 
 def report_facts(fixture: Mapping[str, Any], stdout: str, changed: Sequence[str], answer: str) -> dict[str, Any]:
@@ -185,7 +202,13 @@ def run_command(args: argparse.Namespace) -> None:
         fixture = {**suite["fixture"], "id": f"{suite['fixture']['id']}-{repeat}"}
         record = run_fixture(fixture, prompt, args.output, env, runner=_run, timeout=args.timeout)
         stdout = (args.output / "raw" / f"{fixture['id']}.jsonl").read_text(encoding="utf-8")
-        record.update(report=report_facts(suite["fixture"], stdout, record["mechanical"]["changed_paths"], record["answer"]))
+        mechanical = record["mechanical"]
+        seed_ids = [spec["id"] for spec in suite["seed_sessions"]]
+        record["seed_judgements_dropped"] = drop_seed_judgements(mechanical, seed_ids)
+        record.update(report=report_facts(suite["fixture"], stdout, mechanical["changed_paths"], record["answer"]))
+        if record["report"]["ledger_paths_changed"]:
+            mechanical["failures"].append(f"changed the ledger: {record['report']['ledger_paths_changed']}")
+            mechanical["status"] = "fail"
         records.append(record)
     result = {
         "suite_id": "Q15-G01",
