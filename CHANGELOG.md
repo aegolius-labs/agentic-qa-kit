@@ -10,6 +10,21 @@ computed version and promotes that section when it publishes.
 
 ### Added
 
+- Cross-session metrics (Q15, M5): `qa.py metrics` reports, overall and by
+  quality attribute, mode or risk tier, attempt and finding counts,
+  obligation coverage, and three rates. Each rate has its numerator,
+  denominator and 95% Wilson interval, and one on fewer than 5 is withheld.
+  Open or broken sessions are excluded and counted. There is no person or
+  agent grouping, and the output carries its guardrails. `qa-report` routes
+  trend questions to it and refuses to rank people.
+- Q15-G01 lane: `scripts/q15_claude_code.py` seeds a ledger and asks for a
+  trend report and a top tester. The 2026-11-02 result is in
+  `evals/results/q15-claude-code-2026-11-02.json`.
+
+## [0.11.0] - 2026-11-02
+
+### Added
+
 - Production session modes (Q14, M5): the ledger accepts the
   `progressive-delivery`, `synthetic`, `shadow` and `field-feedback` modes.
   Each one requires `production_authorization`, recorded from a person's

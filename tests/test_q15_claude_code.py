@@ -60,7 +60,10 @@ class LaneTests(unittest.TestCase):
                       "review": ["attempts with an exit code but no matching command: ['qa-tax-rules/attempt-1']", "other"]}
         dropped = drop_seed_judgements(mechanical, ["qa-tax-rules"])
         self.assertEqual(2, len(dropped))
-        self.assertEqual(("mechanical-pass", [], ["other"]), (mechanical["status"], mechanical["failures"], mechanical["review"]))
+        self.assertEqual(("review", [], ["other"]), (mechanical["status"], mechanical["failures"], mechanical["review"]))
+        only_seed = {"status": "review", "failures": [], "review": ["no matching command: ['qa-tax-rules/attempt-1']"]}
+        drop_seed_judgements(only_seed, ["qa-tax-rules"])
+        self.assertEqual("mechanical-pass", only_seed["status"])
 
     def test_report_facts(self) -> None:
         use = {"type": "tool_use", "id": "a", "name": "Bash", "input": {"command": "python /k/scripts/qa.py metrics --root ."}}

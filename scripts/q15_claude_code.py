@@ -170,8 +170,8 @@ def drop_seed_judgements(mechanical: dict[str, Any], seed_ids: Sequence[str]) ->
         for entry in mechanical.get(key) or []:
             (dropped if any(sid in entry for sid in seed_ids) else kept).append(entry)
         mechanical[key] = kept
-    if mechanical.get("status") == "fail" and not mechanical["failures"]:
-        mechanical["status"] = "mechanical-pass"
+    if mechanical.get("status") in {"fail", "review"} and not mechanical["failures"]:
+        mechanical["status"] = "review" if mechanical["review"] else "mechanical-pass"
     return dropped
 
 
