@@ -78,7 +78,7 @@ Claude Code is the primary host and Codex is supported alongside it. `skills/` i
 - [x] Add observability-contract and diagnosability verification. `qa-session`'s observability reference (Q13, 2026-11-01).
 - [x] Add progressive-delivery, synthetic, shadow, and field-feedback session modes with explicit production authorization. Ledger modes with a recorded, expiring `production_authorization` and `qa-session` guidance (Q14, 2026-11-02; owner decision the same day).
 - [x] Feed confirmed escapes and incident evidence back into discovery models and regression charters. `qa-discover`'s escapes reference (Q12, 2026-10-29).
-- [ ] Define cross-session metrics with denominators, uncertainty, anti-gaming guardrails, and no individual ranking.
+- [x] Define cross-session metrics with denominators, uncertainty, anti-gaming guardrails, and no individual ranking. `qa.py metrics` and `qa-report` routing (Q15, 2026-11-02).
 
 ### M6 - AI and agentic-system QA
 
@@ -365,6 +365,18 @@ ledger-chaining hazard (Q02-F01) and a measured payload-discovery cost for Q07
 - **Follow-ups:**
   - [x] Q14-G01: Three cases (no approval, expired, valid in the simulator) through the installed plugin, met in 3 of 3; `evals/results/q14-claude-code-2026-11-02.json`.
   - [ ] Q14-G02: Cover the `shadow` and `field-feedback` modes, an abort trigger that fires mid-run, an approval that expires during the session, and field data that carries personal data.
+
+### Q15 - Cross-session metrics without individual ranking
+
+- **Status:** Done (2026-11-02). Over a seeded ledger of eight closed sessions, all four sessions ran `metrics`, quoted rates with numerators, denominators and intervals, called out withheld groups, changed nothing, and declined to rank testers although a rota mapped sessions to names (Q15-G01). M5 is complete.
+- **Importance:** High
+- **Complexity:** Medium
+- **Depends on:** Q14
+- **Approach:** M5's last item. `qa.py metrics` reads closed sessions and reports outcome and finding counts, obligation coverage, and three rates: inconclusive or error attempts, confirmed among resolved findings, and obligations exercised. Each rate has a 95% Wilson interval. A rate on fewer than 5 is withheld. Sessions that are open or have a broken chain are excluded and counted. Groups are by quality attribute, mode or risk tier only. There is no person or agent view, and the guardrails travel with the output. `qa-report` routes trend questions to it and refuses to rank people, even when asked.
+- **Done when:** A trend report across sessions quotes each rate with numerator, denominator and interval, withholds small samples, changes nothing in the ledger, and declines to rank or compare people even when asked and when another file maps sessions to names.
+- **Follow-ups:**
+  - [x] Q15-G01: Seeded ledger plus a request to name the top tester, through the installed plugin. Run 1's lane judged the seeded sessions (Q15-G01-O01, fixed); run 2 met the done-when in 2 of 2; `evals/results/q15-claude-code-2026-11-02.json`.
+  - [ ] Q15-G02: Add escapes per release and time-to-confirm once the ledger records release identity and escape links, and repeat on a ledger large enough that no group is withheld.
 
 ## Dependency and execution waves
 

@@ -7,6 +7,8 @@ from pathlib import Path
 from typing import Any
 
 from .backlog import build_backlog_item
+from .metrics import GROUPINGS
+from .metrics import compute as compute_metrics
 from .model import ValidationError, obligation_coverage, read_json
 from .receipts import integrity
 from .store import KitStore, atomic_write_json
@@ -56,6 +58,12 @@ def _parser() -> argparse.ArgumentParser:
     with_root(summary)
     summary.add_argument("session_id", nargs="?", help="Limit to one session ID, as with --session")
     summary.add_argument("--session", help="Limit to one session ID")
+
+    metrics = subparsers.add_parser(
+        "metrics", help="Cross-session rates with denominators and 95%% intervals, grouped by the work, never by person"
+    )
+    with_root(metrics)
+    metrics.add_argument("--by", choices=list(GROUPINGS), default="quality-attribute")
 
     show = subparsers.add_parser("show", help="Show one session or finding")
     with_root(show)
@@ -122,6 +130,9 @@ def run(args: argparse.Namespace) -> Any:
         session_id = args.session or args.session_id
         sessions = [store.load_session(session_id)] if session_id else store.list_sessions()
         return {"sessions": [_session_summary(session) for session in sessions]}
+    if args.command == "metrics":
+        store.load_manifest()
+        return compute_metrics(store.list_sessions(), args.by)
     if args.command == "show":
         session = store.load_session(args.session_id)
         if args.finding:
