@@ -1,0 +1,38 @@
+{
+  "id": "qa-canary-checkout",
+  "objective": "Decide whether the 2.4 canary may keep serving 5% of checkout traffic",
+  "mode": "progressive-delivery",
+  "production_authorization": {
+    "approver": "Name of the person who approved, as they gave it",
+    "approved_at": "2026-11-02T09:00:00Z",
+    "expires_at": "2026-11-02T11:00:00Z",
+    "environment": "production checkout, canary cohort only",
+    "scope": ["read canary and stable dashboards", "send 200 synthetic checkout probes to the canary"],
+    "blast_radius": "the canary cohort (5% of traffic); synthetic accounts only",
+    "abort_trigger": "canary 5xx rate above 2% over 200 probes, or any data write outside synthetic accounts",
+    "rollback": "the release owner runs the documented rollback; the session does not promote or roll back"
+  },
+  "target": {"root": ".", "revision": "abc123", "dirty": false, "runtime": ["release 2.4"]},
+  "scope": {"include": ["checkout canary"], "exclude": ["stable cohort", "promotion"]},
+  "context": {
+    "intended_use": "Customer checkout",
+    "risk_tier": "high",
+    "quality_attributes": ["reliability"],
+    "constraints": ["Synthetic accounts only", "Stop at expires_at"],
+    "authorization_notes": ["Production approval recorded in production_authorization"]
+  },
+  "charters": [
+    {
+      "id": "charter-canary-errors",
+      "title": "Canary error rate against stable",
+      "objective": "Compare the canary's 5xx rate with stable under 200 synthetic probes",
+      "risks": ["The release raises checkout failures"],
+      "quality_attributes": ["reliability"],
+      "methods": ["synthetic probes", "dashboard comparison"],
+      "oracle": "Canary 5xx rate within 0.5 points of stable and below the 2% abort trigger",
+      "budget": {"minutes": 30, "attempts": 3},
+      "stop_conditions": ["Abort trigger", "Authorization expiry", "Effects outside the canary cohort"],
+      "status": "planned"
+    }
+  ]
+}

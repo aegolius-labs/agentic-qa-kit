@@ -16,6 +16,7 @@ from .model import (
     normalize_attempt,
     normalize_finding,
     normalize_session,
+    production_authorization_expired,
     read_json,
     utc_now,
     validate_manifest,
@@ -215,6 +216,10 @@ class KitStore:
         # New sessions are always chained, whatever version the input names.
         payload = {**input_payload, "schema_version": SESSION_SCHEMA_VERSION, "receipts": []}
         session = normalize_session(payload)
+        if production_authorization_expired(session, utc_now()):
+            raise ValidationError(
+                "session.production_authorization.expires_at has passed; ask the approver to renew it before starting"
+            )
         path = self.session_path(session["id"])
         with self.session_lock(session["id"]):
             if path.exists():
@@ -358,6 +363,11 @@ class KitStore:
         if session["status"] in TERMINAL_SESSION_STATUSES:
             raise ValidationError("cannot add an attempt to a terminal session")
         attempt = normalize_attempt(input_payload)
+        if attempt["outcome"] != "inconclusive" and production_authorization_expired(session, utc_now()):
+            raise ValidationError(
+                "the session's production authorization has expired: stop, record the attempt as "
+                "`inconclusive`, and ask the approver to renew it"
+            )
         self._seal_evidence(attempt["evidence"], "attempt.evidence")
         charter_ids = {charter["id"] for charter in session["charters"]}
         if attempt["charter_id"] not in charter_ids:
