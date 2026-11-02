@@ -22,6 +22,15 @@ Use increasing scope/fidelity only when the previous layer leaves material uncer
 4. Broader system/UI checks in an isolated environment.
 5. Performance, recovery, fault, external, or production-shaped work under an explicit experiment and authorization.
 
+## Production modes
+
+`progressive-delivery`, `synthetic`, `shadow` and `field-feedback` sessions observe or act on production. Start one only from a person's approval given for this work, recorded as `production_authorization` (see `examples/production-session.json`). Never invent an approver, a scope, an expiry or an abort trigger, or widen one. If any field is missing, ask and stop.
+
+- Act only within `scope` and `environment`. Never promote, roll back, or change traffic unless `scope` names it.
+- Check `abort_trigger` after every attempt. When it fires, stop, record the attempt, and hand rollback to its owner as `rollback` says.
+- After `expires_at`, the ledger accepts only `inconclusive`. Stop.
+- Mask personal data and secrets from field data.
+
 ## Retry semantics
 
 - A retry diagnoses; it does not erase the first outcome.

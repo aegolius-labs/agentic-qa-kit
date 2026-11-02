@@ -22,7 +22,24 @@ SESSION_MODES = {
     "non-functional",
     "reproduction",
     "evidence",
+    "progressive-delivery",
+    "synthetic",
+    "shadow",
+    "field-feedback",
 }
+# Q14: modes that observe or act on production. Each needs a recorded,
+# expiring approval (owner decision 2026-11-02).
+PRODUCTION_MODES = {"progressive-delivery", "synthetic", "shadow", "field-feedback"}
+PRODUCTION_AUTHORIZATION_FIELDS = (
+    "approver",
+    "approved_at",
+    "expires_at",
+    "environment",
+    "scope",
+    "blast_radius",
+    "abort_trigger",
+    "rollback",
+)
 SESSION_STATUSES = {"planned", "running", "completed", "blocked"}
 TERMINAL_SESSION_STATUSES = {"completed", "blocked"}
 # Version 2 adds the receipt chain (Q03). Version 1 sessions stay readable,
@@ -453,6 +470,54 @@ def normalize_finding(payload: dict[str, Any]) -> dict[str, Any]:
     return result
 
 
+def parse_timestamp(value: str, path: str) -> datetime:
+    try:
+        parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
+    except ValueError as error:
+        raise ValidationError(f"{path} must be an ISO 8601 timestamp") from error
+    if parsed.tzinfo is None:
+        raise ValidationError(f"{path} must include a time zone, such as Z")
+    return parsed
+
+
+def validate_production_authorization(mode: Any, authorization: Any) -> None:
+    """A production-mode session carries one recorded approval; no other session carries one.
+
+    Expiry is not checked here, so a stored session stays valid after its approval lapses;
+    the store refuses new work under an expired approval.
+    """
+
+    path = "session.production_authorization"
+    if mode not in PRODUCTION_MODES:
+        if authorization is not None:
+            raise ValidationError(f"{path} is only for the production modes: {', '.join(sorted(PRODUCTION_MODES))}")
+        return
+    if authorization is None:
+        raise ValidationError(
+            f"a {mode} session requires {path} recorded from a person's approval: "
+            + ", ".join(PRODUCTION_AUTHORIZATION_FIELDS)
+            + "; without one, do not start it"
+        )
+    record = _expect_object(authorization, path)
+    _reject_unknown(record, set(PRODUCTION_AUTHORIZATION_FIELDS), path)
+    for field in PRODUCTION_AUTHORIZATION_FIELDS:
+        if field == "scope":
+            _expect_string_list(record.get(field), f"{path}.scope", nonempty=True)
+        else:
+            _expect_string(record.get(field), f"{path}.{field}")
+    approved = parse_timestamp(record["approved_at"], f"{path}.approved_at")
+    expires = parse_timestamp(record["expires_at"], f"{path}.expires_at")
+    if expires <= approved:
+        raise ValidationError(f"{path}.expires_at must be later than approved_at")
+
+
+def production_authorization_expired(session: dict[str, Any], now: str) -> bool:
+    record = session.get("production_authorization")
+    if session.get("mode") not in PRODUCTION_MODES or not record:
+        return False
+    return parse_timestamp(now, "now") >= parse_timestamp(record["expires_at"], "expires_at")
+
+
 def validate_session(payload: dict[str, Any]) -> None:
     _reject_unknown(
         payload,
@@ -465,6 +530,7 @@ def validate_session(payload: dict[str, Any]) -> None:
             "created_at",
             "closed_at",
             "continuation_of",
+            "production_authorization",
             "target",
             "scope",
             "context",
@@ -505,6 +571,8 @@ def validate_session(payload: dict[str, Any]) -> None:
         finding_id = continuation_obj.get("finding_id")
         if finding_id is not None:
             _expect_id(finding_id, "session.continuation_of.finding_id")
+
+    validate_production_authorization(payload.get("mode"), payload.get("production_authorization"))
 
     target = _expect_object(payload.get("target"), "session.target")
     _reject_unknown(target, {"root", "revision", "dirty", "runtime"}, "session.target")
@@ -600,6 +668,8 @@ def normalize_session(payload: dict[str, Any]) -> dict[str, Any]:
     result.setdefault("status", "planned")
     result.setdefault("closed_at", None)
     result.setdefault("continuation_of", None)
+    if result.get("mode") in PRODUCTION_MODES:
+        result.setdefault("production_authorization", None)
     result.setdefault("attempts", [])
     result.setdefault("findings", [])
     result.setdefault("gaps", [])

@@ -35,6 +35,10 @@ A session binds:
 - findings and evidence gaps; and
 - a final disposition with limitations when closed.
 
+### Production modes
+
+The `progressive-delivery`, `synthetic`, `shadow` and `field-feedback` modes observe or act on production. A session in one of them must carry `production_authorization`, recorded from a person's approval: `approver`, `approved_at`, `expires_at` (ISO 8601 with a time zone, later than `approved_at`), `environment`, a non-empty `scope` list, `blast_radius`, `abort_trigger` and `rollback`. No other mode may carry one, and unknown fields are rejected. `session-create` refuses an approval that has already expired. After `expires_at`, `attempt-add` accepts only an `inconclusive` attempt, so a session can record that it stopped but nothing more. The stored session stays valid after its approval lapses. The ledger cannot tell whether the named person really approved; an agent must never invent an approval or fill one in for the user (owner decision 2026-11-02). See `examples/production-session.json`.
+
 The target revision may be `unknown` when the directory is not under version control, but the limitation must stay visible. Do not pretend an unstable working tree is an immutable test item.
 
 ## Attempt

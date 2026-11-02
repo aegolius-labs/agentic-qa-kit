@@ -76,7 +76,7 @@ Claude Code is the primary host and Codex is supported alongside it. `skills/` i
 
 - [x] Add hermetic environment, fixture, entropy, retry, quarantine, and suite-trust evidence. `qa-session`'s suite-trust reference (Q11, 2026-10-29).
 - [x] Add observability-contract and diagnosability verification. `qa-session`'s observability reference (Q13, 2026-11-01).
-- [ ] Add progressive-delivery, synthetic, shadow, and field-feedback session modes with explicit production authorization.
+- [x] Add progressive-delivery, synthetic, shadow, and field-feedback session modes with explicit production authorization. Ledger modes with a recorded, expiring `production_authorization` and `qa-session` guidance (Q14, 2026-11-02; owner decision the same day).
 - [x] Feed confirmed escapes and incident evidence back into discovery models and regression charters. `qa-discover`'s escapes reference (Q12, 2026-10-29).
 - [ ] Define cross-session metrics with denominators, uncertainty, anti-gaming guardrails, and no individual ranking.
 
@@ -353,6 +353,18 @@ ledger-chaining hazard (Q02-F01) and a measured payload-discovery cost for Q07
 - **Follow-ups:**
   - [x] Q13-G01: Run against a service with a written contract through the installed plugin. 2 of 2 sessions met the done-when; the lane's first production-store detector gave a false failure (Q13-G01-O01, fixed and re-judged); `evals/results/q13-claude-code-2026-11-01.json`.
   - [ ] Q13-G02: Repeat on a system with no written contract and on one whose signals go to a local collector (traces, structured metrics), so diagnosability is judged without a contract table.
+
+### Q14 - Production session modes under recorded approval
+
+- **Status:** Done (2026-11-02). Against a local rollout simulator, the session with no approval and the one with an expired approval touched nothing in production and closed blocked; the one with a valid approval recorded it, stayed in scope, and stopped at the abort trigger without promoting or rolling back (Q14-G01)
+- **Importance:** High
+- **Complexity:** Medium
+- **Depends on:** Q13
+- **Approach:** M5's third item. The owner decided on 2026-11-02 that production work needs a recorded, expiring approval and is evaluated only against local simulations. The ledger adds the `progressive-delivery`, `synthetic`, `shadow` and `field-feedback` modes. Each one requires `production_authorization` (approver, approval and expiry times, environment, scope, blast radius, abort trigger, rollback). `session-create` refuses an expired approval, and after expiry `attempt-add` takes only `inconclusive`. `qa-session`'s session-design reference says never to invent or widen an approval, to act only within scope, and to stop at the abort trigger.
+- **Done when:** A session asked to check something in production starts only from an approval given for that work, records it unchanged, refuses an expired one, sends nothing to production outside its approved environment, never promotes or rolls back unless the scope names it, and stops at the abort trigger.
+- **Follow-ups:**
+  - [x] Q14-G01: Three cases (no approval, expired, valid in the simulator) through the installed plugin, met in 3 of 3; `evals/results/q14-claude-code-2026-11-02.json`.
+  - [ ] Q14-G02: Cover the `shadow` and `field-feedback` modes, an abort trigger that fires mid-run, an approval that expires during the session, and field data that carries personal data.
 
 ## Dependency and execution waves
 

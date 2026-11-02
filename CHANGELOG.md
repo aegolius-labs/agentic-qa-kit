@@ -10,6 +10,28 @@ computed version and promotes that section when it publishes.
 
 ### Added
 
+- Production session modes (Q14, M5): the ledger accepts the
+  `progressive-delivery`, `synthetic`, `shadow` and `field-feedback` modes.
+  Each one requires `production_authorization`, recorded from a person's
+  approval: approver, approval and expiry times, environment, scope, blast
+  radius, abort trigger and rollback. `session-create` refuses an expired
+  approval, and after expiry `attempt-add` accepts only `inconclusive`.
+  `qa-session`'s session-design reference adds the rules for these modes, and
+  `examples/production-session.json` shows the shape (owner decision
+  2026-11-02).
+- Q14-G01 lane: `scripts/q14_claude_code.py` runs no-approval, expired and
+  valid cases against a local rollout simulator. The 2026-11-02 result is in
+  `evals/results/q14-claude-code-2026-11-02.json`.
+
+### Changed
+
+- Four `qa-session` packs were trimmed by a few bytes each to fit the new
+  route within the activation budget.
+
+## [0.10.0] - 2026-11-01
+
+### Added
+
 - Observability session pack (Q13, M5): a `qa-session` reference for the
   `observability` quality attribute. It names the signal contract, triggers one
   documented failure at a time, and judges from logs and metrics alone, before

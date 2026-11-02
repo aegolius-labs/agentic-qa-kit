@@ -1,4 +1,4 @@
-# Accessibility, compatibility and i18n session pack
+# Accessibility, compatibility and i18n pack
 
 Use when a charter's quality attribute is `interaction-capability` or `compatibility`: accessibility, browser, OS and device support, localization and text handling.
 
@@ -24,7 +24,7 @@ Name:
 - the pages or components, states and full journeys in scope;
 - the populations and input modes considered, such as keyboard only, screen reader, zoom or reflow, touch, reduced motion, RTL script or an IME.
 
-Anything outside it stays unevaluated.
+Anything else stays unevaluated.
 
 ## Environment
 

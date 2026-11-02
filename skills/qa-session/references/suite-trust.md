@@ -1,4 +1,4 @@
-# Suite trust session pack
+# Suite trust pack
 
 Use when the question is whether a suite's verdicts can be trusted: flaky or order-dependent tests, retries, quarantine, hermeticity and entropy.
 
@@ -43,7 +43,7 @@ For a retry policy, report which observed failures it would hide.
 ## Uncertainty
 
 - N passing runs do not rule out a flake. Report N, the sources varied and the failure rate.
-- A failure reproduced under a fixed seed is deterministic. Record the seed.
+- A failure under a fixed seed is deterministic. Record the seed.
 - A source not varied is not evaluated.
 
 ## Stop conditions

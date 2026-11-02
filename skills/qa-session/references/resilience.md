@@ -1,4 +1,4 @@
-# Resilience and recovery session pack
+# Resilience and recovery pack
 
 Use when a charter's quality attribute is `reliability`: fault tolerance, degradation, recovery, backup and restore.
 
@@ -11,7 +11,7 @@ Inject faults only into processes, containers or data the session created. Each 
 - touching a backup;
 - any fault in staging or production.
 
-If the rollback is unknown, do not inject. Record the attempt as `inconclusive` and stop.
+Without a known rollback, do not inject. Record the attempt as `inconclusive` and stop.
 
 ## Fault model
 
@@ -30,7 +30,7 @@ Record:
 - data seed and state before the fault;
 - the health check used for "recovered".
 
-Take a baseline window before the fault.
+Take a baseline before the fault.
 
 ## Oracle
 

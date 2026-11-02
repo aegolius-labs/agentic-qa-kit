@@ -8,7 +8,7 @@ The design is derived from `Modern_Quality_Engineering_2026.md`: quality is a co
 
 - `qa-workflow`: orchestrate a full lifecycle or resume at a requested stage.
 - `qa-discover`: map the product context, codebase, execution surface, risks, quality attributes, and evidence gaps.
-- `qa-session`: plan and execute bounded functional, exploratory, regression, static, integration, or non-functional charters.
+- `qa-session`: plan and execute bounded functional, exploratory, regression, static, integration, or non-functional charters, and production-mode sessions (progressive delivery, synthetic, shadow, field feedback) only under a recorded, unexpired approval.
 - `qa-reproduce`: control, repeat, minimize, and classify a suspected anomaly.
 - `qa-report`: normalize attempts and findings into an evidence package and QA session report.
 - `qa-backlog-handoff`: generate a reviewed Bug payload and optionally feed it to Agentic Backlog Kit.

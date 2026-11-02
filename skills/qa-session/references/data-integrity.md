@@ -1,4 +1,4 @@
-# Data integrity session pack
+# Data integrity pack
 
 Use when a charter's quality attribute is `data-integrity`: validity, keys and references, invariants, paging, concurrency, persistence, events, pipelines and migrations.
 
@@ -39,7 +39,7 @@ Record:
 
 ## Uncertainty
 
-- An isolation level's name does not define behavior; the configured engine does.
+- An isolation level's name does not define behavior; the engine does.
 - A race absent in N runs is not ruled out. Report N and how it was forced.
 - A sample does not cover the full population.
 - A schema check proves shape, not meaning.
