@@ -138,6 +138,12 @@ missing file is counted, not failed, because evidence is often kept out of
 version control and a fresh clone lacks it; a missing file proves nothing
 either way.
 
+## Cross-session metrics
+
+`metrics` reads every closed session in the ledger and reports, overall and per group, counts of attempts by outcome, findings by status, obligation coverage, and three rates: attempts that ended `inconclusive` or `error`, confirmed findings among those that reached a verdict, and obligations exercised. Each rate carries its numerator, its denominator and a 95% Wilson score interval. A rate whose denominator is below 5 is withheld (`value: null`) with the reason. Sessions still open, and sessions whose receipt chain is broken, are excluded and counted under `scope.excluded`.
+
+Groups are properties of the work: `--by quality-attribute` (the default; a session with several attributes counts once in each, and `scope.groups_overlap` says so), `mode` or `risk-tier`. There is no grouping by person or agent, and the command never reads a production approver. The output repeats its guardrails: the numbers describe the QA process on this ledger, are not targets, and are not a product quality score or release authority.
+
 ## Concurrent writers
 
 Every change to a session holds an exclusive operating-system lock on `.session.lock` beside `session.json` for the whole read-modify-write, so parallel writers are serialized and none loses another's record. The lock is released when its holder exits, including after a crash. It covers processes on one machine sharing a local filesystem; network filesystems may not honor it.

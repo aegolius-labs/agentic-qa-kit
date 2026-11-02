@@ -25,6 +25,7 @@ python scripts/qa.py session-create --root PATH_TO_TARGET --input session.json
 python scripts/qa.py attempt-add SESSION_ID --root PATH_TO_TARGET --input attempt.json
 python scripts/qa.py finding-add SESSION_ID --root PATH_TO_TARGET --input finding.json
 python scripts/qa.py summary --root PATH_TO_TARGET --session SESSION_ID
+python scripts/qa.py metrics --root PATH_TO_TARGET --by quality-attribute
 python scripts/qa.py backlog-export SESSION_ID FINDING_ID --root PATH_TO_TARGET --input backlog-fields.json
 ```
 
