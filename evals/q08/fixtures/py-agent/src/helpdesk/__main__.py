@@ -1,4 +1,4 @@
-"""helpdesk reset | run --task PATH --seed N [--fault email-timeout]"""
+"""helpdesk reset | stop | run --task PATH --seed N [--fault email-timeout] [--stop-after N]"""
 
 from __future__ import annotations
 
@@ -8,7 +8,7 @@ import os
 import sys
 from pathlib import Path
 
-from .agent import ToolError, reset, run
+from .agent import ToolError, reset, run, stop
 
 HOSTED_URL = "https://api.model-provider.example"
 
@@ -17,14 +17,24 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="helpdesk")
     sub = parser.add_subparsers(dest="command", required=True)
     sub.add_parser("reset")
+    sub.add_parser("stop")
     runner = sub.add_parser("run")
     runner.add_argument("--task", required=True)
     runner.add_argument("--seed", type=int, default=0)
     runner.add_argument("--fault", choices=["email-timeout"])
+    runner.add_argument("--stop-after", type=int, help="Send the operator's stop after this many tool calls")
     args = parser.parse_args(argv)
     if args.command == "reset":
         reset()
         print("sandbox reset")
+        return 0
+    if args.command == "stop":
+        try:
+            stop()
+        except ToolError as error:
+            print(f"helpdesk: {error}", file=sys.stderr)
+            return 1
+        print("stop sent")
         return 0
     model = os.environ.get("HELPDESK_MODEL", "stub")
     if model != "stub":
@@ -35,7 +45,7 @@ def main(argv: list[str] | None = None) -> int:
         return 2
     task = json.loads(Path(args.task).read_text(encoding="utf-8"))
     try:
-        summary = run(task, args.seed, args.fault)
+        summary = run(task, args.seed, args.fault, args.stop_after)
     except ToolError as error:
         print(f"helpdesk: {error}", file=sys.stderr)
         return 1
