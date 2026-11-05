@@ -125,6 +125,9 @@ def trial_facts(sessions: Sequence[Mapping[str, Any]], seeds_run: Sequence[int])
                 return True
         return False
 
+    # Seeds the session ran: parsed from its commands, plus those its trials record. The fixture is
+    # deterministic, so a recorded seed fixes what a correct verdict for that trial must say.
+    seeds_run = sorted(set(seeds_run) | set(by_seed))
     leak_seeds = [s for s in seeds_run if leaks(s)]
     overrun_seeds = [s for s in seeds_run if overruns(s)]
     critical_elsewhere = [
@@ -143,6 +146,14 @@ def trial_facts(sessions: Sequence[Mapping[str, Any]], seeds_run: Sequence[int])
         "overrun_seeds_run": overrun_seeds,
         "overrun_seeds_cost_fail": [s for s in overrun_seeds if flagged(s, "cost", False)],
         "other_critical_flags": critical_elsewhere,
+        "confidentiality_fails_on_clean_seeds": sorted(
+            seed for seed, entries in by_seed.items() if not leaks(seed)
+            and any((d.get("confidentiality") or {}).get("outcome") == "fail" for d in entries)
+        ),
+        "seeds_judged_by_dimension": {
+            name: sorted(seed for seed, entries in by_seed.items() if any(name in d for d in entries))
+            for name in ("recovery",)
+        },
         "confidentiality_verdicts": {
             sid: report["charters"][cid]["dimensions"]["confidentiality"].get("verdict")
             for sid, report in reports.items()
@@ -163,14 +174,26 @@ def run_command(args: argparse.Namespace) -> None:
     revision = subprocess.run(
         ["git", "rev-parse", "HEAD"], cwd=PLUGIN_ROOT, capture_output=True, text=True, check=True
     ).stdout.strip()
+    if args.rejudge:
+        revision = json.loads((args.output / "result.json").read_text(encoding="utf-8"))["plugin_revision"]
     suite = load_suite(SUITE)
     prompt = suite["prompt"] + SUFFIX
     args.output.mkdir(parents=True, exist_ok=True)
     selected = [c for c in suite["cases"] if not args.case or c["id"] in args.case]
 
+    previous = {}
+    if args.rejudge:
+        previous = {r["case"]: r for r in json.loads((args.output / "result.json").read_text(encoding="utf-8"))["observations"]}
+
     def one(case: Mapping[str, Any]) -> dict[str, Any]:
         fixture = {**suite["fixture"], "id": f"{suite['fixture']['id']}-{case['id']}"}
-        record = run_fixture(fixture, prompt, args.output, env, runner=_run, timeout=args.timeout)
+        if args.rejudge:
+            record = dict(previous[case["id"]])
+            record["mechanical"] = {**record["mechanical"], "failures": [
+                f for f in record["mechanical"]["failures"] if not f.startswith("called the billed hosted model")
+            ]}
+        else:
+            record = run_fixture(fixture, prompt, args.output, env, runner=_run, timeout=args.timeout)
         stdout = (args.output / "raw" / f"{fixture['id']}.jsonl").read_text(encoding="utf-8")
         sessions, _ = read_ledger(args.output / "targets" / fixture["id"])
         mechanical = record["mechanical"]
@@ -210,6 +233,10 @@ def run_command(args: argparse.Namespace) -> None:
         ],
         "observations": records,
     }
+    if args.rejudge:
+        earlier = json.loads((args.output / "result.json").read_text(encoding="utf-8"))
+        result.update(recorded_at=earlier["recorded_at"], rejudged_at=_stamp(datetime.now(timezone.utc)),
+                      claude_code_version=earlier["claude_code_version"])
     (args.output / "result.json").write_text(json.dumps(result, indent=2) + "\n", encoding="utf-8")
     print(
         json.dumps(
@@ -240,6 +267,7 @@ def main(argv: Sequence[str] | None = None) -> None:
     parser.add_argument("--case", action="append", help="Run only this case (repeatable)")
     parser.add_argument("--timeout", type=int, default=1800, help="Seconds per session")
     parser.add_argument("--workers", type=int, default=2)
+    parser.add_argument("--rejudge", action="store_true", help="Re-judge the sessions already in --output; run nothing")
     run_command(parser.parse_args(argv))
 
 

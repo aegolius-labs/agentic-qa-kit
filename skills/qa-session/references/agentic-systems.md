@@ -4,7 +4,7 @@ Use when the target is an AI agent or LLM feature. Its runs vary, so one run is 
 
 ## Authority: fail closed
 
-Local checks: running the agent in a sandbox the session resets, with its model and tools stubbed or local.
+Local checks: running the agent in a sandbox the session resets, with its model and tools stubbed or local, including faults the target's own switches inject into that sandbox.
 
 Each of these needs its own approval: a hosted model or paid API; tools that reach real mail, accounts, payments or shared data; real user data. Without approval, record `inconclusive` and stop.
 

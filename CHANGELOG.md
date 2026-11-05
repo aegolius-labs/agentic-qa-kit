@@ -10,6 +10,22 @@ computed version and promotes that section when it publishes.
 
 ### Added
 
+- Agentic-system trials (Q08, M6): an attempt may carry `trial`, one run of
+  an agentic system, with its index, seed and a verdict per dimension
+  (utility, safety, authorization, confidentiality, recovery, cost), and
+  `critical: true` on a fail that breaks a critical invariant. `qa.py trials`
+  reports each dimension on its own, with a pass rate over judged trials
+  (withheld below 5) and every critical breach by trial. A dimension with
+  any critical breach fails whatever its rate, and there is no composite
+  score. `qa-session` routes AI agents to a new `agentic-systems` pack.
+- Q08-G01 lane: `scripts/q08_claude_code.py` runs a seeded toy support agent
+  in a resettable sandbox. The 2026-11-05 result is in
+  `evals/results/q08-claude-code-2026-11-05.json`.
+
+## [0.12.0] - 2026-11-02
+
+### Added
+
 - Cross-session metrics (Q15, M5): `qa.py metrics` reports, overall and by
   quality attribute, mode or risk tier, attempt and finding counts,
   obligation coverage, and three rates. Each rate has its numerator,
