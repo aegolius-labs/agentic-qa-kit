@@ -40,6 +40,9 @@ PRODUCTION_AUTHORIZATION_FIELDS = (
     "abort_trigger",
     "rollback",
 )
+# Q08: what each trial of an agentic system is judged on, independently.
+AGENTIC_DIMENSIONS = ("utility", "safety", "authorization", "confidentiality", "recovery", "cost")
+TRIAL_OUTCOMES = {"pass", "fail", "inconclusive"}
 SESSION_STATUSES = {"planned", "running", "completed", "blocked"}
 TERMINAL_SESSION_STATUSES = {"completed", "blocked"}
 # Version 2 adds the receipt chain (Q03). Version 1 sessions stay readable,
@@ -343,6 +346,7 @@ def validate_attempt(payload: dict[str, Any]) -> None:
             "oracle",
             "evidence",
             "obligation_ids",
+            "trial",
         },
         "attempt",
     )
@@ -368,6 +372,39 @@ def validate_attempt(payload: dict[str, Any]) -> None:
     if "obligation_ids" in payload:
         for index, value in enumerate(_expect_list(payload["obligation_ids"], "attempt.obligation_ids")):
             _expect_id(value, f"attempt.obligation_ids[{index}]")
+    if "trial" in payload:
+        validate_trial(payload["trial"])
+
+
+def validate_trial(trial: Any) -> None:
+    """One run of an agentic system, judged per dimension (Q08).
+
+    A dimension verdict marked `critical` is a breach of a critical invariant;
+    reports count it separately so no pass rate can average it away.
+    """
+
+    record = _expect_object(trial, "attempt.trial")
+    _reject_unknown(record, {"index", "seed", "dimensions"}, "attempt.trial")
+    _expect_int(record.get("index"), "attempt.trial.index", 1)
+    seed = record.get("seed")
+    if seed is not None and not isinstance(seed, (str, int)):
+        raise ValidationError("attempt.trial.seed must be a string or an integer")
+    dimensions = _expect_object(record.get("dimensions"), "attempt.trial.dimensions")
+    if not dimensions:
+        raise ValidationError("attempt.trial.dimensions must judge at least one dimension")
+    for name, verdict in dimensions.items():
+        path = f"attempt.trial.dimensions.{name}"
+        _expect_enum(name, set(AGENTIC_DIMENSIONS), "attempt.trial.dimensions key")
+        verdict = _expect_object(verdict, path)
+        _reject_unknown(verdict, {"outcome", "critical", "note"}, path)
+        outcome = _expect_enum(verdict.get("outcome"), TRIAL_OUTCOMES, f"{path}.outcome")
+        critical = verdict.get("critical", False)
+        if not isinstance(critical, bool):
+            raise ValidationError(f"{path}.critical must be a boolean")
+        if critical and outcome != "fail":
+            raise ValidationError(f"{path}.critical applies only to a fail")
+        if "note" in verdict:
+            _expect_string(verdict["note"], f"{path}.note")
 
 
 def normalize_attempt(payload: dict[str, Any]) -> dict[str, Any]:

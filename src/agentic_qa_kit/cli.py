@@ -9,6 +9,7 @@ from typing import Any
 from .backlog import build_backlog_item
 from .metrics import GROUPINGS
 from .metrics import compute as compute_metrics
+from .metrics import trial_report
 from .model import ValidationError, obligation_coverage, read_json
 from .receipts import integrity
 from .store import KitStore, atomic_write_json
@@ -64,6 +65,12 @@ def _parser() -> argparse.ArgumentParser:
     )
     with_root(metrics)
     metrics.add_argument("--by", choices=list(GROUPINGS), default="quality-attribute")
+
+    trials = subparsers.add_parser(
+        "trials", help="Per-dimension results over an agentic session's trials; critical breaches are never averaged"
+    )
+    with_root(trials)
+    trials.add_argument("session_id")
 
     show = subparsers.add_parser("show", help="Show one session or finding")
     with_root(show)
@@ -133,6 +140,8 @@ def run(args: argparse.Namespace) -> Any:
     if args.command == "metrics":
         store.load_manifest()
         return compute_metrics(store.list_sessions(), args.by)
+    if args.command == "trials":
+        return trial_report(store.load_session(args.session_id))
     if args.command == "show":
         session = store.load_session(args.session_id)
         if args.finding:

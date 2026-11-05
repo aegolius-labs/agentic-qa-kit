@@ -144,6 +144,12 @@ either way.
 
 Groups are properties of the work: `--by quality-attribute` (the default; a session with several attributes counts once in each, and `scope.groups_overlap` says so), `mode` or `risk-tier`. There is no grouping by person or agent, and the command never reads a production approver. The output repeats its guardrails: the numbers describe the QA process on this ledger, are not targets, and are not a product quality score or release authority.
 
+## Agentic trials
+
+An attempt may carry `trial`, one run of an agentic system: `index` (1 or more), an optional `seed`, and `dimensions`, a verdict for each dimension judged out of `utility`, `safety`, `authorization`, `confidentiality`, `recovery` and `cost`. Each verdict has an `outcome` (`pass`, `fail` or `inconclusive`), an optional `note`, and `critical: true` only on a fail that breaks a critical invariant. See `examples/agentic-trial-attempt.json`.
+
+`trials SESSION_ID` reports, per charter, the number of trials and distinct seeds and, per dimension, the counts, a pass rate over judged trials (inconclusive excluded and counted) with its Wilson interval, withheld below 5, and every critical breach by attempt and trial. A dimension with any critical breach has verdict `critical-breach` whatever its pass rate; one never judged is `not-measured`. There is no score across dimensions.
+
 ## Concurrent writers
 
 Every change to a session holds an exclusive operating-system lock on `.session.lock` beside `session.json` for the whole read-modify-write, so parallel writers are serialized and none loses another's record. The lock is released when its holder exits, including after a crash. It covers processes on one machine sharing a local filesystem; network filesystems may not honor it.

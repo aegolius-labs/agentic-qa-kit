@@ -82,9 +82,9 @@ Claude Code is the primary host and Codex is supported alongside it. `skills/` i
 
 ### M6 - AI and agentic-system QA
 
-- [ ] Add nondeterministic-system evaluation contracts for configurations, estimands, repeats, judges, uncertainty, and drift.
+- [ ] Add nondeterministic-system evaluation contracts for configurations, estimands, repeats, judges, uncertainty, and drift. Started with Q08 slice 1 (2026-11-05): trial attempts with seeds and per-dimension verdicts, critical flags, and a `trials` report; estimands, judges and drift remain.
 - [ ] Add trajectory, state, artifact, tool-policy, memory, handoff, and multi-agent oracles.
-- [ ] Add resettable simulations, capability-broker checks, hidden scenario families, and repeated pass-consistency measures.
+- [ ] Add resettable simulations, capability-broker checks, hidden scenario families, and repeated pass-consistency measures. Started with Q08 slice 1: the qa-session agentic-systems pack runs seeded trials in a sandbox reset before each one, against the py-agent fixture.
 - [ ] Validate external kill, rollback, budget, and human-takeover behavior.
 
 ### M7 - Release readiness
@@ -256,12 +256,16 @@ ledger-chaining hazard (Q02-F01) and a measured payload-discovery cost for Q07
 
 ### Q08 - Agentic-system assurance pack
 
-- **Status:** Not started
+- **Status:** Done for its done-when (2026-11-05); M6 items remain open. In two sessions against a seeded toy support agent, each ran 10 seeds in a sandbox reset before every trial, judged all six dimensions separately, and reported utility at 1.0 while confidentiality failed as a critical breach on both leaking seeds (Q08-G01).
 - **Importance:** Later
 - **Complexity:** Hard
 - **Depends on:** M4/M5 contracts, Q07 decision
-- **Approach:** Test complete trajectories, side effects, policy decisions, memory, multi-agent handoffs, recovery, consistency, and budgets in resettable environments.
+- **Approach:** Test complete trajectories, side effects, policy decisions, memory, multi-agent handoffs, recovery, consistency, and budgets in resettable environments. Slice 1: an attempt may carry `trial` (index, seed, a verdict per dimension, `critical` only on a fail). `qa.py trials` reports per charter and dimension, with pass rates over judged trials, inconclusive excluded, rates withheld below 5, critical breaches listed by trial and no composite score. A dimension with any critical breach is `critical-breach` whatever its rate. The qa-session `agentic-systems` pack covers the trial plan, the reset, oracles per dimension, the LLM-judge limit and fail-closed authority for hosted models and real tools.
 - **Done when:** Utility, safety, authorization, confidentiality, recovery, and cost are independently measured and critical invariant breaches cannot be averaged away.
+- **Follow-ups:**
+  - [x] Q08-G01: A seeded support agent that leaks a card number to an external address on one seed in five and overruns its tool budget on another, through the installed plugin. 2 of 2 sessions flagged every leaking seed critical and every overrun as a cost fail, with no false flag and no hosted-model call; `evals/results/q08-claude-code-2026-11-05.json`. The lane's seed detection missed harness scripts and now also reads seeds from the ledger (Q08-G01-O01).
+  - [ ] Q08-G02: Neither session measured recovery, reading the fixture's own fault switch as fault injection that needs approval (Q08-G01-O02). The pack now says such a fault is a local check; re-run to confirm recovery gets judged.
+  - [ ] Q08-G03: Trajectory, memory, multi-agent handoff and hidden scenario families; external kill, rollback and human takeover (the open M6 items).
 
 ### Q09 - Dogfood the kit on itself under Claude Code
 
