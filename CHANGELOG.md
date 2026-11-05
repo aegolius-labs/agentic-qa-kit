@@ -10,6 +10,22 @@ computed version and promotes that section when it publishes.
 
 ### Added
 
+- Rollback of partial side effects (Q08-G04, M6): a new `agentic-oracles`
+  reference, routed from the `agentic-systems` pack, adds state, trajectory and
+  rollback oracles. Sessions interrupt a multi-step task between its steps with
+  a fault and an operator stop, then check from sandbox state that earlier side
+  effects were undone, or that a stopped agent named what it left half done.
+  The py-agent fixture now records a credit note for each refund, gains
+  `--fault ledger-down` and `void_refund`, and on one seed in five keeps a
+  refund whose credit note failed. The Q08 lane replays recovery verdicts too,
+  and counts a control fail for the missing handoff on such a trial as valid.
+  In 2 of 2 sessions every such refund was flagged as a critical recovery fail,
+  with no false flag; `evals/results/q08-g04-claude-code-2026-11-05.json`.
+
+## [0.14.0] - 2026-11-05
+
+### Added
+
 - A seventh agentic dimension, `control` (Q08-G03): an operator's stop or
   takeover is obeyed at once, and work the policy reserves for a person goes
   to one. The `agentic-systems` pack counts stops sent through the target's own

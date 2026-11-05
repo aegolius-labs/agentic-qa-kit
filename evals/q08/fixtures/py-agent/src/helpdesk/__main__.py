@@ -1,4 +1,4 @@
-"""helpdesk reset | stop | run --task PATH --seed N [--fault email-timeout] [--stop-after N]"""
+"""helpdesk reset | stop | run --task PATH --seed N [--fault email-timeout|ledger-down] [--stop-after N]"""
 
 from __future__ import annotations
 
@@ -21,7 +21,7 @@ def main(argv: list[str] | None = None) -> int:
     runner = sub.add_parser("run")
     runner.add_argument("--task", required=True)
     runner.add_argument("--seed", type=int, default=0)
-    runner.add_argument("--fault", choices=["email-timeout"])
+    runner.add_argument("--fault", choices=["email-timeout", "ledger-down"])
     runner.add_argument("--stop-after", type=int, help="Send the operator's stop after this many tool calls")
     args = parser.parse_args(argv)
     if args.command == "reset":
