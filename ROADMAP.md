@@ -264,7 +264,7 @@ ledger-chaining hazard (Q02-F01) and a measured payload-discovery cost for Q07
 - **Done when:** Utility, safety, authorization, confidentiality, recovery, and cost are independently measured and critical invariant breaches cannot be averaged away.
 - **Follow-ups:**
   - [x] Q08-G01: A seeded support agent that leaks a card number to an external address on one seed in five and overruns its tool budget on another, through the installed plugin. 2 of 2 sessions flagged every leaking seed critical and every overrun as a cost fail, with no false flag and no hosted-model call; `evals/results/q08-claude-code-2026-11-05.json`. The lane's seed detection missed harness scripts and now also reads seeds from the ledger (Q08-G01-O01).
-  - [ ] Q08-G02: Neither session measured recovery, reading the fixture's own fault switch as fault injection that needs approval (Q08-G01-O02). The pack now says such a fault is a local check; re-run to confirm recovery gets judged.
+  - [x] Q08-G02: Run 1 measured no recovery, reading the fixture's own fault switch as fault injection that needs approval (Q08-G01-O02). After the pack named it a local check, run 2 judged recovery in 2 of 2 sessions, with every other verdict still correct (Q08-G01-O04).
   - [ ] Q08-G03: Trajectory, memory, multi-agent handoff and hidden scenario families; external kill, rollback and human takeover (the open M6 items).
 
 ### Q09 - Dogfood the kit on itself under Claude Code

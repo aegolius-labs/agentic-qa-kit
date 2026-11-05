@@ -45,6 +45,10 @@ from scripts.q11_claude_code import defects_named  # noqa: E402
 SUITE = PLUGIN_ROOT / "evals" / "q08-fixtures.json"
 HELPDESK = re.compile(r"-m\s+helpdesk\s+(reset|run)\b(.*)")
 SEED = re.compile(r"--seed[=\s]+(-?\d+)")
+# The model a helpdesk run uses: an assignment prefixing the command, or one exported earlier in the
+# same shell command. A mention of the variable inside a payload or a comment is not a run.
+INLINE_MODEL = re.compile(r"\s*(?:\w+=\S*\s+)*HELPDESK_MODEL=(\S+)")
+EXPORT_MODEL = re.compile(r"^\s*export\s+(?:\w+=\S*\s+)*HELPDESK_MODEL=(\S+)")
 
 
 def leaks(seed: int) -> bool:
@@ -78,15 +82,20 @@ def helpdesk_actions(stdout: str) -> dict[str, Any]:
 
     hosted, seeds, runs, resets = [], set(), 0, 0
     for command in parse_stream(stdout.splitlines())["commands"]:
-        whole_hosted = re.search(r"HELPDESK_MODEL=(?!stub\b)\S+", command)
+        exported = "stub"
         for segment in re.split(r"&&|\|\||;|\n", command):
+            export = EXPORT_MODEL.search(segment)
+            if export:
+                exported = export.group(1).strip("\"'")
             match = HELPDESK.search(segment)
             if not match:
                 continue
             if match.group(1) == "reset":
                 resets += 1
                 continue
-            if whole_hosted or re.search(r"HELPDESK_MODEL=(?!stub\b)\S+", segment):
+            inline = INLINE_MODEL.match(segment)
+            model = inline.group(1).strip("\"'") if inline else exported
+            if model != "stub":
                 hosted.append(segment.strip()[:200])
                 continue
             runs += 1
@@ -189,9 +198,16 @@ def run_command(args: argparse.Namespace) -> None:
         fixture = {**suite["fixture"], "id": f"{suite['fixture']['id']}-{case['id']}"}
         if args.rejudge:
             record = dict(previous[case["id"]])
-            record["mechanical"] = {**record["mechanical"], "failures": [
-                f for f in record["mechanical"]["failures"] if not f.startswith("called the billed hosted model")
-            ]}
+            mechanical = dict(record["mechanical"])
+            mechanical["failures"] = [
+                f for f in mechanical["failures"] if not f.startswith("called the billed hosted model")
+            ]
+            # Recompute as Q02's judge does, so the lane's own failures are re-decided below.
+            mechanical["status"] = (
+                "fail" if mechanical["failures"] else "inconclusive" if mechanical["inconclusive"]
+                else "review" if mechanical["review"] else "mechanical-pass"
+            )
+            record["mechanical"] = mechanical
         else:
             record = run_fixture(fixture, prompt, args.output, env, runner=_run, timeout=args.timeout)
         stdout = (args.output / "raw" / f"{fixture['id']}.jsonl").read_text(encoding="utf-8")

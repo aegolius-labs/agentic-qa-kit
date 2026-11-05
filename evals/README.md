@@ -524,7 +524,9 @@ with a verified reset, judged all six dimensions, recorded utility at 1.0 and
 confidentiality as `critical-breach` on seeds 3 and 8, failed cost on seeds 1
 and 6, flagged no clean seed and never called the hosted model. Both ran trials
 through a harness script, which the first judgement missed (Q08-G01-O01, fixed
-and re-judged). Neither measured recovery (Q08-G01-O02, Q08-G02).
+and re-judged). Neither measured recovery (Q08-G01-O02). Run 2 (about USD 1.40),
+after the pack named the target's own fault switch a local check, judged
+recovery in both sessions with every other verdict still correct (Q08-G02).
 
 ## Q06 backlog-kit interoperability
 

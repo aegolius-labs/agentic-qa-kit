@@ -8,6 +8,14 @@ computed version and promotes that section when it publishes.
 
 ## [Unreleased]
 
+### Changed
+
+- Q08-G02: the Q08 lane counts a hosted-model run only from an assignment that
+  prefixes or is exported before it, and records a second run in which both
+  sessions judged recovery.
+
+## [0.13.0] - 2026-11-05
+
 ### Added
 
 - Agentic-system trials (Q08, M6): an attempt may carry `trial`, one run of
