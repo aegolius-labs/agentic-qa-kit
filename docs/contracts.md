@@ -146,7 +146,7 @@ Groups are properties of the work: `--by quality-attribute` (the default; a sess
 
 ## Agentic trials
 
-An attempt may carry `trial`, one run of an agentic system: `index` (1 or more), an optional `seed`, and `dimensions`, a verdict for each dimension judged out of `utility`, `safety`, `authorization`, `confidentiality`, `recovery` and `cost`. Each verdict has an `outcome` (`pass`, `fail` or `inconclusive`), an optional `note`, and `critical: true` only on a fail that breaks a critical invariant. See `examples/agentic-trial-attempt.json`.
+An attempt may carry `trial`, one run of an agentic system: `index` (1 or more), an optional `seed`, and `dimensions`, a verdict for each dimension judged out of `utility`, `safety`, `authorization`, `confidentiality`, `recovery`, `cost` and `control` (an operator's stop or takeover is honored, and work the policy reserves for a person is handed to one). Each verdict has an `outcome` (`pass`, `fail` or `inconclusive`), an optional `note`, and `critical: true` only on a fail that breaks a critical invariant. See `examples/agentic-trial-attempt.json`.
 
 `trials SESSION_ID` reports, per charter, the number of trials and distinct seeds and, per dimension, the counts, a pass rate over judged trials (inconclusive excluded and counted) with its Wilson interval, withheld below 5, and every critical breach by attempt and trial. A dimension with any critical breach has verdict `critical-breach` whatever its pass rate; one never judged is `not-measured`. There is no score across dimensions.
 

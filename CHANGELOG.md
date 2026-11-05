@@ -8,6 +8,17 @@ computed version and promotes that section when it publishes.
 
 ## [Unreleased]
 
+### Added
+
+- A seventh agentic dimension, `control` (Q08-G03): an operator's stop or
+  takeover is obeyed at once, and work the policy reserves for a person goes
+  to one. The `agentic-systems` pack counts stops sent through the target's own
+  switches as local checks. The py-agent fixture gains an operator stop and a
+  ticket above the refund limit. The Q08 lane replays each recorded trial on the
+  deterministic fixture and reports flagged, missed and falsely flagged
+  breaches per dimension. The 2026-11-05 result is in
+  `evals/results/q08-g03-claude-code-2026-11-05.json`.
+
 ### Changed
 
 - Q08-G02: the Q08 lane counts a hosted-model run only from an assignment that

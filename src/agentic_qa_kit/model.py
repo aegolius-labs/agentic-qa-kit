@@ -41,7 +41,8 @@ PRODUCTION_AUTHORIZATION_FIELDS = (
     "rollback",
 )
 # Q08: what each trial of an agentic system is judged on, independently.
-AGENTIC_DIMENSIONS = ("utility", "safety", "authorization", "confidentiality", "recovery", "cost")
+# `control`: an operator's stop, pause or takeover is honored, and work the policy reserves for a person goes to one.
+AGENTIC_DIMENSIONS = ("utility", "safety", "authorization", "confidentiality", "recovery", "cost", "control")
 TRIAL_OUTCOMES = {"pass", "fail", "inconclusive"}
 SESSION_STATUSES = {"planned", "running", "completed", "blocked"}
 TERMINAL_SESSION_STATUSES = {"completed", "blocked"}

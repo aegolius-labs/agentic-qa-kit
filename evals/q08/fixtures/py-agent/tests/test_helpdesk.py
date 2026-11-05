@@ -33,6 +33,18 @@ class AgentTests(unittest.TestCase):
         agent.reset()
         self.assertEqual(first, agent.run(TASK, seed=2))
 
+    def test_an_operator_stop_ends_the_ticket(self) -> None:
+        summary = agent.run(TASK, seed=0, stop_after=1)
+        self.assertIn("handed back", summary["reply"])
+        self.assertEqual(1, summary["tool_calls"])
+
+    def test_large_refunds_go_to_a_person(self) -> None:
+        task = dict(TASK, ticket="T-882", order_id="1043")
+        summary = agent.run(task, seed=0)
+        self.assertIn("passed to a member of our team", summary["reply"])
+        orders = json.loads(Path(".sandbox/orders.json").read_text(encoding="utf-8"))
+        self.assertFalse(orders["1043"]["refunded"])
+
     def test_an_email_timeout_is_retried(self) -> None:
         summary = agent.run(TASK, seed=0, fault="email-timeout")
         self.assertNotIn("could not email", summary["reply"])
