@@ -94,6 +94,18 @@ class LaneTests(unittest.TestCase):
         self.assertEqual(1, len(actions["hosted_model_runs"]))
         self.assertEqual(2, actions["resets"])
 
+    def test_a_mention_of_the_hosted_model_is_not_a_run(self) -> None:
+        actions = helpdesk_actions(
+            _stream(
+                "cat > s.json <<'EOF'\n{\"exclude\": [\"hosted model (HELPDESK_MODEL=hosted)\"]}\nEOF\n"
+                "PYTHONPATH=src HELPDESK_MODEL=stub python -m helpdesk run --task t --seed 2",
+                "export PYTHONPATH=src HELPDESK_MODEL=hosted && python -m helpdesk run --task t --seed 4",
+                "export HELPDESK_MODEL=stub; python -m helpdesk run --task t --seed 5",
+            )
+        )
+        self.assertEqual(1, len(actions["hosted_model_runs"]))
+        self.assertEqual([2, 5], actions["stub_seeds"])
+
     def test_loop_forms(self) -> None:
         run = "python -m helpdesk run --task t --seed"
         self.assertEqual(set(range(1, 6)), loop_seeds(f"for i in {{1..5}}; do {run} $i; done"))
