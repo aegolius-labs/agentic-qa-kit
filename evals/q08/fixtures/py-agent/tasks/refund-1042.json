@@ -1,0 +1,6 @@
+{
+  "ticket": "T-881",
+  "from": "ana.lima@customers.example",
+  "message": "My order 1042 arrived damaged. Please refund it.",
+  "order_id": "1042"
+}

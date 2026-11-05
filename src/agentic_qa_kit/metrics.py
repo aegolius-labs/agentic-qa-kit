@@ -15,7 +15,7 @@ from __future__ import annotations
 import math
 from typing import Any, Iterable
 
-from .model import ATTEMPT_OUTCOMES, FINDING_STATUSES, ValidationError, obligation_coverage
+from .model import AGENTIC_DIMENSIONS, ATTEMPT_OUTCOMES, FINDING_STATUSES, ValidationError, obligation_coverage
 from .receipts import integrity
 
 GROUPINGS = ("quality-attribute", "mode", "risk-tier")
@@ -117,3 +117,53 @@ def compute(sessions: Iterable[dict[str, Any]], by: str = "quality-attribute") -
         "groups": {key: _group(members) for key, members in sorted(groups.items())},
         "guardrails": GUARDRAILS,
     }
+
+
+TRIAL_GUARDRAILS = [
+    "Each dimension is reported on its own; there is no composite score across dimensions.",
+    "A critical breach fails its dimension whatever the pass rate, and is listed by trial.",
+    f"A pass rate on fewer than {MIN_DENOMINATOR} judged trials is withheld.",
+    "Inconclusive verdicts are excluded from the pass rate's denominator and counted.",
+]
+
+
+def trial_report(session: dict[str, Any]) -> dict[str, Any]:
+    """Per-charter, per-dimension results over an agentic session's trials (Q08)."""
+
+    charters: dict[str, dict[str, Any]] = {}
+    for attempt in session["attempts"]:
+        trial = attempt.get("trial")
+        if not trial:
+            continue
+        entry = charters.setdefault(attempt["charter_id"], {"trials": set(), "seeds": set(), "dimensions": {}})
+        entry["trials"].add(trial["index"])
+        if trial.get("seed") is not None:
+            entry["seeds"].add(str(trial["seed"]))
+        for name, verdict in trial["dimensions"].items():
+            counts = entry["dimensions"].setdefault(
+                name, {"pass": 0, "fail": 0, "inconclusive": 0, "critical_breaches": []}
+            )
+            counts[verdict["outcome"]] += 1
+            if verdict.get("critical"):
+                counts["critical_breaches"].append({"attempt": attempt["id"], "trial": trial["index"]})
+    report = {}
+    for charter_id, entry in sorted(charters.items()):
+        dimensions = {}
+        for name in AGENTIC_DIMENSIONS:
+            counts = entry["dimensions"].get(name)
+            if counts is None:
+                dimensions[name] = {"judged": 0, "verdict": "not-measured"}
+                continue
+            judged = counts["pass"] + counts["fail"]
+            dimensions[name] = {
+                **counts,
+                "judged": judged,
+                "pass_rate": rate(counts["pass"], judged),
+                "verdict": "critical-breach" if counts["critical_breaches"] else "measured",
+            }
+        report[charter_id] = {
+            "trials": len(entry["trials"]),
+            "distinct_seeds": len(entry["seeds"]),
+            "dimensions": dimensions,
+        }
+    return {"session": session["id"], "charters": report, "guardrails": TRIAL_GUARDRAILS}
