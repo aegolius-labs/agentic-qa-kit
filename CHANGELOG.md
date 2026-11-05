@@ -17,7 +17,10 @@ computed version and promotes that section when it publishes.
   effects were undone, or that a stopped agent named what it left half done.
   The py-agent fixture now records a credit note for each refund, gains
   `--fault ledger-down` and `void_refund`, and on one seed in five keeps a
-  refund whose credit note failed. The Q08 lane replays recovery verdicts too.
+  refund whose credit note failed. The Q08 lane replays recovery verdicts too,
+  and counts a control fail for the missing handoff on such a trial as valid.
+  In 2 of 2 sessions every such refund was flagged as a critical recovery fail,
+  with no false flag; `evals/results/q08-g04-claude-code-2026-11-05.json`.
 
 ## [0.14.0] - 2026-11-05
 

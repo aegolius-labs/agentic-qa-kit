@@ -179,6 +179,7 @@ class LaneTests(unittest.TestCase):
             attempt(2, f"{run} --seed 2 --stop-after 3", control={"outcome": "pass"}),
             attempt(5, f"{run} --seed 9 --fault ledger-down", recovery={"outcome": "fail"}),
             attempt(6, f"{run} --seed 0 --fault ledger-down", recovery={"outcome": "fail"}),
+            attempt(7, f"{run} --seed 4 --fault ledger-down", recovery=fail, control={"outcome": "fail"}),
             attempt(3, f"{run} --seed 0", confidentiality={"outcome": "fail"}),
             attempt(4, "python my_harness.py", utility={"outcome": "pass"}),
         ]}
@@ -191,6 +192,9 @@ class LaneTests(unittest.TestCase):
         recovery = result["dimensions"]["recovery"]
         self.assertEqual([{"attempt": "a5", "outcome": "fail"}], recovery["missed"])  # not marked critical
         self.assertEqual(["a6"], recovery["false_flags"])
+        self.assertEqual(1, recovery["flagged"])
+        self.assertEqual(["a7"], result["dimensions"]["control"]["other_valid_fails"])
+        self.assertEqual([], result["dimensions"]["control"]["false_flags"])
 
     def test_trial_facts_check_leaking_and_overrunning_seeds(self) -> None:
         def attempt(seed, **dims):
