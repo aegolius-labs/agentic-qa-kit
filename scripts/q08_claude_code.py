@@ -52,7 +52,7 @@ from scripts.q05_claude_code import SUFFIX, ledger_outcomes  # noqa: E402
 from scripts.q11_claude_code import defects_named  # noqa: E402
 
 SUITE = PLUGIN_ROOT / "evals" / "q08-fixtures.json"
-HELPDESK = re.compile(r"-m\s+helpdesk\s+(reset|run)\b(.*)")
+HELPDESK = re.compile(r"(?:-m\s+|(?<![\w./-]))helpdesk\s+(reset|run)\b(.*)")
 SEED = re.compile(r"--seed[=\s]+(-?\d+)")
 # The model a helpdesk run uses: an assignment prefixing the command, or one exported earlier in the
 # same shell command. A mention of the variable inside a payload or a comment is not a run.

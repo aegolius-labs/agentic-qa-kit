@@ -166,6 +166,9 @@ class LaneTests(unittest.TestCase):
         self.assertFalse(replay(f"{run} --task tasks/refund-1043.json --seed 3")["leak"])
         self.assertIsNone(replay(f"{run} --task tasks/other.json --seed 1"))
         self.assertIsNone(replay("python -m unittest"))
+        # A session's own wrapper named helpdesk replays the same as `python -m helpdesk`.
+        self.assertTrue(replay("cd $(mktemp -d) && helpdesk reset && helpdesk run --task tasks/refund-1042.json --seed 3")["leak"])
+        self.assertIsNone(replay("cat src/helpdesk/run.py"))
 
     def test_replay_agreement_counts_misses_and_false_flags(self) -> None:
         run = "python -m helpdesk run --task tasks/refund-1042.json"
