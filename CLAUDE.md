@@ -7,13 +7,17 @@ This file adds only what differs when the host is Claude Code.
 
 ## Organization authority model
 
-This repository is one of three related Aegolius Labs repositories. The
-normative statement of which repository owns which kind of truth is
-`doc/authority-model.md` in `aegolius-labs/aio-agentic-sdlc`.
+`aio-agentic-sdlc` is the organization's end product: a framework whose backlog
+is the diff between intended and actual software. This kit closes its loop with
+QA evidence and is also used on its own. The normative statement of which
+repository owns which kind of truth is `doc/authority-model.md` in
+`aegolius-labs/aio-agentic-sdlc`.
 
 In the composed system this kit owns **layer 5**: evidence about reality. It does
-not decide disposition on its own and does not manage a backlog. A finding has
-exactly two legitimate dispositions:
+not decide disposition and does not manage a backlog. The framework chooses a
+finding's disposition when it consumes the finding, and records the choice and
+the reason (owner decision, 2026-11-11). A finding has exactly two legitimate
+dispositions:
 
 - `revert-node` — the defect falls inside existing accepted intent, so the
   responsible Intention DAG node is reverted to an open state and the work
@@ -22,9 +26,12 @@ exactly two legitimate dispositions:
 - `bug-handoff` — the defect falls outside modeled intent, or this kit is being
   used standalone. Emit one Bug payload for Agentic Backlog Kit ingestion.
 
-Record which disposition was chosen and why. Emitting a Bug payload for a defect
-that belongs to an existing accepted node creates a second competing record of
-the same work and is a contract violation.
+This kit supplies the evidence for that choice: the confirmed finding, its
+reproduction and its limitations. The ledger has no disposition field for it,
+and the contract between the two repositories (Seam B) is not built yet.
+Emitting a Bug payload for a defect that belongs to an existing accepted node
+creates a second competing record of the same work and is a contract violation,
+so inside a full pipeline do not hand off a Bug before the framework has chosen.
 
 Used standalone, `bug-handoff` is the only disposition available. That is a
 supported configuration, not a degraded mode.
@@ -36,6 +43,9 @@ The plugin ships one manifest per host, and they must agree:
 - `.codex-plugin/plugin.json` — Codex
 - `.claude-plugin/plugin.json` — Claude Code
 - `.claude-plugin/marketplace.json` — Claude Code marketplace entry
+
+Antigravity is the organization's third supported host and has no manifest
+here yet (roadmap item Q16).
 
 `skills/` is the single source of truth for behavior and is auto-discovered by
 both hosts. Do not fork skill content per host.

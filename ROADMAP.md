@@ -1,12 +1,12 @@
 # Agentic QA Kit Roadmap
 
-Last updated: 2026-10-22
+Last updated: 2026-11-11
 
 ## Product goal
 
-Create a host-portable QA plugin that can autonomously perform full or partial, risk-based quality workflows across diverse codebases while producing reproducible evidence and safe backlog handoffs. The repository remains the QA component of a broader agentic SDLC suite; backlog operations stay in `agentic-backlog-kit`.
+Create a host-portable QA plugin that can autonomously perform full or partial, risk-based quality workflows across diverse codebases while producing reproducible evidence and safe backlog handoffs. The repository is the QA component of the Aegolius Labs suite, whose end product is the `aio-agentic-sdlc` framework: the kit closes that framework's loop by returning evidence about reality, and it stays usable on its own. Backlog operations stay in `agentic-backlog-kit`.
 
-Claude Code is the primary host and Codex is supported alongside it. `skills/` is the single source of truth for behavior on both; a per-host manifest carries only packaging and provenance. Skill content is never forked per host, and a host-specific divergence is recorded as a limitation rather than resolved by duplicating a skill.
+Claude Code, Codex and Antigravity are equally supported hosts (owner decision, 2026-11-02, in the organization's CONTRIBUTING.md). Claude Code is the lane the evaluations run on, Codex has a manifest and less evidence (Q10), and Antigravity has no manifest yet (Q16). `skills/` is the single source of truth for behavior on every host; a per-host manifest carries only packaging and provenance. Skill content is never forked per host, and a host-specific divergence is recorded as a limitation rather than resolved by duplicating a skill.
 
 ## Progress rules
 
@@ -28,6 +28,7 @@ Claude Code is the primary host and Codex is supported alongside it. `skills/` i
 - Discovery is read-only by default. Writes, destructive operations, production exposure, sensitive data, external messages, and unbounded cost require explicit authorization.
 - No MCP server is planned until evaluations demonstrate a missing controlled capability or an unacceptable tool/context cost.
 - Backlog handoff produces a confirmed Bug payload only. Agentic Backlog Kit owns planning and synchronization.
+- Composed with `aio-agentic-sdlc`, the framework chooses whether a finding reopens an Intention node (`revert-node`) or becomes a Bug (`bug-handoff`), and records that choice (owner decision, 2026-11-11). This kit supplies the evidence and does not choose. Standalone, `bug-handoff` is the only disposition.
 
 ## Milestones
 
@@ -382,6 +383,24 @@ ledger-chaining hazard (Q02-F01) and a measured payload-discovery cost for Q07
 - **Follow-ups:**
   - [x] Q15-G01: Seeded ledger plus a request to name the top tester, through the installed plugin. Run 1's lane judged the seeded sessions (Q15-G01-O01, fixed); run 2 met the done-when in 2 of 2; `evals/results/q15-claude-code-2026-11-02.json`.
   - [ ] Q15-G02: Add escapes per release and time-to-confirm once the ledger records release identity and escape links, and repeat on a ledger large enough that no group is withheld.
+
+### Q16 - Add Antigravity as a supported host
+
+- **Status:** Not started. Added 2026-11-11: the owner confirmed the missing manifest is a gap against the organization's three-host rule.
+- **Importance:** Medium
+- **Complexity:** Easy
+- **Depends on:** Nothing
+- **Approach:** Add `.antigravity-plugin/plugin.json` over the same `skills/`, using only fields its schema lists, as `agentic-backlog-kit` and `agentic-product-playbook` do. Extend `tests/test_host_manifest_parity.py` to cover it, and state in the README which hosts are validated.
+- **Done when:** `agy plugin validate .` passes, the parity test covers three manifests, no skill content is forked, and the README and `CLAUDE.md` name the validated hosts.
+
+### Q17 - Supply evidence across Seam B
+
+- **Status:** Not started; blocked on the contract. Added 2026-11-11.
+- **Importance:** High
+- **Complexity:** Medium
+- **Depends on:** `aio-agentic-sdlc` ROADMAP M5 defining the Seam B contract and fixture
+- **Approach:** Export a confirmed finding in the versioned form the framework reads, with a fixture held byte-identical in both repositories as for Seam A. The framework chooses and records the disposition; this kit adds no disposition of its own. Q09's done-when had the kit disposition its own defects, which was written before that decision.
+- **Done when:** The framework can read a confirmed finding from this kit's export, map it to an Intention node or report it unmapped, and the standalone Bug handoff is unchanged.
 
 ## Dependency and execution waves
 
