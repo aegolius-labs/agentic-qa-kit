@@ -10,6 +10,14 @@ computed version and promotes that section when it publishes.
 
 ### Added
 
+- Antigravity host manifest (Q16, in progress): `.antigravity-plugin/plugin.json`
+  describes the plugin over the same `skills/`, declaring no version, as in
+  `agentic-backlog-kit`. `tests/test_host_manifest_parity.py` now requires it,
+  checks its identity against the Codex and Claude Code manifests, and pins the
+  published schema's key list because `agy plugin validate` accepts unknown
+  keys. Not yet validated: `agy plugin validate .` has not been run and the
+  plugin has not been installed in Antigravity.
+
 - Rollback of partial side effects (Q08-G04, M6): a new `agentic-oracles`
   reference, routed from the `agentic-systems` pack, adds state, trajectory and
   rollback oracles. Sessions interrupt a multi-step task between its steps with

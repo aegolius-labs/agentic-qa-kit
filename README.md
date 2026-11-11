@@ -1,6 +1,6 @@
 # Agentic QA Kit
 
-Agentic QA Kit is a plugin for evidence-centered software quality assurance, supported on Claude Code and Codex, with Antigravity planned (roadmap item Q16). It equips agents to discover unfamiliar codebases, design risk-based QA work, run bounded sessions, identify and reproduce defects, preserve auditable evidence, and hand confirmed work to a backlog system.
+Agentic QA Kit is a plugin for evidence-centered software quality assurance, supported on Claude Code and Codex, with an Antigravity manifest added but not yet validated (roadmap item Q16). It equips agents to discover unfamiliar codebases, design risk-based QA work, run bounded sessions, identify and reproduce defects, preserve auditable evidence, and hand confirmed work to a backlog system.
 
 The design is derived from `Modern_Quality_Engineering_2026.md`: quality is a contextual claim supported by versioned evidence, not a test count or a green dashboard.
 
@@ -39,8 +39,8 @@ This repository does not manage a backlog. `qa-backlog-handoff` emits one `Bug` 
 
 `skills/` is the single source of truth for behavior on every host and is
 auto-discovered. Each host reads its own thin manifest: `.claude-plugin/` for
-Claude Code, `.codex-plugin/plugin.json` for Codex. Skill content is never forked
-per host.
+Claude Code, `.codex-plugin/plugin.json` for Codex, `.antigravity-plugin/plugin.json`
+for Antigravity. Skill content is never forked per host.
 
 Claude Code, from a checkout of this repository's parent directory:
 
@@ -68,6 +68,12 @@ at `0.1.0` and says it is already up to date; uninstall and install it once.
 For Codex, add this plugin to a local or repository marketplace and install it
 from the Plugins Directory.
 
+Antigravity, from a checkout: `agy plugin install ./agentic-qa-kit`. This
+manifest is added but **not yet validated**: `agy plugin validate .` and an
+install have not been run, because the `agy` CLI was not available where it was
+written (roadmap item Q16). Only the parity test has checked it, against the
+schema's key list.
+
 ## Limitations
 
 What 0.1.0 does not establish, so nobody has to infer it:
@@ -79,9 +85,12 @@ What 0.1.0 does not establish, so nobody has to infer it:
   [the lane result](evals/README.md#claude-code-lane-results).
 - **Codex is supported but less evidenced.** The Codex lane's observations are
   inconclusive on provenance (roadmap item Q10).
-- **Antigravity is not supported yet.** The organization supports Claude Code,
-  Codex and Antigravity equally, and this kit has no Antigravity manifest
-  (roadmap item Q16).
+- **Antigravity is added but not yet validated.** The organization supports
+  Claude Code, Codex and Antigravity equally. This kit has an Antigravity
+  manifest (`.antigravity-plugin/plugin.json`), checked only by the parity test
+  against the published schema's key list. `agy plugin validate .` has not been
+  run and the plugin has not been installed or exercised in Antigravity
+  (roadmap item Q16, in progress).
 - **The ledger trusts the agent.** It validates structure and history rules, but
   it does not run tests or check that evidence files say what an attempt
   claims. Evidence digests are optional.
