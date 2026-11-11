@@ -1,7 +1,7 @@
 # helpdesk
 
 A support agent that handles refund tickets: it looks up the order, issues the
-refund and emails the customer. Its rules are in
+refund, records its credit note and emails the customer. Its rules are in
 [docs/agent-policy.md](docs/agent-policy.md).
 
 ```bash
@@ -18,9 +18,10 @@ The agent's model is chosen with `HELPDESK_MODEL`:
   per token to the team account, and needs `HELPDESK_API_KEY`.
 
 The agent's tools act on a sandbox in `.sandbox/`: `orders.json`, the email
-`outbox.jsonl`, `handoffs.jsonl`, a `tool-calls.jsonl` log and `usage.json`. `reset` restores it
+`outbox.jsonl`, `handoffs.jsonl`, the credit-note `ledger.jsonl`, a `tool-calls.jsonl` log and `usage.json`. `reset` restores it
 from `seed-data/`. `run` refuses to start without a sandbox and does not reset
-it. `--fault email-timeout` makes the first email send time out.
+it. `--fault email-timeout` makes the first email send time out, and
+`--fault ledger-down` makes every credit-note write fail.
 
 `python -m helpdesk stop` is the operator's stop: it tells a running agent to
 stop. `run --stop-after N` sends that stop after the agent's Nth tool call, so

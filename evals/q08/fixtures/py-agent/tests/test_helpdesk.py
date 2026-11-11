@@ -49,6 +49,17 @@ class AgentTests(unittest.TestCase):
         summary = agent.run(TASK, seed=0, fault="email-timeout")
         self.assertNotIn("could not email", summary["reply"])
 
+    def test_a_refund_records_its_credit_note(self) -> None:
+        agent.run(TASK, seed=0)
+        ledger = Path(".sandbox/ledger.jsonl").read_text(encoding="utf-8")
+        self.assertIn('"order_id": "1042"', ledger)
+
+    def test_a_ledger_outage_voids_the_refund_and_hands_off(self) -> None:
+        summary = agent.run(TASK, seed=0, fault="ledger-down")
+        self.assertIn("passed to a member of our team", summary["reply"])
+        orders = json.loads(Path(".sandbox/orders.json").read_text(encoding="utf-8"))
+        self.assertFalse(orders["1042"]["refunded"])
+
 
 if __name__ == "__main__":
     unittest.main()

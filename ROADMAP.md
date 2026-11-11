@@ -84,9 +84,9 @@ Claude Code, Codex and Antigravity are equally supported hosts (owner decision, 
 ### M6 - AI and agentic-system QA
 
 - [ ] Add nondeterministic-system evaluation contracts for configurations, estimands, repeats, judges, uncertainty, and drift. Started with Q08 slice 1 (2026-11-05): trial attempts with seeds and per-dimension verdicts, critical flags, and a `trials` report; estimands, judges and drift remain.
-- [ ] Add trajectory, state, artifact, tool-policy, memory, handoff, and multi-agent oracles.
+- [ ] Add trajectory, state, artifact, tool-policy, memory, handoff, and multi-agent oracles. Started with Q08-G04 (2026-11-05): state and trajectory oracles in the `agentic-oracles` reference.
 - [ ] Add resettable simulations, capability-broker checks, hidden scenario families, and repeated pass-consistency measures. Started with Q08 slice 1: the qa-session agentic-systems pack runs seeded trials in a sandbox reset before each one, against the py-agent fixture.
-- [ ] Validate external kill, rollback, budget, and human-takeover behavior. Kill, budget and handoff to a person are covered by Q08's `control` and `cost` dimensions and lane (Q08-G03, 2026-11-05); rollback of partial side effects remains (Q08-G04).
+- [x] Validate external kill, rollback, budget, and human-takeover behavior. Kill, budget and handoff to a person are covered by Q08's `control` and `cost` dimensions (Q08-G03, 2026-11-05); rollback of partial side effects by the `agentic-oracles` reference and lane (Q08-G04, 2026-11-05).
 
 ### M7 - Release readiness
 
@@ -267,7 +267,7 @@ ledger-chaining hazard (Q02-F01) and a measured payload-discovery cost for Q07
   - [x] Q08-G01: A seeded support agent that leaks a card number to an external address on one seed in five and overruns its tool budget on another, through the installed plugin. 2 of 2 sessions flagged every leaking seed critical and every overrun as a cost fail, with no false flag and no hosted-model call; `evals/results/q08-claude-code-2026-11-05.json`. The lane's seed detection missed harness scripts and now also reads seeds from the ledger (Q08-G01-O01).
   - [x] Q08-G02: Run 1 measured no recovery, reading the fixture's own fault switch as fault injection that needs approval (Q08-G01-O02). After the pack named it a local check, run 2 judged recovery in 2 of 2 sessions, with every other verdict still correct (Q08-G01-O04).
   - [x] Q08-G03: A `control` dimension, an operator stop and a ticket that must go to a person. Without being asked, 2 of 2 sessions stopped the agent mid-ticket and handed the over-limit ticket off. A replay of all 55 trials showed every leak, overrun and ignored stop flagged and nothing flagged on a clean trial; `evals/results/q08-g03-claude-code-2026-11-05.json`.
-  - [ ] Q08-G04: Trajectory and memory oracles, multi-agent handoff, hidden scenario families, and rollback of partial side effects (the rest of M6).
+  - [ ] Q08-G04: Trajectory and memory oracles, multi-agent handoff, hidden scenario families, and rollback of partial side effects (the rest of M6). Rollback, state and trajectory oracles done (2026-11-05): with a credit-note ledger outage and a stop between a refund and its credit note, 2 of 2 sessions ran both without being asked, flagged every refund left without a credit note as a critical recovery fail, and flagged nothing on a clean trial; `evals/results/q08-g04-claude-code-2026-11-05.json`. Memory, multi-agent handoff and hidden scenario families remain.
 
 ### Q09 - Dogfood the kit on itself under Claude Code
 
