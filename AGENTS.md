@@ -2,7 +2,7 @@
 
 ## Purpose
 
-This repository packages host-portable agent skills and a deterministic, dependency-free Python evidence ledger for autonomous and assisted software quality assurance. Claude Code is the primary host and Codex is supported alongside it; `skills/` is the single source of truth for behavior on both.
+This repository packages host-portable agent skills and a deterministic, dependency-free Python evidence ledger for autonomous and assisted software quality assurance. Claude Code, Codex and Antigravity are the organization's supported hosts. This kit ships manifests for Claude Code and Codex so far, and its evaluation evidence is from Claude Code; the Antigravity manifest is roadmap item Q16. `skills/` is the single source of truth for behavior on every host.
 
 ## Invariants
 

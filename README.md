@@ -1,6 +1,6 @@
 # Agentic QA Kit
 
-Agentic QA Kit is a plugin for evidence-centered software quality assurance, supported on Claude Code and Codex. It equips agents to discover unfamiliar codebases, design risk-based QA work, run bounded sessions, identify and reproduce defects, preserve auditable evidence, and hand confirmed work to a backlog system.
+Agentic QA Kit is a plugin for evidence-centered software quality assurance, supported on Claude Code and Codex, with Antigravity planned (roadmap item Q16). It equips agents to discover unfamiliar codebases, design risk-based QA work, run bounded sessions, identify and reproduce defects, preserve auditable evidence, and hand confirmed work to a backlog system.
 
 The design is derived from `Modern_Quality_Engineering_2026.md`: quality is a contextual claim supported by versioned evidence, not a test count or a green dashboard.
 
@@ -79,6 +79,9 @@ What 0.1.0 does not establish, so nobody has to infer it:
   [the lane result](evals/README.md#claude-code-lane-results).
 - **Codex is supported but less evidenced.** The Codex lane's observations are
   inconclusive on provenance (roadmap item Q10).
+- **Antigravity is not supported yet.** The organization supports Claude Code,
+  Codex and Antigravity equally, and this kit has no Antigravity manifest
+  (roadmap item Q16).
 - **The ledger trusts the agent.** It validates structure and history rules, but
   it does not run tests or check that evidence files say what an attempt
   claims. Evidence digests are optional.
@@ -87,6 +90,10 @@ What 0.1.0 does not establish, so nobody has to infer it:
 - **No backlog of its own.** Handoff produces one Agentic Backlog Kit `Bug`
   payload. Ingestion and GitHub synchronization happen in that kit, under its
   plan and confirmation rules.
+- **No return path into aio-agentic-sdlc yet.** Inside that framework, a
+  finding should usually reopen the responsible Intention node instead of
+  becoming a Bug, and the framework makes that choice. That contract (Seam B)
+  is not built on either side, so today the kit hands off Bugs only.
 - **Known open findings** are tracked in [ROADMAP.md](ROADMAP.md), including
   the Q09 self-QA results.
 
