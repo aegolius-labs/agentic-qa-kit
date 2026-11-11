@@ -43,15 +43,20 @@ The plugin ships one manifest per host, and they must agree:
 - `.codex-plugin/plugin.json` — Codex
 - `.claude-plugin/plugin.json` — Claude Code
 - `.claude-plugin/marketplace.json` — Claude Code marketplace entry
+- `.antigravity-plugin/plugin.json` — Antigravity
 
-Antigravity is the organization's third supported host and has no manifest
-here yet (roadmap item Q16).
+The Antigravity manifest declares no version and no `skills` key, like the
+Claude Code ones. Antigravity's schema is closed but `agy plugin validate`
+accepts unknown keys silently, so the parity test pins the schema's key list.
+As of Q16 the manifest exists but `agy plugin validate .` has not been run
+(no `agy` CLI where it was added), so Antigravity is not yet a validated host.
 
 `skills/` is the single source of truth for behavior and is auto-discovered by
-both hosts. Do not fork skill content per host.
+all three hosts. Do not fork skill content per host.
 `tests/test_host_manifest_parity.py` enforces that `name` and `description`
 agree across manifests, that only the Codex manifest declares a version, and
-that both hosts discover the same skills. The Codex manifest currently carries
+that every host discovers the same skills, and that the Antigravity manifest
+stays within its published schema keys. The Codex manifest currently carries
 an evaluation-provenance suffix after `+`, which is deliberate and referenced by
 Q01.
 

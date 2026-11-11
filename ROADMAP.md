@@ -6,7 +6,7 @@ Last updated: 2026-11-11
 
 Create a host-portable QA plugin that can autonomously perform full or partial, risk-based quality workflows across diverse codebases while producing reproducible evidence and safe backlog handoffs. The repository is the QA component of the Aegolius Labs suite, whose end product is the `aio-agentic-sdlc` framework: the kit closes that framework's loop by returning evidence about reality, and it stays usable on its own. Backlog operations stay in `agentic-backlog-kit`.
 
-Claude Code, Codex and Antigravity are equally supported hosts (owner decision, 2026-11-02, in the organization's CONTRIBUTING.md). Claude Code is the lane the evaluations run on, Codex has a manifest and less evidence (Q10), and Antigravity has no manifest yet (Q16). `skills/` is the single source of truth for behavior on every host; a per-host manifest carries only packaging and provenance. Skill content is never forked per host, and a host-specific divergence is recorded as a limitation rather than resolved by duplicating a skill.
+Claude Code, Codex and Antigravity are equally supported hosts (owner decision, 2026-11-02, in the organization's CONTRIBUTING.md). Claude Code is the lane the evaluations run on, Codex has a manifest and less evidence (Q10), and Antigravity has a manifest that is not yet validated (Q16). `skills/` is the single source of truth for behavior on every host; a per-host manifest carries only packaging and provenance. Skill content is never forked per host, and a host-specific divergence is recorded as a limitation rather than resolved by duplicating a skill.
 
 ## Progress rules
 
@@ -386,7 +386,7 @@ ledger-chaining hazard (Q02-F01) and a measured payload-discovery cost for Q07
 
 ### Q16 - Add Antigravity as a supported host
 
-- **Status:** Not started. Added 2026-11-11: the owner confirmed the missing manifest is a gap against the organization's three-host rule.
+- **Status:** In progress (2026-11-11). Added 2026-11-11: the owner confirmed the missing manifest is a gap against the organization's three-host rule. Done so far: `.antigravity-plugin/plugin.json` over the shared `skills/`, and `tests/test_host_manifest_parity.py` covering three manifests (existence, identity, closed key list, no version). Outstanding: `agy plugin validate .` has NOT been run (the `agy` CLI was not available where this was written); the owner runs it on a machine with Antigravity. The README states Antigravity is added but not yet validated. Next proof required: the `agy plugin validate .` result, then the README and `CLAUDE.md` can name Antigravity as validated.
 - **Importance:** Medium
 - **Complexity:** Easy
 - **Depends on:** Nothing

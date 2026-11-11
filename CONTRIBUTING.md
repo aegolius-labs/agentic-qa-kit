@@ -22,7 +22,7 @@ python scripts/validate_plugin.py
 python scripts/budgets.py --check
 ```
 
-`skills/` is the single source of truth for both hosts. Do not fork skill
+`skills/` is the single source of truth for every host. Do not fork skill
 content per host.
 
 Commits intended for `main` use Conventional Commits, and the squash-merge
